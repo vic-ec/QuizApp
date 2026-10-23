@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X-ray Quiz — Host</title>
+<style>
+  :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;
+        --accent:#4f8cff;--ok:#2ecc71;--bad:#e74c3c;--warn:#f1c40f;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .layout{display:grid;grid-template-columns:1fr 340px;gap:16px;padding:16px;min-height:100vh}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  h1{margin:0;font-size:22px}
+  h2{margin:0 0 10px;font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .big{font-size:48px;font-weight:800;line-height:1}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:12px 16px;cursor:pointer;background:#2b3642;color:var(--text)}
+  button.primary{background:var(--accent);color:#fff}
+  button.ok{background:var(--ok);color:#06220f}
+  button.warn{background:var(--warn);color:#2a2400}
+  button.danger{background:var(--bad);color:#fff}
+  button.xl{font-size:22px;padding:18px 26px}
+  button:disabled{opacity:.4;cursor:default}
+  input{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
+  .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .g{border:2px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-weight:600;position:relative}
+  .g.done{border-color:var(--ok);background:#163d2b}
+  .g.right{border-color:var(--ok);background:#163d2b}
+  .g.wrong{border-color:var(--bad);background:#4a1f1b}
+  .g .c{font-size:28px;display:block;margin-top:4px}
+  .g .x{position:absolute;top:4px;right:8px;color:var(--muted);cursor:pointer;font-weight:400;font-size:12px}
+  .bar{display:flex;align-items:center;gap:10px;margin:8px 0}
+  .bar .n{width:140px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar .t{flex:1;background:#0f1419;border-radius:8px;height:30px;overflow:hidden}
+  .bar .f{height:100%;background:var(--accent);border-radius:8px;transition:width .4s;min-width:2px}
+  .bar .s{width:60px;text-align:right;font-weight:700}
+  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .d{background:#0f1419;border-radius:10px;padding:12px;text-align:center;border:2px solid var(--line)}
+  .d.correct{border-color:var(--ok)}
+  .d b{font-size:26px;display:block}
+  .key{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+  .key .k{display:flex;align-items:center;gap:4px;font-size:13px}
+  .key .k span{width:24px;color:var(--muted)}
+  .key .k button{padding:6px 0;width:30px;font-size:13px;background:#0f1419;border:1px solid var(--line)}
+  .key .k button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .muted{color:var(--muted);font-size:13px}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600}
+  .pill.open{background:#1d2f4d;color:#9cc0ff}.pill.locked{background:#3a3415;color:var(--warn)}.pill.revealed{background:#163d2b;color:var(--ok)}
+  #qr{background:#fff;padding:8px;border-radius:8px;width:fit-content}
+  .net{position:fixed;left:0;right:0;bottom:0;background:#4a1f1b;color:#ff8a7f;text-align:center;padding:8px;display:none}
+  a{color:#9cc0ff}
+</style>
+</head>
+<body>
+<div id="gate" class="card" style="max-width:360px;margin:60px auto">
+  <h1>Host login</h1>
+  <p class="muted">Enter the host PIN.</p>
+  <input id="pin" type="password" placeholder="PIN" style="width:100%;font-size:20px">
+  <button class="primary" id="login" style="width:100%;margin-top:10px">Enter</button>
+  <p id="pinerr" style="color:#ff8a7f"></p>
+</div>
+<div id="app" class="layout" style="display:none"></div>
+<div class="net" id="net">Connection lost — retrying…</div>
+
+<script src="vendor-supabase.js"></script>
+<script src="vendor-qrcode.js"></script>
+<script src="config.js"></script>
+<script>
+const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
+const app = document.getElementById('app'), net = document.getElementById('net');
+let pin = sessionStorage.getItem('quiz_pin') || '';
+let st=null, groups=[], answers=[], key={}, correct=null, keyOpen=false;
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+async function act(action, value={}){
+  const {data,error} = await sb.rpc('host_action',{p_pin:pin,p_action:action,p_value:value});
+  if(error){ alert(error.message); throw error; }
+  return data;
+}
+
+async function login(){
+  const p = document.getElementById('pin').value.trim();
+  const {error} = await sb.rpc('host_action',{p_pin:p,p_action:'ping'});
+  if(error){ document.getElementById('pinerr').textContent = error.message; return; }
+  pin = p; sessionStorage.setItem('quiz_pin', p);
+  start();
+}
+document.getElementById('login').onclick = login;
+document.getElementById('pin').addEventListener('keydown',e=>{if(e.key==='Enter') login();});
+
+async function start(){
+  document.getElementById('gate').style.display='none';
+  app.style.display='grid';
+  key = await act('get_key');
+  sb.channel('host')
+    .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},load)
+    .on('postgres_changes',{event:'*',schema:'public',table:'answers'},load)
+    .on('postgres_changes',{event:'*',schema:'public',table:'groups'},load)
+    .subscribe();
+  setInterval(load, 3000);
+  load();
+}
+
+async function load(){
+  try{
+    const {data:s,error} = await sb.from('quiz_state').select('*').eq('id',1).single();
+    if(error) throw error;
+    st = s;
+    const [g,a] = await Promise.all([
+      sb.from('groups').select('name').eq('session_id',s.session_id).order('joined_at'),
+      sb.from('answers').select('group_name,question,choice,is_correct').eq('session_id',s.session_id)
+    ]);
+    groups = (g.data||[]).map(r=>r.name);
+    answers = a.data||[];
+    correct = s.revealed ? (await sb.rpc('revealed_answer',{p_question:s.current_question})).data : null;
+    net.style.display='none';
+  }catch(e){ net.style.display='block'; }
+  render();
+}
+
+let lastSig = '';
+function render(force){
+  if(!st) return;
+  const sig = JSON.stringify([st,groups,answers,correct,key,keyOpen]);
+  if(!force && sig===lastSig) return;   // nothing changed — don't disturb inputs
+  lastSig = sig;
+  // preserve typed values across re-render
+  const keep = {}; ['sname','newpin','total','goto'].forEach(id=>{const el=document.getElementById(id); if(el && document.activeElement===el) keep[id]=el.value;});
+  const q = st.current_question;
+  const cur = {}; answers.filter(a=>a.question===q).forEach(a=>cur[a.group_name]=a);
+  const done = groups.filter(g=>cur[g]).length;
+  const status = st.revealed?'revealed':st.locked?'locked':'open';
+  const keyCur = key[q];
+
+  // leaderboard
+  const revealedN = (q-1)+(st.revealed?1:0);
+  const scores = groups.map(g=>({g, s:answers.filter(a=>a.group_name===g&&a.is_correct===true).length}))
+                       .sort((x,y)=>y.s-x.s||x.g.localeCompare(y.g));
+  const maxS = Math.max(1,revealedN);
+  const dist = {A:0,B:0,C:0,D:0}; Object.values(cur).forEach(a=>dist[a.choice]++);
+
+  const candidateUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
+
+  app.innerHTML = `
+  <div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <h1>${esc(st.session_name)}</h1>
+          <span class="pill ${status}">${status.toUpperCase()}</span>
+          ${keyCur?'':'<span class="pill" style="background:#4a1f1b;color:#ff8a7f">No answer key for Q'+q+'</span>'}
+        </div>
+        <div style="text-align:right">
+          <div class="big">Q${q}<span style="font-size:20px;color:var(--muted)"> / ${st.total_questions}</span></div>
+          <div class="muted">${done} of ${groups.length} groups answered</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button id="prev" ${q<=1?'disabled':''}>◀ Prev</button>
+        ${st.locked?'<button class="warn" id="unlock">Unlock</button>':'<button class="warn xl" id="lock">🔒 Lock answers</button>'}
+        <button class="ok xl" id="reveal" ${st.revealed||!keyCur?'disabled':''}>✓ Reveal (${keyCur||'?'})</button>
+        <button class="primary xl" id="next" ${q>=st.total_questions?'disabled':''}>Next ▶</button>
+      </div>
+      <p class="muted" style="margin:10px 0 0">Flow: candidates answer → <b>Lock</b> when all ticks are green (or time is up) → click to the answer in Canva → <b>Reveal</b> here → <b>Next</b>.</p>
+    </div>
+
+    <div class="card">
+      <h2>Groups — question ${q}</h2>
+      ${groups.length?'':'<p class="muted">No groups have joined this session yet. Show them the QR code →</p>'}
+      <div class="groups">
+        ${groups.map(g=>{
+          const a=cur[g]; let cls='g';
+          if(a){ cls += st.revealed ? (a.is_correct?' right':' wrong') : ' done'; }
+          return `<div class="${cls}"><span class="x" data-g="${esc(g)}" title="Remove group">✕</span>${esc(g)}<span class="c">${a?(st.revealed||st.locked?a.choice:'✓'):'…'}</span></div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Leaderboard <span class="muted" style="text-transform:none">(${revealedN} question${revealedN===1?'':'s'} revealed)</span></h2>
+      ${scores.map(x=>`<div class="bar"><div class="n">${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.s/maxS*100).toFixed(0)}%"></div></div><div class="s">${x.s}</div></div>`).join('')||'<p class="muted">—</p>'}
+      <p class="muted"><a href="board.html" target="_blank">Open full-screen leaderboard for the projector ↗</a></p>
+    </div>
+
+    <div class="card">
+      <h2>Answer spread — question ${q}</h2>
+      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${st.revealed&&o===correct?'correct':''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>Join link</h2>
+      <div id="qr"></div>
+      <p style="word-break:break-all;margin:8px 0 0"><a href="${candidateUrl}" target="_blank">${candidateUrl}</a></p>
+    </div>
+    <div class="card">
+      <h2>Session</h2>
+      <div class="row"><input id="sname" placeholder="e.g. Group 2 — 10:00" style="flex:1"><button class="danger" id="newsess">New session</button></div>
+      <p class="muted">Starts a fresh session: Q1, no groups, no scores. Previous results stay in the database.</p>
+      <div class="row" style="margin-top:8px"><label class="muted">Total questions</label><input id="total" type="number" min="1" max="100" value="${st.total_questions}" style="width:80px"><button id="settotal">Set</button></div>
+      <div class="row" style="margin-top:8px"><label class="muted">Jump to Q</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:80px"><button id="gotobtn">Go</button></div>
+    </div>
+    <div class="card">
+      <h2>Answer key <button id="togglekey" style="padding:4px 10px;font-size:12px">${keyOpen?'hide':'edit'}</button></h2>
+      <p class="muted">${Object.keys(key).length} of ${st.total_questions} set. Keep this hidden while candidates can see your screen.</p>
+      <div class="key" style="${keyOpen?'':'display:none'}">
+        ${Array.from({length:st.total_questions},(_,i)=>i+1).map(n=>`<div class="k"><span>${n}</span>${['A','B','C','D'].map(o=>`<button class="${key[n]===o?'on':''}" data-q="${n}" data-o="${o}">${o}</button>`).join('')}</div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h2>Security</h2>
+      <div class="row"><input id="newpin" placeholder="New PIN" style="flex:1"><button id="setpin">Change PIN</button></div>
+      <p class="muted"><a href="#" id="logout">Log out</a></p>
+    </div>
+  </div>`;
+
+  new QRCode(document.getElementById('qr'),{text:candidateUrl,width:160,height:160});
+  Object.entries(keep).forEach(([id,v])=>{const el=document.getElementById(id); if(el){el.value=v; el.focus();}});
+
+  const on=(id,fn)=>{const el=document.getElementById(id); if(el) el.onclick=fn;};
+  on('lock',()=>act('lock').then(load));
+  on('unlock',()=>act('unlock').then(load));
+  on('reveal',()=>act('reveal').then(load));
+  on('next',()=>act('next').then(load));
+  on('prev',()=>act('prev').then(load));
+  on('newsess',()=>{ if(confirm('Start a new session? Current groups and scores will be cleared from the screen.')) act('new_session',{name:document.getElementById('sname').value}).then(load); });
+  on('settotal',()=>act('set_total',{total:+document.getElementById('total').value}).then(load));
+  on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
+  on('togglekey',()=>{keyOpen=!keyOpen;render(true);});
+  on('setpin',async()=>{const p=document.getElementById('newpin').value.trim(); await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); alert('PIN changed');});
+  on('logout',(e)=>{e.preventDefault();sessionStorage.removeItem('quiz_pin');location.reload();});
+  app.querySelectorAll('.key button').forEach(b=>b.onclick=async()=>{
+    const n=b.dataset.q,o=b.dataset.o; const v=(key[n]===o)?'':o;
+    await act('set_key',{[n]:v}); if(v) key[n]=v; else delete key[n]; render(true);
+  });
+  app.querySelectorAll('.g .x').forEach(x=>x.onclick=()=>{ if(confirm('Remove group "'+x.dataset.g+'" from this session?')) act('remove_group',{name:x.dataset.g}).then(load); });
+}
+
+if(pin) start();
+</script>
+</body>
+</html>

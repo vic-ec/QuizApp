@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>X-ray Quiz</title>
+<style>
+  :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;
+        --accent:#4f8cff;--ok:#2ecc71;--bad:#e74c3c;--warn:#f1c40f;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+       min-height:100vh;display:flex;flex-direction:column}
+  .wrap{max-width:520px;width:100%;margin:0 auto;padding:16px;flex:1;display:flex;flex-direction:column;gap:14px}
+  .top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted)}
+  .top b{color:var(--text)}
+  .q{font-size:34px;font-weight:700;text-align:center;margin:6px 0 0}
+  .status{text-align:center;font-size:15px;color:var(--muted);min-height:22px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  button.opt{font-size:40px;font-weight:700;padding:34px 0;border-radius:16px;border:2px solid var(--line);
+             background:var(--card);color:var(--text);cursor:pointer;transition:.12s}
+  button.opt:active{transform:scale(.97)}
+  button.opt.sel{border-color:var(--accent);background:#1d2f4d}
+  button.opt.correct{border-color:var(--ok);background:#163d2b}
+  button.opt.wrong{border-color:var(--bad);background:#4a1f1b}
+  button.opt:disabled{cursor:default;opacity:.85}
+  .banner{border-radius:12px;padding:14px;text-align:center;font-size:18px;font-weight:600}
+  .banner.lock{background:#3a3415;color:var(--warn)}
+  .banner.ok{background:#163d2b;color:var(--ok)}
+  .banner.bad{background:#4a1f1b;color:#ff8a7f}
+  .banner.wait{background:var(--card);color:var(--muted);font-weight:500}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  input{width:100%;font-size:20px;padding:14px;border-radius:10px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
+  .btn{width:100%;font-size:18px;font-weight:600;padding:14px;border-radius:10px;border:0;background:var(--accent);color:#fff;margin-top:10px}
+  .net{position:fixed;left:0;right:0;bottom:0;background:#4a1f1b;color:#ff8a7f;text-align:center;padding:8px;font-size:14px;display:none}
+  .small{font-size:13px;color:var(--muted);text-align:center}
+  a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="net" id="net">Connection lost — retrying…</div>
+
+<script src="vendor-supabase.js"></script>
+<script src="config.js"></script>
+<script>
+const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
+const app = document.getElementById('app');
+const net = document.getElementById('net');
+
+let group = localStorage.getItem('quiz_group') || '';
+let st = null;            // quiz_state row
+let mine = {};            // question -> {choice,is_correct}
+let correct = null;       // revealed answer for current question
+let pending = null;       // optimistic choice
+let knownSession = null;
+let busy = false;
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+async function load(){
+  try{
+    const {data:s, error} = await sb.from('quiz_state').select('*').eq('id',1).single();
+    if(error) throw error;
+    st = s;
+    if(group){
+      if(knownSession !== s.session_id){
+        await sb.rpc('join_group',{p_group:group});
+        knownSession = s.session_id;
+      }
+      const {data:a} = await sb.from('answers').select('question,choice,is_correct')
+        .eq('session_id', s.session_id).eq('group_name', group);
+      mine = {}; (a||[]).forEach(r=>mine[r.question]=r);
+      if(s.revealed){
+        const {data:c} = await sb.rpc('revealed_answer',{p_question:s.current_question});
+        correct = c;
+      } else correct = null;
+      if(pending && mine[s.current_question]) pending = null;
+    }
+    net.style.display='none';
+  }catch(e){
+    net.style.display='block';
+  }
+  render();
+}
+
+function score(){
+  let n=0; for(const q in mine) if(mine[q].is_correct===true) n++; return n;
+}
+function revealedCount(){
+  if(!st) return 0;
+  return (st.current_question-1) + (st.revealed?1:0);
+}
+
+function render(){
+  if(!group){
+    app.innerHTML = `
+      <div class="card">
+        <h2 style="margin:0 0 6px">X-ray Quiz</h2>
+        <p class="small" style="text-align:left;margin:0 0 14px">Enter your group name exactly as given. Keep this page open; if you lose connection just reload — you'll land back on the current question.</p>
+        <input id="g" placeholder="Group name" maxlength="40" autocomplete="off">
+        <button class="btn" id="join">Join</button>
+      </div>`;
+    const inp = document.getElementById('g');
+    inp.focus();
+    const join = async()=>{
+      const v = inp.value.trim(); if(!v) return;
+      group = v; localStorage.setItem('quiz_group', v); knownSession=null; await load();
+    };
+    document.getElementById('join').onclick = join;
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter') join();});
+    return;
+  }
+  if(!st){ app.innerHTML = `<div class="banner wait">Connecting…</div>`; return; }
+
+  const q = st.current_question;
+  const my = mine[q] ? mine[q].choice : pending;
+  let banner='';
+  if(st.revealed){
+    if(!mine[q]) banner = `<div class="banner bad">No answer submitted. Correct answer: ${correct||'?'}</div>`;
+    else if(mine[q].is_correct===true) banner = `<div class="banner ok">Correct! Answer: ${correct}</div>`;
+    else banner = `<div class="banner bad">Not quite — correct answer: ${correct||'?'}</div>`;
+    banner += `<div class="banner wait">Waiting for the next question…</div>`;
+  } else if(st.locked){
+    banner = `<div class="banner lock">Answers locked${my?` — you chose ${my}`:' — you did not answer'}</div>`;
+  } else if(my){
+    banner = `<div class="banner wait">Answer <b>${my}</b> saved. You can change it until the host locks.</div>`;
+  } else {
+    banner = `<div class="banner wait">Choose an answer</div>`;
+  }
+
+  const opts = ['A','B','C','D'].map(o=>{
+    let cls='opt';
+    if(st.revealed){ if(o===correct) cls+=' correct'; else if(o===my) cls+=' wrong'; }
+    else if(o===my) cls+=' sel';
+    const dis = st.locked || st.revealed ? 'disabled':'';
+    return `<button class="${cls}" data-o="${o}" ${dis}>${o}</button>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="top"><span>Group: <b>${esc(group)}</b></span><span>Score <b>${score()}</b>/${revealedCount()}</span></div>
+    <div class="q">Question ${q} <span style="color:var(--muted);font-size:20px">of ${st.total_questions}</span></div>
+    <div class="status">${esc(st.session_name)}</div>
+    <div class="grid">${opts}</div>
+    ${banner}
+    <div class="small"><a href="#" id="leave">Change group</a></div>`;
+
+  app.querySelectorAll('button.opt').forEach(b=>b.onclick=()=>choose(b.dataset.o));
+  document.getElementById('leave').onclick=(e)=>{e.preventDefault(); if(confirm('Change group name?')){localStorage.removeItem('quiz_group');group='';mine={};render();}};
+}
+
+async function choose(o){
+  if(busy) return; busy=true;
+  pending = o; render();
+  const {error} = await sb.rpc('submit_answer',{p_group:group,p_choice:o});
+  busy=false;
+  if(error){ pending=null; alert(error.message); }
+  await load();
+}
+
+// Realtime + polling fallback
+sb.channel('cand')
+  .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},()=>load())
+  .on('postgres_changes',{event:'*',schema:'public',table:'answers'},(p)=>{ if(p.new && p.new.group_name===group) load(); })
+  .subscribe();
+setInterval(load, QUIZ_CONFIG.pollMs);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) load(); });
+window.addEventListener('online', load);
+load();
+</script>
+</body>
+</html>

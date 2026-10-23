@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaderboard</title>
+<style>
+  body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:5vh 6vw}
+  h1{font-size:5vw;margin:0 0 1vh}
+  .sub{color:#8d9aa8;font-size:2.2vw;margin-bottom:4vh}
+  .bar{display:flex;align-items:center;gap:2vw;margin:2.2vh 0}
+  .n{width:28vw;font-size:3.2vw;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .t{flex:1;background:#1a2129;border-radius:1.5vw;height:7vh;overflow:hidden}
+  .f{height:100%;background:#4f8cff;border-radius:1.5vw;transition:width .6s;min-width:.5vw}
+  .bar:first-child .f{background:#f1c40f}
+  .s{width:8vw;text-align:right;font-size:3.6vw;font-weight:800}
+</style>
+</head>
+<body>
+<h1 id="title">Leaderboard</h1>
+<div class="sub" id="sub"></div>
+<div id="list"></div>
+<script src="vendor-supabase.js"></script>
+<script src="config.js"></script>
+<script>
+const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+async function load(){
+  const {data:st} = await sb.from('quiz_state').select('*').eq('id',1).single();
+  if(!st) return;
+  const [g,a] = await Promise.all([
+    sb.from('groups').select('name').eq('session_id',st.session_id),
+    sb.from('answers').select('group_name,is_correct').eq('session_id',st.session_id)
+  ]);
+  const groups=(g.data||[]).map(r=>r.name), answers=a.data||[];
+  const revealedN=(st.current_question-1)+(st.revealed?1:0);
+  const scores=groups.map(n=>({n,s:answers.filter(x=>x.group_name===n&&x.is_correct===true).length})).sort((x,y)=>y.s-x.s||x.n.localeCompare(y.n));
+  document.getElementById('title').textContent=st.session_name+' — Leaderboard';
+  document.getElementById('sub').textContent=revealedN+' of '+st.total_questions+' questions revealed';
+  document.getElementById('list').innerHTML=scores.map(x=>`<div class="bar"><div class="n">${esc(x.n)}</div><div class="t"><div class="f" style="width:${(x.s/Math.max(1,revealedN)*100).toFixed(0)}%"></div></div><div class="s">${x.s}</div></div>`).join('');
+}
+sb.channel('board')
+  .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},load)
+  .on('postgres_changes',{event:'*',schema:'public',table:'answers'},load)
+  .on('postgres_changes',{event:'*',schema:'public',table:'groups'},load)
+  .subscribe();
+setInterval(load,3000); load();
+</script>
+</body>
+</html>
