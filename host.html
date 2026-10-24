@@ -117,7 +117,7 @@
 const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
-let st=null, players=[], answers=[], correct=null, clockOffset=0;
+let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
 let quizzes=[], editing=null;              // editing = working copy of a quiz in the editor
 let view = 'home';                          // home | edit | play | settings
 const candidateUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
@@ -176,10 +176,10 @@ async function load(){
     st = s;
     if(view==='play' || view==='home'){
       const [g,a] = await Promise.all([
-        sb.from('players').select('name').eq('session_id',s.session_id).order('joined_at'),
+        sb.from('players').select('name,avatar').eq('session_id',s.session_id).order('joined_at'),
         sb.from('answers').select('player,question,choice,is_correct,points,elapsed_ms').eq('session_id',s.session_id)
       ]);
-      players = (g.data||[]).map(r=>r.name); answers = a.data||[];
+      players = (g.data||[]).map(r=>r.name); avatars = {}; (g.data||[]).forEach(r=>avatars[r.name]=r.avatar||''); answers = a.data||[];
       correct = s.revealed ? (await sb.rpc('revealed_answer',{p_question:s.current_question})).data : null;
     }
     net.style.display='none';
@@ -284,7 +284,7 @@ function play(){
   const completeCard = complete ? `<div class="card complete">
       <div class="h">🎉 Quiz complete</div>
       <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} players</div>
-      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span></div>`:'').join('')}</div>
+      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span></div>`:'').join('')}</div>
       ${st.ended?'<p class="muted">Candidates are seeing their final score and rank.</p>':'<p class="muted">Press <b>End session</b> to show candidates their final score and rank.</p>'}
     </div>` : '';
 
@@ -311,9 +311,9 @@ function play(){
       ${players.length?'':'<p class="muted">Nobody has joined yet. Open the join screen (right) on a second display.</p>'}
       <div class="players">${players.map(g=>{ const a=cur[g]; let cls='g'; if(a) cls += st.revealed?(a.is_correct?' right':' wrong'):' done';
         const main = a?(st.revealed||st.locked?a.choice:'✓'):'…'; const sub = a?(st.revealed?`+${a.points} pts · ${(a.elapsed_ms/1000).toFixed(1)} s`:`${(a.elapsed_ms/1000).toFixed(1)} s`):'';
-        return `<div class="${cls}"><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span>${esc(g)}<span class="c">${main}</span><span class="t">${sub}</span></div>`;}).join('')}</div></div>
+        return `<div class="${cls}"><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span>${avatars[g]||''} ${esc(g)}<span class="c">${main}</span><span class="t">${sub}</span></div>`;}).join('')}</div></div>
     <div class="card"><h2>Leaderboard <span class="muted" style="text-transform:none">(${revealedN} of ${st.total_questions} revealed)</span></h2>
-      ${scores.map(x=>`<div class="bar"><div class="n">${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}</div>
+      ${scores.map(x=>`<div class="bar"><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}</div>
     <div class="card"><h2>Answer spread — question ${q}</h2>
       <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div></div>
   </div>
