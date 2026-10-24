@@ -101,7 +101,7 @@ async function load(){
     st = s; titleCache = s.quiz_title || 'Quiz'; try{localStorage.setItem('quiz_title', titleCache);}catch(e){}
     if(name){
       const storedSession = localStorage.getItem('quiz_session');
-      if(knownSession && knownSession !== s.session_id || (!knownSession && storedSession && storedSession !== s.session_id && !s.ended)){
+      if((knownSession && knownSession !== s.session_id) || (!knownSession && storedSession && storedSession !== s.session_id)){
         // host started a new session: back to the join screen
         exit(); return;
       }
@@ -138,6 +138,7 @@ const expired = () => { const r=remaining(); return r!==null && r<=0; };
 function render(){
   if(!name){
     document.body.classList.add('centered');
+    if(document.getElementById('g')){ const h=document.querySelector('.join h2'); if(h) h.textContent=titleCache; return; }
     app.innerHTML = `
       <div class="center"><div class="card join">
         <h2>${esc(titleCache)}</h2>
@@ -149,7 +150,7 @@ function render(){
       </div></div>`;
     const inp = document.getElementById('g'); inp.focus();
     app.querySelectorAll('.avatars button').forEach(b=>b.onclick=()=>{ avatar=b.dataset.a; try{localStorage.setItem('quiz_avatar',avatar);}catch(e){} app.querySelectorAll('.avatars button').forEach(x=>x.classList.toggle('sel',x.dataset.a===avatar)); });
-    const join = async()=>{ const v=inp.value.trim(); if(!v) return; if(!avatar){ avatar=AVATARS[Math.floor(Math.random()*AVATARS.length)]; } name=v; localStorage.setItem('quiz_name',v); localStorage.setItem('quiz_avatar',avatar); knownSession=null; lbDismissed=null; await load(); };
+    const join = async()=>{ const v=inp.value.trim(); if(!v) return; if(!avatar){ avatar=AVATARS[Math.floor(Math.random()*AVATARS.length)]; } name=v; localStorage.setItem('quiz_name',v); localStorage.setItem('quiz_avatar',avatar); try{localStorage.removeItem('quiz_session');}catch(e){} knownSession=null; lbDismissed=null; await load(); };
     document.getElementById('join').onclick = join;
     inp.addEventListener('keydown',e=>{if(e.key==='Enter') join();});
     return;
