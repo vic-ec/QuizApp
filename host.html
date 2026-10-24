@@ -32,7 +32,16 @@
   button.warn{background:var(--warn);color:#2a2400}
   button.danger{background:var(--bad);color:#fff}
   button.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
-  button.xl{font-size:22px;padding:18px 26px}
+  button.xl{font-size:clamp(13px,1.5vw,22px);padding:0 clamp(10px,1.6vw,26px);height:clamp(40px,4.6vw,64px);line-height:1;white-space:nowrap}
+  .controls{display:flex;gap:clamp(6px,.8vw,10px);flex-wrap:nowrap;align-items:stretch}
+  .controls button{height:clamp(40px,4.6vw,64px);line-height:1;padding-top:0;padding-bottom:0;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .controls button.xl{flex:1 1 0}
+  .controls #prev{font-size:clamp(12px,1.2vw,16px);padding:0 clamp(8px,1vw,16px)}
+  button.orange{background:#e67e22;color:#fff}
+  .big{font-size:clamp(28px,3.6vw,48px)}
+  .timer{font-size:clamp(28px,3.6vw,48px)}
+  h1{font-size:clamp(16px,1.7vw,22px)}
+  @media(max-width:1200px){.layout{grid-template-columns:1fr 260px}}
   button.sm{padding:8px 12px;font-size:13px}
   button:disabled{opacity:.35;cursor:default}
   input,select{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
@@ -297,12 +306,14 @@ function play(){
         <div style="display:flex;gap:24px;align-items:flex-end"><div class="timer" id="timer"></div>
           <div style="text-align:right"><div class="big">Q${q}<span style="font-size:20px;color:var(--muted)"> / ${st.total_questions}</span></div><div class="muted">${done} of ${players.length} answered</div></div></div>
       </div>
-      <div class="row" style="margin-top:14px">
+      <div class="controls" style="margin-top:14px">
         <button id="prev" ${q<=1||st.ended?'disabled':''}>◀ Prev</button>
-        <button class="primary xl" id="open" ${canOpen?'':'disabled'}>${st.question_opened_at&&!st.revealed?'↻ Restart timer':'▶ Open question'}</button>
-        <button class="warn xl" id="lock" ${status==='open'?'':'disabled'}>🔒 Lock</button>
-        <button class="ok xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>✓ Reveal</button>
-        ${lastRevealed&&!st.ended?`<button class="primary xl" id="endsess">🏁 Finish &amp; show results</button>`:`<button class="primary xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
+        ${st.question_opened_at&&!st.revealed
+          ? `<button class="orange xl" id="open" ${canOpen?'':'disabled'}>Restart timer</button>`
+          : `<button class="primary xl" id="open" ${canOpen?'':'disabled'}>Open question</button>`}
+        <button class="warn xl" id="lock" ${status==='open'?'':'disabled'}>Lock</button>
+        <button class="ok xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
+        ${lastRevealed&&!st.ended?`<button class="primary xl" id="endsess">Finish &amp; show results</button>`:`<button class="primary xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
       </div>
       <p class="muted" style="margin:10px 0 0">Show the question in your deck → <b>Open question</b> (timer starts) → candidates submit → <b>Reveal</b> → advance deck → <b>Next</b> opens the next question immediately.</p>
     </div>
