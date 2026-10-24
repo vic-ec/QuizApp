@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>X-ray Quiz</title>
+<title>Quiz</title>
 <style>
   :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;--accent:#4f8cff;
         --ok:#2ecc71;--bad:#e74c3c;--warn:#f1c40f;
@@ -62,7 +62,7 @@ const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 
 let name = localStorage.getItem('quiz_name') || '';
-let st = null, mine = {}, correct = null, knownSession = null;
+let st = null, mine = {}, correct = null, knownSession = null, titleCache = localStorage.getItem('quiz_title') || 'Quiz';
 let selected = null, busy = false, errMsg = '';
 let clockOffset = 0;           // serverNow ≈ Date.now() - clockOffset
 let board = [];                // final leaderboard when session ended
@@ -80,21 +80,21 @@ async function load(){
     const {data:s, error} = await sb.from('quiz_state').select('*').eq('id',1).single();
     if(error) throw error;
     if(st && st.current_question!==s.current_question) { selected=null; errMsg=''; }
-    st = s;
+    st = s; titleCache = s.quiz_title || 'Quiz'; try{localStorage.setItem('quiz_title', titleCache);}catch(e){}
     if(name){
-      if(knownSession !== s.session_id){ await sb.rpc('join_group',{p_group:name}); knownSession = s.session_id; selected=null; }
+      if(knownSession !== s.session_id){ await sb.rpc('join_quiz',{p_player:name}); knownSession = s.session_id; selected=null; }
       const {data:a} = await sb.from('answers').select('question,choice,is_correct,points,elapsed_ms')
-        .eq('session_id', s.session_id).eq('group_name', name);
+        .eq('session_id', s.session_id).eq('player', name);
       mine = {}; (a||[]).forEach(r=>mine[r.question]=r);
       correct = s.revealed ? (await sb.rpc('revealed_answer',{p_question:s.current_question})).data : null;
       if(s.ended){
         const [g,all] = await Promise.all([
-          sb.from('groups').select('name').eq('session_id',s.session_id),
-          sb.from('answers').select('group_name,points,is_correct').eq('session_id',s.session_id)
+          sb.from('players').select('name').eq('session_id',s.session_id),
+          sb.from('answers').select('player,points,is_correct').eq('session_id',s.session_id)
         ]);
         board = (g.data||[]).map(r=>r.name).map(n=>({n,
-          p:(all.data||[]).filter(x=>x.group_name===n).reduce((t,x)=>t+(x.points||0),0),
-          c:(all.data||[]).filter(x=>x.group_name===n&&x.is_correct===true).length}))
+          p:(all.data||[]).filter(x=>x.player===n).reduce((t,x)=>t+(x.points||0),0),
+          c:(all.data||[]).filter(x=>x.player===n&&x.is_correct===true).length}))
           .sort((x,y)=>y.p-x.p||y.c-x.c||x.n.localeCompare(y.n));
       }
     }
@@ -115,7 +115,7 @@ function render(){
   if(!name){
     app.innerHTML = `
       <div class="card">
-        <h2 style="margin:0 0 6px">X-ray Quiz</h2>
+        <h2 style="margin:0 0 6px">${esc(titleCache)}</h2>
         <p class="small" style="text-align:left;margin:0 0 14px">Enter your name as you'd like it on the leaderboard. Keep this page open; if you lose connection just reload — you'll land back on the current question.</p>
         <input id="g" placeholder="Your name" maxlength="40" autocomplete="off">
         <button class="btn" id="join">Join quiz</button>
@@ -132,7 +132,7 @@ function render(){
     const rank = board.findIndex(x=>x.n===name)+1;
     app.innerHTML = `
       <div class="card final">
-        <div class="small">${esc(st.session_name)} — session over</div>
+        <div class="small">${esc(st.quiz_title)} · ${esc(st.session_name)} — session over</div>
         <div class="pts">${totalPts()} pts</div>
         <div>${totalCorrect()} correct · ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''}</div>
         <div class="lb">${board.slice(0,10).map((x,i)=>`<div class="${x.n===name?'me':''}"><span>${i+1}. ${esc(x.n)}</span><span>${x.p}</span></div>`).join('')}</div>
@@ -173,7 +173,7 @@ function render(){
   app.innerHTML = `
     <div class="top"><span><b>${esc(name)}</b></span><span><b>${totalPts()}</b> pts · ${totalCorrect()} correct</span></div>
     <div class="head"><div class="q">Q${q} <small>of ${st.total_questions}</small></div><div class="timer" id="timer"></div></div>
-    <div class="status">${esc(st.session_name)}</div>
+    <div class="status">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
     <div class="grid">${opts}</div>
     ${banner}
     <div class="err">${esc(errMsg)}</div>
@@ -200,7 +200,7 @@ async function submit(){
   if(busy||!selected) return; busy=true;
   const choice=selected;
   document.getElementById('submit')?.setAttribute('disabled','');
-  const {error} = await sb.rpc('submit_answer',{p_group:name,p_choice:choice});
+  const {error} = await sb.rpc('submit_answer',{p_player:name,p_choice:choice});
   busy=false;
   if(error){ errMsg=error.message; selected=null; }
   await load();
@@ -212,7 +212,7 @@ function exit(){
 
 sb.channel('cand')
   .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},()=>{ delete app.dataset.expiredRendered; load(); })
-  .on('postgres_changes',{event:'*',schema:'public',table:'answers'},(p)=>{ if(p.new && p.new.group_name===name) load(); })
+  .on('postgres_changes',{event:'*',schema:'public',table:'answers'},(p)=>{ if(p.new && p.new.player===name) load(); })
   .subscribe();
 setInterval(load, QUIZ_CONFIG.pollMs);
 setInterval(syncClock, 60000);

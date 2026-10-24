@@ -30,21 +30,21 @@ async function load(){
   const {data:st} = await sb.from('quiz_state').select('*').eq('id',1).single();
   if(!st) return;
   const [g,a] = await Promise.all([
-    sb.from('groups').select('name').eq('session_id',st.session_id),
-    sb.from('answers').select('group_name,is_correct,points').eq('session_id',st.session_id)
+    sb.from('players').select('name').eq('session_id',st.session_id),
+    sb.from('answers').select('player,is_correct,points').eq('session_id',st.session_id)
   ]);
   const groups=(g.data||[]).map(r=>r.name), answers=a.data||[];
   const revealedN=(st.current_question-1)+(st.revealed?1:0);
-  const scores=groups.map(n=>{const m=answers.filter(x=>x.group_name===n);return {n,s:m.reduce((t,x)=>t+(x.points||0),0),c:m.filter(x=>x.is_correct===true).length}}).sort((x,y)=>y.s-x.s||y.c-x.c||x.n.localeCompare(y.n));
+  const scores=groups.map(n=>{const m=answers.filter(x=>x.player===n);return {n,s:m.reduce((t,x)=>t+(x.points||0),0),c:m.filter(x=>x.is_correct===true).length}}).sort((x,y)=>y.s-x.s||y.c-x.c||x.n.localeCompare(y.n));
   const maxP=Math.max(1,...scores.map(x=>x.s));
-  document.getElementById('title').textContent=st.session_name+(st.ended?' — Final':' — Leaderboard');
+  document.getElementById('title').textContent=st.quiz_title+' · '+st.session_name+(st.ended?' — Final':' — Leaderboard');
   document.getElementById('sub').textContent=revealedN+' of '+st.total_questions+' questions revealed';
   document.getElementById('list').innerHTML=scores.map(x=>`<div class="bar"><div class="n">${esc(x.n)}</div><div class="t"><div class="f" style="width:${(x.s/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.s}<small> · ${x.c}✓</small></div></div>`).join('');
 }
 sb.channel('board')
   .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},load)
   .on('postgres_changes',{event:'*',schema:'public',table:'answers'},load)
-  .on('postgres_changes',{event:'*',schema:'public',table:'groups'},load)
+  .on('postgres_changes',{event:'*',schema:'public',table:'players'},load)
   .subscribe();
 setInterval(load,3000); load();
 </script>

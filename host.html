@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>X-ray Quiz — Host</title>
+<title>Quiz — Host</title>
 <style>
   :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;
         --accent:#4f8cff;--ok:#2ecc71;--bad:#e74c3c;--warn:#f1c40f;
@@ -27,7 +27,7 @@
   button.xl{font-size:22px;padding:18px 26px}
   button:disabled{opacity:.35;cursor:default}
   input,select{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
-  .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
   .g{border:2px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-weight:600;position:relative}
   .g.done{border-color:var(--accent);background:#1d2f4d}
   .g.right{border-color:var(--ok);background:#163d2b}
@@ -81,7 +81,7 @@
 const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
-let st=null, groups=[], answers=[], key={}, correct=null, keyOpen=false, clockOffset=0;
+let st=null, players=[], answers=[], key={}, correct=null, keyOpen=false, clockOffset=0;
 
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 const serverNow = () => Date.now() - clockOffset;
@@ -109,7 +109,7 @@ async function start(){
   sb.channel('host')
     .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},load)
     .on('postgres_changes',{event:'*',schema:'public',table:'answers'},load)
-    .on('postgres_changes',{event:'*',schema:'public',table:'groups'},load)
+    .on('postgres_changes',{event:'*',schema:'public',table:'players'},load)
     .subscribe();
   setInterval(load, 3000); setInterval(tick, 250); setInterval(syncClock, 60000);
   load();
@@ -121,10 +121,10 @@ async function load(){
     if(error) throw error;
     st = s;
     const [g,a] = await Promise.all([
-      sb.from('groups').select('name').eq('session_id',s.session_id).order('joined_at'),
-      sb.from('answers').select('group_name,question,choice,is_correct,points,elapsed_ms').eq('session_id',s.session_id)
+      sb.from('players').select('name').eq('session_id',s.session_id).order('joined_at'),
+      sb.from('answers').select('player,question,choice,is_correct,points,elapsed_ms').eq('session_id',s.session_id)
     ]);
-    groups = (g.data||[]).map(r=>r.name); answers = a.data||[];
+    players = (g.data||[]).map(r=>r.name); answers = a.data||[];
     correct = s.revealed ? (await sb.rpc('revealed_answer',{p_question:s.current_question})).data : null;
     net.style.display='none';
   }catch(e){ net.style.display='block'; }
@@ -148,19 +148,19 @@ function tick(){
 let lastSig = '';
 function render(force){
   if(!st) return;
-  const sig = JSON.stringify([st,groups,answers,correct,key,keyOpen]);
+  const sig = JSON.stringify([st,players,answers,correct,key,keyOpen]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
-  const keep = {}; ['sname','newpin','total','goto','timer_in'].forEach(id=>{const el=document.getElementById(id); if(el && document.activeElement===el) keep[id]=el.value;});
+  const keep = {}; ['sname','newpin','total','goto','timer_in','qtitle'].forEach(id=>{const el=document.getElementById(id); if(el && document.activeElement===el) keep[id]=el.value;});
   const q = st.current_question;
-  const cur = {}; answers.filter(a=>a.question===q).forEach(a=>cur[a.group_name]=a);
-  const done = groups.filter(g=>cur[g]).length;
+  const cur = {}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
+  const done = players.filter(g=>cur[g]).length;
   const r = remaining(), timeUp = r!==null && r<=0;
   const status = st.ended?'ended':st.revealed?'revealed':st.locked?(st.question_opened_at?'locked':'waiting'):timeUp?'timeup':'open';
   const statusLabel = {ended:'SESSION ENDED',revealed:'REVEALED',locked:'LOCKED',waiting:'WAITING TO OPEN',timeup:"TIME UP",open:'OPEN'}[status];
   const keyCur = key[q];
   const revealedN = (q-1)+(st.revealed?1:0);
-  const scores = groups.map(g=>{ const mine=answers.filter(a=>a.group_name===g); return {g, p:mine.reduce((t,a)=>t+(a.points||0),0), c:mine.filter(a=>a.is_correct===true).length}; })
+  const scores = players.map(g=>{ const mine=answers.filter(a=>a.player===g); return {g, p:mine.reduce((t,a)=>t+(a.points||0),0), c:mine.filter(a=>a.is_correct===true).length}; })
                        .sort((x,y)=>y.p-x.p||y.c-x.c||x.g.localeCompare(y.g));
   const maxP = Math.max(1,...scores.map(s=>s.p));
   const dist = {A:0,B:0,C:0,D:0}; Object.values(cur).forEach(a=>dist[a.choice]++);
@@ -172,7 +172,7 @@ function render(force){
     <div class="card">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
         <div>
-          <h1>${esc(st.session_name)}</h1>
+          <h1>${esc(st.quiz_title)} <span style="color:var(--muted);font-weight:500">· ${esc(st.session_name)}</span></h1>
           <div style="margin-top:6px"><span class="pill ${status}">${statusLabel}</span>
           ${keyCur?'':'<span class="pill nokey">No answer key for Q'+q+'</span>'}
           <span class="pill waiting">${st.scoring==='flat'?'Flat scoring':'Speed scoring'} · ${st.timer_seconds?st.timer_seconds+' s':'no timer'}</span></div>
@@ -181,7 +181,7 @@ function render(force){
           <div class="timer" id="timer"></div>
           <div style="text-align:right">
             <div class="big">Q${q}<span style="font-size:20px;color:var(--muted)"> / ${st.total_questions}</span></div>
-            <div class="muted">${done} of ${groups.length} answered</div>
+            <div class="muted">${done} of ${players.length} answered</div>
           </div>
         </div>
       </div>
@@ -199,9 +199,9 @@ function render(force){
 
     <div class="card">
       <h2>Candidates — question ${q}</h2>
-      ${groups.length?'':'<p class="muted">Nobody has joined this session yet. Show them the QR code →</p>'}
-      <div class="groups">
-        ${groups.map(g=>{
+      ${players.length?'':'<p class="muted">Nobody has joined this session yet. Show them the QR code →</p>'}
+      <div class="players">
+        ${players.map(g=>{
           const a=cur[g]; let cls='g';
           if(a){ cls += st.revealed ? (a.is_correct?' right':' wrong') : ' done'; }
           const main = a ? (st.revealed||st.locked ? a.choice : '✓') : '…';
@@ -230,7 +230,10 @@ function render(force){
       <p style="word-break:break-all;margin:8px 0 0"><a href="${candidateUrl}" target="_blank">${candidateUrl}</a></p>
     </div>
     <div class="card">
-      <h2>Session</h2>
+      <h2>Quiz</h2>
+      <div class="row"><input id="qtitle" placeholder="Quiz title, e.g. ECG Quiz" value="${esc(st.quiz_title)}" style="flex:1"><button id="settitle">Set</button></div>
+      <p class="muted">Shown to candidates on the join screen and during the quiz.</p>
+      <h2 style="margin-top:14px">Session</h2>
       <div class="row"><input id="sname" placeholder="e.g. Group 2 — 10:00" style="flex:1"><button class="primary" id="newsess">New session</button></div>
       <p class="muted">Fresh session: Q1 waiting to open, no candidates, no scores. The answer key, timer and scoring mode are kept — so this is also how you repeat the quiz for the next group.</p>
       <div class="row" style="margin-top:8px"><label class="muted">Timer (s, 0 = off)</label><input id="timer_in" type="number" min="0" max="600" value="${st.timer_seconds}" style="width:80px"><button id="settimer">Set</button></div>
@@ -240,7 +243,7 @@ function render(force){
     </div>
     <div class="card">
       <h2>Answer key <button id="togglekey" style="padding:4px 10px;font-size:12px">${keyOpen?'hide':'edit'}</button></h2>
-      <p class="muted">${Object.keys(key).length} of ${st.total_questions} set. Kept across sessions. Keep this hidden while candidates can see your screen.</p>
+      <p class="muted">${Object.keys(key).length} of ${st.total_questions} set. Kept across sessions. Keep this hidden while candidates can see your screen. <a href="#" id="clearkey">Clear all</a> when you set up a different quiz.</p>
       <div class="key" style="${keyOpen?'':'display:none'}">
         ${Array.from({length:st.total_questions},(_,i)=>i+1).map(n=>`<div class="k"><span>${n}</span>${['A','B','C','D'].map(o=>`<button class="${key[n]===o?'on':''}" data-q="${n}" data-o="${o}">${o}</button>`).join('')}</div>`).join('')}
       </div>
@@ -264,18 +267,20 @@ function render(force){
   on('prev',()=>act('prev').then(load));
   on('endsess',()=>{ if(confirm('End this session? Candidates will see their final score and rank.')) act('end_session').then(load); });
   on('newsess',()=>{ if(confirm('Start a new session? Candidates and scores clear from the screen (answer key is kept).')) act('new_session',{name:document.getElementById('sname').value}).then(load); });
+  on('settitle',()=>act('set_title',{title:document.getElementById('qtitle').value}).then(load));
   on('settimer',()=>act('set_timer',{seconds:+document.getElementById('timer_in').value}).then(load));
   document.getElementById('scoring').onchange=(e)=>act('set_scoring',{mode:e.target.value}).then(load);
   on('settotal',()=>act('set_total',{total:+document.getElementById('total').value}).then(load));
   on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
   on('togglekey',()=>{keyOpen=!keyOpen;render(true);});
   on('setpin',async()=>{const p=document.getElementById('newpin').value.trim(); await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); alert('PIN changed');});
+  on('clearkey',(e)=>{e.preventDefault(); if(confirm('Clear the whole answer key?')) act('clear_key').then(async()=>{key=await act('get_key'); render(true);});});
   on('logout',(e)=>{e.preventDefault();sessionStorage.removeItem('quiz_pin');location.reload();});
   app.querySelectorAll('.key button').forEach(b=>b.onclick=async()=>{
     const n=b.dataset.q,o=b.dataset.o; const v=(key[n]===o)?'':o;
     await act('set_key',{[n]:v}); if(v) key[n]=v; else delete key[n]; render(true);
   });
-  app.querySelectorAll('.g .x').forEach(x=>x.onclick=()=>{ if(confirm('Remove "'+x.dataset.g+'" from this session?')) act('remove_group',{name:x.dataset.g}).then(load); });
+  app.querySelectorAll('.g .x').forEach(x=>x.onclick=()=>{ if(confirm('Remove "'+x.dataset.g+'" from this session?')) act('remove_player',{name:x.dataset.g}).then(load); });
 }
 
 if(pin) start();
