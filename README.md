@@ -4,11 +4,12 @@ Live multiple-choice quiz for teaching sessions. Candidates answer on their phon
 
 ## Pages
 - `index.html` — candidate page: join with your name, tap A–D, submit
-- `host.html` — host control panel (PIN protected): open / lock / reveal / next, timer, scoring mode, quiz title, answer key, new session, end session, QR join code
+- `host.html` — host app (PIN protected): **My quizzes** (create / edit / play saved quizzes with name, question count, timer, scoring and answer key), **Live session** (open / lock / reveal / next, candidates, leaderboard, new round, end session) and **Settings** (PIN)
+- `join.html` — full-screen QR code and link for a second display, so the host page stays private
 - `board.html` — full-screen leaderboard for a projector
 
 ## Backend
-Supabase (`config.js`). All writes go through PIN-checked database functions; the answer key is never sent to candidates until revealed. Tables: `quiz_state`, `players`, `answers`, `answer_key`, `host_config`.
+Supabase (`config.js`). All writes go through PIN-checked database functions; the answer key is never sent to candidates until revealed. Tables: `quizzes` (saved quizzes incl. answer key), `quiz_state` (the one live session), `players`, `answers`, `host_config`.
 
 ## Scoring
 Speed mode: first correct answer 100 pts, then 90, 80 … (minimum 50). Flat mode: 100 per correct answer. Wrong or no answer: 0.

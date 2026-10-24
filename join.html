@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join the quiz</title>
+<style>
+  html,body{height:100%}
+  body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vh;text-align:center;padding:4vh 4vw;box-sizing:border-box}
+  h1{font-size:5vw;margin:0}
+  .sub{color:#8d9aa8;font-size:2.4vw}
+  #qr{background:#fff;padding:2vh;border-radius:2vh;line-height:0}
+  .url{font-size:3.2vw;font-weight:700;letter-spacing:.01em;word-break:break-all}
+  .steps{color:#8d9aa8;font-size:2vw}
+  .count{position:fixed;bottom:3vh;right:3vw;color:#8d9aa8;font-size:2vw}
+</style>
+</head>
+<body>
+<h1 id="title">Join the quiz</h1>
+<div class="sub" id="sub"></div>
+<div id="qr"></div>
+<div class="url" id="url"></div>
+<div class="steps">Scan the code or type the link · enter your name · wait for the first question</div>
+<div class="count" id="count"></div>
+<script src="vendor-supabase.js"></script>
+<script src="vendor-qrcode.js"></script>
+<script src="config.js"></script>
+<script>
+const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
+const url = location.origin + location.pathname.replace(/join\.html$/,'');
+document.getElementById('url').textContent = url.replace(/^https?:\/\//,'');
+new QRCode(document.getElementById('qr'),{text:url,width:Math.min(window.innerHeight*0.45,520),height:Math.min(window.innerHeight*0.45,520)});
+async function load(){
+  const {data:st} = await sb.from('quiz_state').select('quiz_title,session_name,session_id,ended').eq('id',1).single();
+  if(!st) return;
+  document.getElementById('title').textContent = st.quiz_title || 'Join the quiz';
+  document.getElementById('sub').textContent = st.session_name || '';
+  const {count} = await sb.from('players').select('*',{count:'exact',head:true}).eq('session_id',st.session_id);
+  document.getElementById('count').textContent = count ? `${count} joined` : '';
+}
+sb.channel('join').on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},load).on('postgres_changes',{event:'*',schema:'public',table:'players'},load).subscribe();
+setInterval(load,4000); load();
+</script>
+</body>
+</html>

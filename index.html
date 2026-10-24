@@ -130,11 +130,14 @@ function render(){
 
   if(st.ended){
     const rank = board.findIndex(x=>x.n===name)+1;
+    const medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
     app.innerHTML = `
       <div class="card final">
-        <div class="small">${esc(st.quiz_title)} · ${esc(st.session_name)} — session over</div>
+        <div style="font-size:40px">🎉</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px">Quiz complete!</div>
+        <div class="small">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
         <div class="pts">${totalPts()} pts</div>
-        <div>${totalCorrect()} correct · ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''}</div>
+        <div style="font-size:18px">${medal} ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''} · ${totalCorrect()} of ${st.total_questions} correct</div>
         <div class="lb">${board.slice(0,10).map((x,i)=>`<div class="${x.n===name?'me':''}"><span>${i+1}. ${esc(x.n)}</span><span>${x.p}</span></div>`).join('')}</div>
         <button class="btn" id="exit">Exit quiz</button>
       </div>`;
@@ -149,7 +152,7 @@ function render(){
     if(!my) banner = `<div class="banner bad">No answer submitted. Correct answer: ${correct||'?'}</div>`;
     else if(my.is_correct) banner = `<div class="banner ok">Correct! +${my.points} pts</div>`;
     else banner = `<div class="banner bad">Not quite — correct answer: ${correct||'?'}</div>`;
-    banner += `<div class="banner wait">Waiting for the next question…</div>`;
+    banner += q>=st.total_questions ? `<div class="banner wait">That was the last question — final results coming up…</div>` : `<div class="banner wait">Waiting for the next question…</div>`;
   } else if(my){
     banner = `<div class="banner wait">Submitted <b>${my.choice}</b>${my.elapsed_ms!=null?` in ${(my.elapsed_ms/1000).toFixed(1)} s`:''}. Waiting for the reveal…</div>`;
   } else if(!st.question_opened_at){

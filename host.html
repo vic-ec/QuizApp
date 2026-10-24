@@ -10,11 +10,18 @@
         --A:#e74c3c;--B:#3498db;--C:#f1c40f;--D:#2ecc71;}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-  .layout{display:grid;grid-template-columns:1fr 340px;gap:16px;padding:16px;min-height:100vh}
+  a{color:#9cc0ff}
+  .topbar{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--line);background:#121920}
+  .topbar .brand{font-weight:800;font-size:18px;letter-spacing:.02em}
+  .topbar .crumb{color:var(--muted)}
+  .topbar .sp{flex:1}
+  .topbar a{font-size:14px}
+  .page{max-width:1100px;margin:0 auto;padding:20px}
+  .layout{display:grid;grid-template-columns:1fr 300px;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
   @media(max-width:900px){.layout{grid-template-columns:1fr}}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
   h1{margin:0;font-size:22px}
-  h2{margin:0 0 10px;font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  h2{margin:0 0 10px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   .big{font-size:48px;font-weight:800;line-height:1}
   .timer{font-size:48px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1}
   .timer.low{color:var(--bad)} .timer.up{color:var(--warn);font-size:22px}
@@ -24,9 +31,38 @@
   button.ok{background:var(--ok);color:#06220f}
   button.warn{background:var(--warn);color:#2a2400}
   button.danger{background:var(--bad);color:#fff}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
   button.xl{font-size:22px;padding:18px 26px}
+  button.sm{padding:8px 12px;font-size:13px}
   button:disabled{opacity:.35;cursor:default}
   input,select{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
+  label.f{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+  label.f input,label.f select{font-size:16px;color:var(--text)}
+  .muted{color:var(--muted);font-size:13px}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;margin-right:4px}
+  .pill.waiting{background:#2b3642;color:var(--muted)} .pill.open{background:#1d2f4d;color:#9cc0ff}
+  .pill.locked{background:#3a3415;color:var(--warn)} .pill.revealed{background:#163d2b;color:var(--ok)}
+  .pill.ended{background:#4a1f1b;color:#ff8a7f} .pill.timeup{background:#3a3415;color:var(--warn)}
+  .pill.nokey{background:#4a1f1b;color:#ff8a7f} .pill.done{background:#163d2b;color:var(--ok)}
+  /* home */
+  .quizzes{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .qz{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .qz.new{border-style:dashed;align-items:center;justify-content:center;min-height:160px;cursor:pointer;color:var(--muted)}
+  .qz.new:hover{color:var(--text);border-color:var(--accent)}
+  .qz h3{margin:0;font-size:18px}
+  .qz .meta{font-size:13px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+  .qz .actions{display:flex;gap:8px;margin-top:auto}
+  /* editor */
+  .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+  .form .wide{grid-column:1/-1}
+  .key{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:8px}
+  .key .k{display:flex;align-items:center;gap:5px;font-size:13px}
+  .key .k span{width:26px;color:var(--muted);text-align:right}
+  .key .k button{padding:8px 0;width:32px;font-size:13px;background:#0f1419;border:1px solid var(--line);color:var(--muted)}
+  .key .k button.on{color:#fff;border-color:transparent}
+  .key .k button.on.A{background:var(--A)} .key .k button.on.B{background:var(--B)}
+  .key .k button.on.C{background:var(--C);color:#2a2400} .key .k button.on.D{background:var(--D);color:#06220f}
+  /* play */
   .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
   .g{border:2px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-weight:600;position:relative}
   .g.done{border-color:var(--accent);background:#1d2f4d}
@@ -39,6 +75,7 @@
   .bar .n{width:140px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bar .t{flex:1;background:#0f1419;border-radius:8px;height:30px;overflow:hidden}
   .bar .f{height:100%;background:var(--accent);border-radius:8px;transition:width .4s;min-width:2px}
+  .bar:first-of-type .f{background:var(--warn)}
   .bar .s{width:110px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
   .bar .s small{color:var(--muted);font-weight:500}
   .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
@@ -46,21 +83,19 @@
   .d.A{background:var(--A)} .d.B{background:var(--B)} .d.C{background:var(--C);color:#2a2400} .d.D{background:var(--D);color:#06220f}
   .d.correct{border-color:#fff} .d.dim{opacity:.3}
   .d b{font-size:26px;display:block}
-  .key{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
-  .key .k{display:flex;align-items:center;gap:4px;font-size:13px}
-  .key .k span{width:24px;color:var(--muted)}
-  .key .k button{padding:6px 0;width:30px;font-size:13px;background:#0f1419;border:1px solid var(--line)}
-  .key .k button.on{background:var(--accent);border-color:var(--accent);color:#fff}
-  .muted{color:var(--muted);font-size:13px}
-  .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;margin-right:4px}
-  .pill.waiting{background:#2b3642;color:var(--muted)} .pill.open{background:#1d2f4d;color:#9cc0ff}
-  .pill.locked{background:#3a3415;color:var(--warn)} .pill.revealed{background:#163d2b;color:var(--ok)}
-  .pill.ended{background:#4a1f1b;color:#ff8a7f} .pill.timeup{background:#3a3415;color:var(--warn)}
-  .pill.nokey{background:#4a1f1b;color:#ff8a7f}
-  #qr{background:#fff;padding:8px;border-radius:8px;width:fit-content}
+  .qrmini{display:flex;gap:12px;align-items:center;cursor:pointer}
+  .qrmini #qr{background:#fff;padding:4px;border-radius:6px;width:fit-content;line-height:0}
+  .qrmini:hover .hint{color:var(--text)}
+  .complete{text-align:center;padding:10px 0}
+  .complete .h{font-size:28px;font-weight:800}
+  .podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;margin:16px 0 6px}
+  .podium div{background:#0f1419;border-radius:10px 10px 0 0;padding:10px;text-align:center;width:130px}
+  .podium .p1{height:120px;border-top:4px solid var(--warn)} .podium .p2{height:95px;border-top:4px solid #bfc7d1} .podium .p3{height:80px;border-top:4px solid #c8792a}
+  .podium b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .net{position:fixed;left:0;right:0;bottom:0;background:#4a1f1b;color:#ff8a7f;text-align:center;padding:8px;display:none}
-  a{color:#9cc0ff}
-  label.muted{min-width:110px}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#163d2b;color:var(--ok);padding:10px 16px;border-radius:10px;font-weight:600;display:none}
+  .banner{border-radius:12px;padding:12px 14px;background:#1d2f4d;color:#9cc0ff;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .banner .sp{flex:1}
 </style>
 </head>
 <body>
@@ -71,8 +106,9 @@
   <button class="primary" id="login" style="width:100%;margin-top:10px">Enter</button>
   <p id="pinerr" style="color:#ff8a7f"></p>
 </div>
-<div id="app" class="layout" style="display:none"></div>
+<div id="app" style="display:none"></div>
 <div class="net" id="net">Connection lost — retrying…</div>
+<div class="toast" id="toast"></div>
 
 <script src="vendor-supabase.js"></script>
 <script src="vendor-qrcode.js"></script>
@@ -81,17 +117,23 @@
 const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
-let st=null, players=[], answers=[], key={}, correct=null, keyOpen=false, clockOffset=0;
+let st=null, players=[], answers=[], correct=null, clockOffset=0;
+let quizzes=[], editing=null;              // editing = working copy of a quiz in the editor
+let view = 'home';                          // home | edit | play | settings
+const candidateUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
+const joinUrl = candidateUrl + 'join.html';
 
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 const serverNow = () => Date.now() - clockOffset;
 async function syncClock(){ try{ const t0=Date.now(); const {data}=await sb.rpc('server_now'); const t1=Date.now(); if(data) clockOffset=(t0+t1)/2-new Date(data).getTime(); }catch(e){} }
 async function act(action, value={}){
   const {data,error} = await sb.rpc('host_action',{p_pin:pin,p_action:action,p_value:value});
-  if(error){ alert(error.message); throw error; }
+  if(error){ toast(error.message, true); throw error; }
   return data;
 }
+let toastT; function toast(msg, bad){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; t.style.background=bad?'#4a1f1b':'#163d2b'; t.style.color=bad?'#ff8a7f':'var(--ok)'; clearTimeout(toastT); toastT=setTimeout(()=>t.style.display='none',2500); }
 
+// ---------- auth ----------
 async function login(){
   const p = document.getElementById('pin').value.trim();
   const {error} = await sb.rpc('host_action',{p_pin:p,p_action:'ping'});
@@ -103,34 +145,47 @@ document.getElementById('pin').addEventListener('keydown',e=>{if(e.key==='Enter'
 
 async function start(){
   document.getElementById('gate').style.display='none';
-  app.style.display='grid';
+  app.style.display='block';
   await syncClock();
-  key = await act('get_key');
+  await loadQuizzes();
   sb.channel('host')
     .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},load)
     .on('postgres_changes',{event:'*',schema:'public',table:'answers'},load)
     .on('postgres_changes',{event:'*',schema:'public',table:'players'},load)
     .subscribe();
   setInterval(load, 3000); setInterval(tick, 250); setInterval(syncClock, 60000);
-  load();
+  window.addEventListener('hashchange', route);
+  await load(); route();
 }
+function route(){
+  const h = location.hash.replace('#','');
+  if(h==='play') view='play';
+  else if(h==='settings') view='settings';
+  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : quizzes.find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{}} : (q?JSON.parse(JSON.stringify(q)):null); view = editing?'edit':'home'; }
+  else view='home';
+  lastSig=''; render(true);
+}
+const go = (h) => { location.hash = h; };
 
+// ---------- data ----------
+async function loadQuizzes(){ quizzes = await act('list_quizzes'); }
 async function load(){
   try{
     const {data:s,error} = await sb.from('quiz_state').select('*').eq('id',1).single();
     if(error) throw error;
     st = s;
-    const [g,a] = await Promise.all([
-      sb.from('players').select('name').eq('session_id',s.session_id).order('joined_at'),
-      sb.from('answers').select('player,question,choice,is_correct,points,elapsed_ms').eq('session_id',s.session_id)
-    ]);
-    players = (g.data||[]).map(r=>r.name); answers = a.data||[];
-    correct = s.revealed ? (await sb.rpc('revealed_answer',{p_question:s.current_question})).data : null;
+    if(view==='play' || view==='home'){
+      const [g,a] = await Promise.all([
+        sb.from('players').select('name').eq('session_id',s.session_id).order('joined_at'),
+        sb.from('answers').select('player,question,choice,is_correct,points,elapsed_ms').eq('session_id',s.session_id)
+      ]);
+      players = (g.data||[]).map(r=>r.name); answers = a.data||[];
+      correct = s.revealed ? (await sb.rpc('revealed_answer',{p_question:s.current_question})).data : null;
+    }
     net.style.display='none';
   }catch(e){ net.style.display='block'; }
   render();
 }
-
 function remaining(){
   if(!st || !st.timer_seconds || !st.question_opened_at) return null;
   return Math.max(0, st.timer_seconds - (serverNow() - new Date(st.question_opened_at).getTime())/1000);
@@ -144,143 +199,166 @@ function tick(){
   el.className = 'timer' + (r<=0?' up':r<=5?' low':'');
   if((r<=0)!==wasExpired){ wasExpired=(r<=0); render(true); }
 }
+function scoresFor(){
+  return players.map(g=>{ const m=answers.filter(a=>a.player===g); return {g, p:m.reduce((t,a)=>t+(a.points||0),0), c:m.filter(a=>a.is_correct===true).length}; })
+    .sort((x,y)=>y.p-x.p||y.c-x.c||x.g.localeCompare(y.g));
+}
+const keyCount = (q) => Object.values(q.answer_key||{}).filter(v=>['A','B','C','D'].includes(v)).length;
+const liveActive = () => st && !st.ended && st.session_id;
 
-let lastSig = '';
+// ---------- render ----------
+let lastSig='';
 function render(force){
-  if(!st) return;
-  const sig = JSON.stringify([st,players,answers,correct,key,keyOpen]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
-  const keep = {}; ['sname','newpin','total','goto','timer_in','qtitle'].forEach(id=>{const el=document.getElementById(id); if(el && document.activeElement===el) keep[id]=el.value;});
+  const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
+  app.innerHTML = topbar() + (view==='home'?home():view==='edit'?editor():view==='settings'?settings():play());
+  Object.entries(keep).forEach(([id,v])=>{const el=document.getElementById(id); if(el){el.value=v; el.focus();}});
+  bind();
+}
+function topbar(){
+  const crumb = view==='home'?'My quizzes':view==='edit'?(editing&&editing.id?'Edit quiz':'New quiz'):view==='settings'?'Settings':'Live session';
+  return `<div class="topbar"><span class="brand">QuizApp</span><span class="crumb">› ${crumb}</span><span class="sp"></span>
+    ${view!=='home'?'<a href="#home">My quizzes</a>':''}
+    ${liveActive()&&view!=='play'?'<a href="#play">Live session ▸</a>':''}
+    <a href="#settings">Settings</a><a href="#" id="logout">Log out</a></div>`;
+}
+
+function home(){
+  const live = st && !st.ended ? `<div class="banner"><b>Live session in progress:</b> ${esc(st.quiz_title)} · ${esc(st.session_name)} · Q${st.current_question}/${st.total_questions} · ${players.length} joined<span class="sp"></span><button class="primary sm" data-go="play">Resume ▸</button><button class="ghost sm" id="endlive">End session</button></div>` : '';
+  return `<div class="page">${live}
+    <h1 style="margin:${live?'16px':'0'} 0 14px">My quizzes</h1>
+    <div class="quizzes">
+      <div class="qz new" data-go="edit-new"><div style="font-size:34px">＋</div><div>Create new quiz</div></div>
+      ${quizzes.map(q=>`<div class="qz">
+        <h3>${esc(q.title)}</h3>
+        <div class="meta"><span>${q.total_questions} questions</span><span>${q.timer_seconds?q.timer_seconds+' s timer':'no timer'}</span><span>${q.scoring==='flat'?'flat':'speed'} scoring</span></div>
+        <div>${keyCount(q)>=q.total_questions?'<span class="pill done">Answer key complete</span>':'<span class="pill nokey">Key: '+keyCount(q)+' of '+q.total_questions+'</span>'}</div>
+        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button data-go="edit-${q.id}">Edit</button><button class="ghost sm" data-archive="${q.id}" title="Remove from list">✕</button></div>
+      </div>`).join('')}
+    </div></div>`;
+}
+
+function editor(){
+  const q = editing, n = Math.max(1, Math.min(100, +q.total_questions||1));
+  return `<div class="page">
+    <div class="row" style="justify-content:space-between;margin-bottom:14px"><h1>${q.id?'Edit quiz':'New quiz'}</h1>
+      <div class="row"><button id="save" class="ok">💾 Save quiz</button><button id="saveplay" class="primary">▶ Save &amp; play</button><button class="ghost" data-go="home">Cancel</button></div></div>
+    <div class="card"><div class="form">
+      <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz"></label>
+      <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
+      <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
+      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 90, 80… (min 50)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
+    </div></div>
+    <div class="card"><h2>Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2>
+      <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
+      <div class="key">${Array.from({length:n},(_,i)=>i+1).map(i=>`<div class="k"><span>${i}</span>${['A','B','C','D'].map(o=>`<button class="${q.answer_key[i]===o?'on '+o:''}" data-kq="${i}" data-ko="${o}">${o}</button>`).join('')}</div>`).join('')}</div>
+    </div></div>`;
+}
+
+function settings(){
+  return `<div class="page"><h1 style="margin-bottom:14px">Settings</h1>
+    <div class="card"><h2>Host PIN</h2><div class="row"><input id="newpin" placeholder="New PIN (min 4 characters)" style="flex:1;max-width:320px"><button id="setpin">Change PIN</button></div></div>
+    <div class="card"><h2>Links</h2>
+      <p class="muted">Candidates: <a href="${candidateUrl}" target="_blank">${candidateUrl}</a><br>Join screen (QR for a second display): <a href="${joinUrl}" target="_blank">${joinUrl}</a><br>Projector leaderboard: <a href="${candidateUrl}board.html" target="_blank">${candidateUrl}board.html</a></p></div>
+  </div>`;
+}
+
+function play(){
+  if(!st) return '<div class="page muted">Loading…</div>';
   const q = st.current_question;
   const cur = {}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
   const done = players.filter(g=>cur[g]).length;
   const r = remaining(), timeUp = r!==null && r<=0;
   const status = st.ended?'ended':st.revealed?'revealed':st.locked?(st.question_opened_at?'locked':'waiting'):timeUp?'timeup':'open';
   const statusLabel = {ended:'SESSION ENDED',revealed:'REVEALED',locked:'LOCKED',waiting:'WAITING TO OPEN',timeup:"TIME UP",open:'OPEN'}[status];
-  const keyCur = key[q];
+  const quiz = quizzes.find(x=>x.id===st.quiz_id); const keyCur = quiz && quiz.answer_key[q];
   const revealedN = (q-1)+(st.revealed?1:0);
-  const scores = players.map(g=>{ const mine=answers.filter(a=>a.player===g); return {g, p:mine.reduce((t,a)=>t+(a.points||0),0), c:mine.filter(a=>a.is_correct===true).length}; })
-                       .sort((x,y)=>y.p-x.p||y.c-x.c||x.g.localeCompare(y.g));
-  const maxP = Math.max(1,...scores.map(s=>s.p));
+  const scores = scoresFor(); const maxP = Math.max(1,...scores.map(s=>s.p));
   const dist = {A:0,B:0,C:0,D:0}; Object.values(cur).forEach(a=>dist[a.choice]++);
-  const candidateUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
   const canOpen = !st.ended && (!st.question_opened_at || st.locked || timeUp) && !st.revealed;
+  const lastRevealed = st.revealed && q>=st.total_questions;
+  const complete = lastRevealed || st.ended;
 
-  app.innerHTML = `
-  <div>
+  const completeCard = complete ? `<div class="card complete">
+      <div class="h">🎉 Quiz complete</div>
+      <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} players</div>
+      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span></div>`:'').join('')}</div>
+      ${st.ended?'<p class="muted">Candidates are seeing their final score and rank.</p>':'<p class="muted">Press <b>End session</b> to show candidates their final score and rank.</p>'}
+    </div>` : '';
+
+  return `<div class="layout"><div>
     <div class="card">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
-        <div>
-          <h1>${esc(st.quiz_title)} <span style="color:var(--muted);font-weight:500">· ${esc(st.session_name)}</span></h1>
-          <div style="margin-top:6px"><span class="pill ${status}">${statusLabel}</span>
-          ${keyCur?'':'<span class="pill nokey">No answer key for Q'+q+'</span>'}
-          <span class="pill waiting">${st.scoring==='flat'?'Flat scoring':'Speed scoring'} · ${st.timer_seconds?st.timer_seconds+' s':'no timer'}</span></div>
-        </div>
-        <div style="display:flex;gap:24px;align-items:flex-end">
-          <div class="timer" id="timer"></div>
-          <div style="text-align:right">
-            <div class="big">Q${q}<span style="font-size:20px;color:var(--muted)"> / ${st.total_questions}</span></div>
-            <div class="muted">${done} of ${players.length} answered</div>
-          </div>
-        </div>
+        <div><h1>${esc(st.quiz_title)} <span style="color:var(--muted);font-weight:500">· ${esc(st.session_name)}</span></h1>
+          <div style="margin-top:6px"><span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No answer key for Q'+q+'</span>'}
+          <span class="pill waiting">${st.scoring==='flat'?'Flat':'Speed'} · ${st.timer_seconds?st.timer_seconds+' s':'no timer'}</span></div></div>
+        <div style="display:flex;gap:24px;align-items:flex-end"><div class="timer" id="timer"></div>
+          <div style="text-align:right"><div class="big">Q${q}<span style="font-size:20px;color:var(--muted)"> / ${st.total_questions}</span></div><div class="muted">${done} of ${players.length} answered</div></div></div>
       </div>
       <div class="row" style="margin-top:14px">
         <button id="prev" ${q<=1||st.ended?'disabled':''}>◀ Prev</button>
         <button class="primary xl" id="open" ${canOpen?'':'disabled'}>${st.question_opened_at&&!st.revealed?'↻ Restart timer':'▶ Open question'}</button>
         <button class="warn xl" id="lock" ${status==='open'?'':'disabled'}>🔒 Lock</button>
         <button class="ok xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>✓ Reveal</button>
-        <button class="primary xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>
-        <span style="flex:1"></span>
-        <button class="danger" id="endsess" ${st.ended?'disabled':''}>End session</button>
+        ${lastRevealed&&!st.ended?`<button class="primary xl" id="endsess">🏁 Finish &amp; show results</button>`:`<button class="primary xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
       </div>
-      <p class="muted" style="margin:10px 0 0">Flow: show the image in Canva → <b>Open question</b> (timer starts) → candidates submit → <b>Reveal</b> (after time is up or everyone has answered) → advance Canva → <b>Next</b> opens the next question immediately. <b>End session</b> shows candidates their final score and rank.</p>
+      <p class="muted" style="margin:10px 0 0">Show the question in your deck → <b>Open question</b> (timer starts) → candidates submit → <b>Reveal</b> → advance deck → <b>Next</b> opens the next question immediately.</p>
     </div>
-
-    <div class="card">
-      <h2>Candidates — question ${q}</h2>
-      ${players.length?'':'<p class="muted">Nobody has joined this session yet. Show them the QR code →</p>'}
-      <div class="players">
-        ${players.map(g=>{
-          const a=cur[g]; let cls='g';
-          if(a){ cls += st.revealed ? (a.is_correct?' right':' wrong') : ' done'; }
-          const main = a ? (st.revealed||st.locked ? a.choice : '✓') : '…';
-          const sub = a ? (st.revealed ? `+${a.points} pts · ${(a.elapsed_ms/1000).toFixed(1)} s` : `${(a.elapsed_ms/1000).toFixed(1)} s`) : '';
-          return `<div class="${cls}"><span class="x" data-g="${esc(g)}" title="Remove from session">✕</span>${esc(g)}<span class="c">${main}</span><span class="t">${sub}</span></div>`;
-        }).join('')}
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Leaderboard <span class="muted" style="text-transform:none">(${revealedN} of ${st.total_questions} revealed)</span></h2>
-      ${scores.map(x=>`<div class="bar"><div class="n">${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}
-      <p class="muted"><a href="board.html" target="_blank">Open full-screen leaderboard for the projector ↗</a></p>
-    </div>
-
-    <div class="card">
-      <h2>Answer spread — question ${q}</h2>
-      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div>
-    </div>
+    ${completeCard}
+    <div class="card"><h2>Candidates — question ${q}</h2>
+      ${players.length?'':'<p class="muted">Nobody has joined yet. Open the join screen (right) on a second display.</p>'}
+      <div class="players">${players.map(g=>{ const a=cur[g]; let cls='g'; if(a) cls += st.revealed?(a.is_correct?' right':' wrong'):' done';
+        const main = a?(st.revealed||st.locked?a.choice:'✓'):'…'; const sub = a?(st.revealed?`+${a.points} pts · ${(a.elapsed_ms/1000).toFixed(1)} s`:`${(a.elapsed_ms/1000).toFixed(1)} s`):'';
+        return `<div class="${cls}"><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span>${esc(g)}<span class="c">${main}</span><span class="t">${sub}</span></div>`;}).join('')}</div></div>
+    <div class="card"><h2>Leaderboard <span class="muted" style="text-transform:none">(${revealedN} of ${st.total_questions} revealed)</span></h2>
+      ${scores.map(x=>`<div class="bar"><div class="n">${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}</div>
+    <div class="card"><h2>Answer spread — question ${q}</h2>
+      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div></div>
   </div>
-
   <div>
-    <div class="card">
-      <h2>Join link</h2>
-      <div id="qr"></div>
-      <p style="word-break:break-all;margin:8px 0 0"><a href="${candidateUrl}" target="_blank">${candidateUrl}</a></p>
-    </div>
-    <div class="card">
-      <h2>Quiz</h2>
-      <div class="row"><input id="qtitle" placeholder="Quiz title, e.g. ECG Quiz" value="${esc(st.quiz_title)}" style="flex:1"><button id="settitle">Set</button></div>
-      <p class="muted">Shown to candidates on the join screen and during the quiz.</p>
-      <h2 style="margin-top:14px">Session</h2>
-      <div class="row"><input id="sname" placeholder="e.g. Group 2 — 10:00" style="flex:1"><button class="primary" id="newsess">New session</button></div>
-      <p class="muted">Fresh session: Q1 waiting to open, no candidates, no scores. The answer key, timer and scoring mode are kept — so this is also how you repeat the quiz for the next group.</p>
-      <div class="row" style="margin-top:8px"><label class="muted">Timer (s, 0 = off)</label><input id="timer_in" type="number" min="0" max="600" value="${st.timer_seconds}" style="width:80px"><button id="settimer">Set</button></div>
-      <div class="row" style="margin-top:8px"><label class="muted">Scoring</label><select id="scoring"><option value="speed" ${st.scoring==='speed'?'selected':''}>Speed: 100, 90, 80… (min 50)</option><option value="flat" ${st.scoring==='flat'?'selected':''}>Flat: 100 per correct</option></select></div>
-      <div class="row" style="margin-top:8px"><label class="muted">Total questions</label><input id="total" type="number" min="1" max="100" value="${st.total_questions}" style="width:80px"><button id="settotal">Set</button></div>
-      <div class="row" style="margin-top:8px"><label class="muted">Jump to Q</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:80px"><button id="gotobtn">Go</button></div>
-    </div>
-    <div class="card">
-      <h2>Answer key <button id="togglekey" style="padding:4px 10px;font-size:12px">${keyOpen?'hide':'edit'}</button></h2>
-      <p class="muted">${Object.keys(key).length} of ${st.total_questions} set. Kept across sessions. Keep this hidden while candidates can see your screen. <a href="#" id="clearkey">Clear all</a> when you set up a different quiz.</p>
-      <div class="key" style="${keyOpen?'':'display:none'}">
-        ${Array.from({length:st.total_questions},(_,i)=>i+1).map(n=>`<div class="k"><span>${n}</span>${['A','B','C','D'].map(o=>`<button class="${key[n]===o?'on':''}" data-q="${n}" data-o="${o}">${o}</button>`).join('')}</div>`).join('')}
-      </div>
-    </div>
-    <div class="card">
-      <h2>Security</h2>
-      <div class="row"><input id="newpin" placeholder="New PIN" style="flex:1"><button id="setpin">Change PIN</button></div>
-      <p class="muted"><a href="#" id="logout">Log out</a></p>
-    </div>
-  </div>`;
+    <div class="card"><h2>Join screen</h2>
+      <div class="qrmini" id="openjoin" title="Open the join screen in a new window"><div id="qr"></div><div><div style="font-weight:600">Open on a second display ↗</div><div class="muted hint">Full-screen QR and link for candidates — the host page stays private.</div></div></div></div>
+    <div class="card"><h2>Session</h2>
+      <p class="muted" style="margin-top:0">${esc(st.session_name)} · ${players.length} joined</p>
+      <div class="row"><button class="primary sm" id="newround">↻ New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button></div>
+      <p class="muted">New round: same quiz, fresh players and scores (for the next group).</p>
+      <div class="row" style="margin-top:6px"><label class="muted">Jump to Q</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:70px"><button class="sm" id="gotobtn">Go</button></div></div>
+    <div class="card"><h2>Screens</h2><p class="muted" style="margin:0"><a href="board.html" target="_blank">Projector leaderboard ↗</a><br><a href="#home">← Back to my quizzes</a> (session keeps running)</p></div>
+  </div></div>`;
+}
 
-  new QRCode(document.getElementById('qr'),{text:candidateUrl,width:160,height:160});
-  Object.entries(keep).forEach(([id,v])=>{const el=document.getElementById(id); if(el){el.value=v; el.focus();}});
-  tick();
-
+// ---------- events ----------
+function bind(){
   const on=(id,fn)=>{const el=document.getElementById(id); if(el) el.onclick=fn;};
-  on('open',()=>act('open').then(load));
-  on('lock',()=>act('lock').then(load));
-  on('reveal',()=>act('reveal').then(load));
-  on('next',()=>act('next').then(load));
-  on('prev',()=>act('prev').then(load));
-  on('endsess',()=>{ if(confirm('End this session? Candidates will see their final score and rank.')) act('end_session').then(load); });
-  on('newsess',()=>{ if(confirm('Start a new session? Candidates and scores clear from the screen (answer key is kept).')) act('new_session',{name:document.getElementById('sname').value}).then(load); });
-  on('settitle',()=>act('set_title',{title:document.getElementById('qtitle').value}).then(load));
-  on('settimer',()=>act('set_timer',{seconds:+document.getElementById('timer_in').value}).then(load));
-  document.getElementById('scoring').onchange=(e)=>act('set_scoring',{mode:e.target.value}).then(load);
-  on('settotal',()=>act('set_total',{total:+document.getElementById('total').value}).then(load));
+  app.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>go(el.dataset.go));
+  on('logout',(e)=>{e.preventDefault();sessionStorage.removeItem('quiz_pin');location.hash='';location.reload();});
+  // home
+  app.querySelectorAll('[data-play]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.play); if(liveActive() && !confirm(`A session of "${st.quiz_title}" is still running. Start "${q.title}" instead?`)) return; await act('play',{id:+b.dataset.play}); await load(); go('play'); });
+  app.querySelectorAll('[data-archive]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.archive); if(!confirm(`Remove "${q.title}" from your list?`)) return; await act('archive_quiz',{id:+b.dataset.archive}); await loadQuizzes(); render(true); });
+  on('endlive',()=>{ if(confirm('End the live session?')) act('end_session').then(load); });
+  // editor
+  const readForm=()=>{ editing.title=document.getElementById('e_title').value; editing.total_questions=+document.getElementById('e_total').value||1; editing.timer_seconds=+document.getElementById('e_timer').value||0; editing.scoring=document.getElementById('e_scoring').value; };
+  ['e_title','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el) el.onchange=readForm;});
+  const et=document.getElementById('e_total'); if(et) et.onchange=()=>{ readForm(); render(true); };
+  app.querySelectorAll('[data-kq]').forEach(b=>b.onclick=()=>{ readForm(); const i=b.dataset.kq,o=b.dataset.ko; if(editing.answer_key[i]===o) delete editing.answer_key[i]; else editing.answer_key[i]=o; render(true); });
+  const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); return null; } const q=await act('save_quiz',editing); editing.id=q.id; await loadQuizzes(); toast('Saved'); return q; };
+  on('save',async()=>{ const q=await save(); if(q) render(true); });
+  on('saveplay',async()=>{ const q=await save(); if(!q) return; if(liveActive() && !confirm(`A session of "${st.quiz_title}" is still running. Start this quiz instead?`)) return; await act('play',{id:q.id}); await load(); go('play'); });
+  // settings
+  on('setpin',async()=>{const p=document.getElementById('newpin').value.trim(); await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); toast('PIN changed'); document.getElementById('newpin').value='';});
+  // play
+  on('open',()=>act('open').then(load)); on('lock',()=>act('lock').then(load)); on('reveal',()=>act('reveal').then(load));
+  on('next',()=>act('next').then(load)); on('prev',()=>act('prev').then(load));
+  const end=()=>{ if(confirm('End this session? Candidates will see their final score and rank.')) act('end_session').then(load); };
+  on('endsess',end); on('endsess2',end);
+  on('newround',()=>{ if(confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
-  on('togglekey',()=>{keyOpen=!keyOpen;render(true);});
-  on('setpin',async()=>{const p=document.getElementById('newpin').value.trim(); await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); alert('PIN changed');});
-  on('clearkey',(e)=>{e.preventDefault(); if(confirm('Clear the whole answer key?')) act('clear_key').then(async()=>{key=await act('get_key'); render(true);});});
-  on('logout',(e)=>{e.preventDefault();sessionStorage.removeItem('quiz_pin');location.reload();});
-  app.querySelectorAll('.key button').forEach(b=>b.onclick=async()=>{
-    const n=b.dataset.q,o=b.dataset.o; const v=(key[n]===o)?'':o;
-    await act('set_key',{[n]:v}); if(v) key[n]=v; else delete key[n]; render(true);
-  });
-  app.querySelectorAll('.g .x').forEach(x=>x.onclick=()=>{ if(confirm('Remove "'+x.dataset.g+'" from this session?')) act('remove_player',{name:x.dataset.g}).then(load); });
+  on('openjoin',()=>window.open(joinUrl,'quizjoin','width=900,height=700'));
+  app.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ if(confirm('Remove "'+x.dataset.rm+'" from this session?')) act('remove_player',{name:x.dataset.rm}).then(load); });
+  const qr=document.getElementById('qr'); if(qr) new QRCode(qr,{text:candidateUrl,width:72,height:72});
+  tick();
 }
 
 if(pin) start();
