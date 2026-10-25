@@ -433,6 +433,7 @@ function bind(){
   app.querySelectorAll('[data-kq]').forEach(b=>b.onclick=()=>{ readForm(); const i=b.dataset.kq,o=b.dataset.ko; if(editing.answer_key[i]===o) delete editing.answer_key[i]; else editing.answer_key[i]=o; render(true); });
   on('resetkey',()=>{ readForm(); confirmReset=true; render(true); });
   on('resetno',()=>{ confirmReset=false; render(true); });
+  const rm=document.getElementById('resetmodal'); if(rm){ rm.onclick=(e)=>{ if(e.target===rm){ confirmReset=false; render(true); } }; document.getElementById('resetno').focus(); }
   on('resetyes',()=>{ editing.answer_key={}; confirmReset=false; render(true); toast('Answer key cleared — remember to save'); });
   const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); return null; } const q=await act('save_quiz',editing); editing.id=q.id; await loadQuizzes(); toast('Saved'); return q; };
   on('save',async()=>{ const q=await save(); if(q) render(true); });
