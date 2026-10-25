@@ -88,7 +88,9 @@
   .qz.new{align-items:center;justify-content:center;min-height:160px;cursor:pointer}
   .qz h3{margin:0;font-size:18px}
   .qz .meta{font-size:13px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
-  .qz .actions{display:flex;gap:8px;margin-top:auto}
+  .qz .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto}
+  .qz .actions button{padding-left:0;padding-right:0}
+  button.grey{background:#5b6775;color:#fff}
   /* editor */
   .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
   .form .wide{grid-column:1/-1}
@@ -278,7 +280,7 @@ function home(){
         <h3>${esc(q.title)}</h3>
         <div class="meta"><span>${q.total_questions} questions</span><span>${q.timer_seconds?q.timer_seconds+' s timer':'no timer'}</span><span>${q.scoring==='flat'?'flat':'speed'} scoring</span></div>
         <div>${keyCount(q)>=q.total_questions?'<span class="pill done">Answer key complete</span>':'<span class="pill nokey">Key: '+keyCount(q)+' of '+q.total_questions+'</span>'}</div>
-        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button data-go="edit-${q.id}">Edit</button><button class="remove" data-archive="${q.id}" title="Move to bin">Remove</button></div>
+        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button class="grey" data-go="edit-${q.id}">Edit</button><button class="remove" data-archive="${q.id}" title="Move to bin">Remove</button></div>
       </div>`).join('')}
     </div>
     ${binnedQuizzes().length?`<div style="margin-top:28px">
