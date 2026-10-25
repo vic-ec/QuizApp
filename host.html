@@ -95,11 +95,15 @@
   .qz .actions button{padding:8px 0;font-size:13px}
   button.grey{background:#5b6775;color:#fff}
   .ed-actions button{padding:8px 14px;font-size:13px}
-  .layout.slides{grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr)}
-  .layout.slides .slidewrap{margin-top:0}
-  .layout.slides .slidebar{margin-bottom:16px}
-  .under{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}.under{grid-template-columns:1fr}}
+  .layout.slides{grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);grid-template-areas:"ctrl side" "slides side";align-items:start}
+  .a-ctrl{grid-area:ctrl} .a-slides{grid-area:slides} .a-side{grid-area:side}
+  .layout.slides .controls button.xl{font-size:clamp(12px,1.05vw,17px);padding:0 clamp(6px,.8vw,14px);height:clamp(38px,3.6vw,52px)}
+  .layout.slides .controls #prev{font-size:clamp(11px,.9vw,14px);padding:0 clamp(6px,.7vw,12px);height:clamp(38px,3.6vw,52px)}
+  .layout.slides .big,.layout.slides .timer{font-size:clamp(24px,2.8vw,40px)}
+  .layout.slides h1{font-size:clamp(15px,1.4vw,20px)}
+  @media(max-width:1100px){.layout.slides{grid-template-columns:1fr;grid-template-areas:"ctrl" "slides" "side"}}
+  .modalbox.sess{max-width:520px;text-align:left;max-height:90vh;overflow:auto}
+  .modalbox.sess .card{margin-bottom:12px}
   @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}}
   .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
   .slidewrap iframe{width:100%;height:100%;border:0;display:block}
@@ -181,7 +185,7 @@ const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
-let quizzes=[], editing=null, confirmReset=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
+let quizzes=[], editing=null, confirmReset=false, sessOpen=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
 let view = 'home';                          // home | edit | play | settings
 const baseUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const candidateUrl = baseUrl + 'play/';
@@ -276,7 +280,7 @@ const liveActive = () => st && !st.ended && st.session_id;
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,sessOpen]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
@@ -400,7 +404,7 @@ function play(){
 
   const embed = quiz && quiz.embed_url;
   const showSlides = embed && slidesOn;
-  const toggle = embed ? `<label class="toggle ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span class="sw"></span><span>Slides</span></label>` : '';
+  const toggle = embed ? `<label class="toggle ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span class="sw"></span><span>Show slides</span></label>` : '';
   const controlsCard = `<div class="card">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
         <div><h1>${esc(st.quiz_title)} <span style="color:var(--muted);font-weight:500">· ${esc(st.session_name)}</span></h1>
@@ -418,7 +422,7 @@ function play(){
         <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
         ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="magenta xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
       </div>
-      <div class="row" style="margin:10px 0 0;justify-content:space-between"><p class="muted" style="margin:0;flex:1;min-width:200px">Show the question → <b>Open question</b> (timer starts) → candidates submit → <b>Reveal</b> → advance → <b>Next</b> opens the next question immediately.</p>${toggle}</div>
+      ${(embed||showSlides)?`<div class="row" style="margin:10px 0 0;justify-content:flex-end;gap:14px">${toggle}${showSlides?'<button class="sm" id="sessbtn">Session &amp; screens</button>':''}</div>`:''}
     </div>`;
   const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
       <div class="slidebar"><span class="muted">Click inside the slides, then use ← → to move. The quiz buttons do not change slides.</span>
@@ -446,10 +450,12 @@ function play(){
   const backCard = `<div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>`;
 
   if(showSlides){
+    const modal = sessOpen ? `<div class="modalbg" id="sessmodal"><div class="modalbox sess"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>Session &amp; screens</b><button class="iconbtn" id="sessclose" aria-label="Close">✕</button></div>${sessionCard}${screensCard}${backCard}</div></div>` : '';
     return `<div class="layout slides">
-      <div>${controlsCard}${slidePane}<div class="under">${sessionCard}<div>${screensCard}${backCard}</div></div></div>
-      <div>${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
-    </div>`;
+      <div class="a-ctrl">${controlsCard}</div>
+      <div class="a-slides">${slidePane}</div>
+      <div class="a-side">${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
+    </div>${modal}`;
   }
   return `<div class="layout">
     <div>${controlsCard}${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
@@ -493,6 +499,9 @@ function bind(){
   on('endsess',end); on('endsess2',end);
   on('newround',()=>{ if(confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
+  on('sessbtn',()=>{ sessOpen=true; render(true); });
+  on('sessclose',()=>{ sessOpen=false; render(true); });
+  const sm=document.getElementById('sessmodal'); if(sm) sm.onclick=(e)=>{ if(e.target===sm){ sessOpen=false; render(true); } };
   on('slidestoggle',()=>{ slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
   on('slidesfs',()=>{ const f=document.getElementById('slides'); if(f&&f.requestFullscreen) f.requestFullscreen(); });
   on('slidesnew',()=>{ const quiz=quizzes.find(x=>x.id===st.quiz_id); if(quiz) window.open(quiz.embed_url,'quizslides'); });
