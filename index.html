@@ -41,6 +41,7 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
   input{width:100%;font-size:20px;padding:14px;border-radius:10px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
   .btn{width:100%;font-size:18px;font-weight:600;padding:14px;border-radius:10px;border:0;background:var(--accent);color:#fff;margin-top:10px}
+  .btn:disabled{opacity:.45}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:14px;padding:10px}
   .net{position:fixed;left:0;right:0;bottom:0;background:#4a1f1b;color:#ff8a7f;text-align:center;padding:8px;font-size:14px;display:none}
   .small{font-size:13px;color:var(--muted);text-align:center}
@@ -76,7 +77,7 @@
 const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 
-const AVATARS = ['🐶','🐱','🐭','🐿️','🐔','🐊','🦝','🦊','🐻','🐸'];
+const AVATARS = ['🐶','🐱','🐼','🦁','🐯','🐨','🐰','🦊','🐻','🐸'];
 let name = localStorage.getItem('quiz_name') || '';
 let avatar = localStorage.getItem('quiz_avatar') || '';
 let lbDismissed = null;        // question number whose leaderboard popup was closed
@@ -138,19 +139,21 @@ const expired = () => { const r=remaining(); return r!==null && r<=0; };
 function render(){
   if(!name){
     document.body.classList.add('centered');
-    if(document.getElementById('g')){ const h=document.querySelector('.join h2'); if(h) h.textContent=titleCache; return; }
+    const closed = !st || st.ended;
+    if(document.getElementById('g')){ const h=document.querySelector('.join h2'); if(h) h.textContent=titleCache;
+      const jb=document.getElementById('join'); if(jb){ jb.disabled=closed; jb.textContent=closed?'Waiting for the host to start a quiz…':'Join quiz'; } return; }
     app.innerHTML = `
       <div class="center"><div class="card join">
         <h2>${esc(titleCache)}</h2>
         <p class="small">Pick an avatar and enter your name</p>
         <div class="avatars">${AVATARS.map(a=>`<button class="${a===avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div>
         <input id="g" placeholder="Your name" maxlength="40" autocomplete="off" value="${esc(name)}">
-        <button class="btn" id="join">Join quiz</button>
+        <button class="btn" id="join" ${closed?'disabled':''}>${closed?'Waiting for the host to start a quiz…':'Join quiz'}</button>
         <p class="small" style="margin:12px 0 0">Keep this page open. If you lose connection, just reload — you'll land back on the current question.</p>
       </div></div>`;
     const inp = document.getElementById('g'); inp.focus();
     app.querySelectorAll('.avatars button').forEach(b=>b.onclick=()=>{ avatar=b.dataset.a; try{localStorage.setItem('quiz_avatar',avatar);}catch(e){} app.querySelectorAll('.avatars button').forEach(x=>x.classList.toggle('sel',x.dataset.a===avatar)); });
-    const join = async()=>{ const v=inp.value.trim(); if(!v) return; if(!avatar){ avatar=AVATARS[Math.floor(Math.random()*AVATARS.length)]; } name=v; localStorage.setItem('quiz_name',v); localStorage.setItem('quiz_avatar',avatar); try{localStorage.removeItem('quiz_session');}catch(e){} knownSession=null; lbDismissed=null; await load(); };
+    const join = async()=>{ const v=inp.value.trim(); if(!v || !st || st.ended) return; if(!avatar){ avatar=AVATARS[Math.floor(Math.random()*AVATARS.length)]; } name=v; localStorage.setItem('quiz_name',v); localStorage.setItem('quiz_avatar',avatar); try{localStorage.removeItem('quiz_session');}catch(e){} knownSession=null; lbDismissed=null; await load(); };
     document.getElementById('join').onclick = join;
     inp.addEventListener('keydown',e=>{if(e.key==='Enter') join();});
     return;
@@ -176,6 +179,27 @@ function render(){
   }
 
   const q = st.current_question, my = mine[q];
+  if(!st.question_opened_at && q===1 && !st.revealed){
+    document.body.classList.add('centered');
+    app.innerHTML = `
+      <div class="center"><div class="card join">
+        <div style="font-size:52px;line-height:1">${avatar}</div>
+        <div style="font-size:20px;font-weight:700;margin:6px 0 2px">${esc(name)}</div>
+        <div class="small">you're in</div>
+        <h2 style="margin-top:16px">${esc(st.quiz_title)}</h2>
+        <ul style="text-align:left;margin:14px auto 0;padding-left:22px;line-height:1.7;max-width:320px">
+          <li><b>${st.total_questions}</b> question${st.total_questions===1?'':'s'}</li>
+          <li><b>${st.timer_seconds?st.timer_seconds+' seconds':'No time limit'}</b> per question</li>
+          <li><b>4</b> answer options (A–D), one correct</li>
+          <li>${st.scoring==='flat'?'100 points per correct answer':'Faster correct answers score more — <b>submit as quickly as you can</b>'}</li>
+        </ul>
+        <div class="banner wait" style="margin-top:16px">Waiting for the host to start…</div>
+        <div style="font-size:22px;font-weight:800;margin-top:14px">Good luck! 🍀</div>
+        <div class="small" style="margin-top:10px"><a href="#" id="exitlink" style="color:var(--muted)">Exit quiz</a></div>
+      </div></div>`;
+    document.getElementById('exitlink').onclick=(e)=>{e.preventDefault(); exit();};
+    return;
+  }
   const open = !st.locked && !st.revealed && st.question_opened_at && !expired();
   let banner='';
   if(st.revealed){
