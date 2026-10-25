@@ -434,7 +434,7 @@ function play(){
           : `<button class="ok xl" id="open" ${canOpen?'':'disabled'}>Open question</button>`}
         <button class="warn xl" id="lock" ${status==='open'?'':'disabled'}>Lock</button>
         <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
-        ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="magenta xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
+        ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
       </div>
       <div class="row" style="margin:10px 0 0;justify-content:flex-end;gap:14px">${toggle}<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top control bar"><span>Presenter bar</span><span class="sw"></span></label></div>
     </div>`;
@@ -444,7 +444,7 @@ function play(){
           : `<button class="ok xl" id="open" ${canOpen?'':'disabled'}>Open question</button>`}
         <button class="warn xl" id="lock" ${status==='open'?'':'disabled'}>Lock</button>
         <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
-        ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="magenta xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}`;
+        ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}`;
   const compactCard = `<div class="card compact">
       <div class="crow">
         <div class="ctitle"><b>${esc(st.quiz_title)}</b><span class="muted"> · ${esc(st.session_name)}</span></div>
