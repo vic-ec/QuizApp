@@ -2,300 +2,53 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuizApp</title>
 <style>
-  :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;--accent:#4f8cff;
-        --ok:#2ecc71;--bad:#e74c3c;--warn:#f1c40f;
-        --A:#e74c3c;--B:#3498db;--C:#f1c40f;--D:#2ecc71;}
+  :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;--accent:#4f8cff;--ok:#2ecc71;--purple:#8e5cf6;
+        --A:#e74c3c;--B:#3498db;--C:#f1c40f;--D:#2ecc71}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
-  .wrap{max-width:520px;width:100%;margin:0 auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
-  body.centered .wrap{max-width:none;padding:0}
-  .top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted)}
-  .top b{color:var(--text)}
-  .head{display:flex;justify-content:space-between;align-items:center}
-  .q{font-size:30px;font-weight:700}
-  .q small{color:var(--muted);font-size:18px;font-weight:500}
-  .timer{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
-  .timer.low{color:var(--bad)}
-  .timer.blink{animation:blink 1s steps(1,end) infinite}
-  @keyframes blink{50%{opacity:0}}
-  @media(prefers-reduced-motion:reduce){.timer.blink{animation:none}}
-  .timer.off{color:var(--muted);font-size:16px;font-weight:500}
-  .status{text-align:center;font-size:14px;color:var(--muted)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  button.opt{font-size:44px;font-weight:800;padding:30px 0;border-radius:16px;border:4px solid transparent;color:#fff;cursor:pointer;transition:.12s;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  button.opt[data-o="A"]{background:var(--A)} button.opt[data-o="B"]{background:var(--B)}
-  button.opt[data-o="C"]{background:var(--C);color:#2a2400;text-shadow:none} button.opt[data-o="D"]{background:var(--D);color:#06220f;text-shadow:none}
-  button.opt:active{transform:scale(.97)}
-  button.opt.sel{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
-  button.opt.dim{opacity:.22}
-  button.opt.correct{border-color:#fff;box-shadow:0 0 0 4px var(--ok)}
-  button.opt.wrong{opacity:.55}
-  button.opt:disabled{cursor:default}
-  .submit{font-size:22px;font-weight:700;padding:18px;border-radius:14px;border:0;background:#fff;color:#0f1419;width:100%}
-  .submit:disabled{opacity:.35}
-  .banner{border-radius:12px;padding:14px;text-align:center;font-size:17px;font-weight:600}
-  .banner.lock{background:#3a3415;color:var(--warn)}
-  .banner.ok{background:#163d2b;color:var(--ok)}
-  .banner.bad{background:#4a1f1b;color:#ff8a7f}
-  .banner.wait{background:var(--card);color:var(--muted);font-weight:500}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-  input{width:100%;font-size:20px;padding:14px;border-radius:10px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
-  .btn{width:100%;font-size:18px;font-weight:600;padding:14px;border-radius:10px;border:0;background:var(--accent);color:#fff;margin-top:10px}
-  .btn:disabled{opacity:.45}
-  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:14px;padding:10px}
-  .net{position:fixed;left:0;right:0;bottom:0;background:#4a1f1b;color:#ff8a7f;text-align:center;padding:8px;font-size:14px;display:none}
-  .small{font-size:13px;color:var(--muted);text-align:center}
-  .final{text-align:center}
-  .final .pts{font-size:56px;font-weight:800;color:var(--warn)}
-  .lb{display:flex;flex-direction:column;gap:6px;margin:12px 0}
-  .lb div{display:flex;justify-content:space-between;padding:8px 12px;border-radius:8px;background:#0f1419}
-  .lb div.me{outline:2px solid var(--accent)}
-  .err{color:#ff8a7f;font-size:14px;text-align:center;min-height:18px}
-  .center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
-  .join{width:100%;max-width:440px;text-align:center}
-  .join h2{font-size:26px;margin:0 0 4px}
-  .avatars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:6px 0 14px}
-  .avatars button{font-size:30px;padding:10px 0;border-radius:12px;border:2px solid var(--line);background:#0f1419;cursor:pointer;line-height:1}
-  .avatars button.sel{border-color:var(--accent);background:#1d2f4d;box-shadow:0 0 0 3px rgba(79,140,255,.35)}
-  .av{font-size:1.2em;margin-right:6px}
-  .modal{position:fixed;inset:0;background:rgba(5,8,12,.82);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
-  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;width:100%;max-width:440px;text-align:center}
-  .modal .res{font-size:22px;font-weight:800;margin-bottom:2px}
-  .modal .res.ok{color:var(--ok)} .modal .res.bad{color:#ff8a7f}
-  .modal h3{margin:12px 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-  .modal .lb div{font-size:16px}
-  .modal .close{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 14px;font:inherit}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);background:#121920}
+  .brand{font-weight:800;font-size:20px}
+  .top a{color:var(--muted);text-decoration:none;font-size:14px;border:1px solid var(--line);border-radius:9px;padding:7px 12px;margin-left:8px}
+  .top a:hover{color:var(--text)}
+  .hero{max-width:900px;margin:0 auto;padding:9vh 20px 6vh;text-align:center}
+  h1{font-size:clamp(28px,5vw,46px);margin:0 0 10px;line-height:1.1}
+  .lead{color:var(--muted);font-size:clamp(15px,2vw,19px);margin:0 auto 32px;max-width:560px}
+  .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:18px;padding:16px 28px;border-radius:14px;text-decoration:none;color:#fff;border:0}
+  .btn.join{background:var(--accent)} .btn.host{background:var(--purple)}
+  .btn:hover{filter:brightness(1.1)}
+  .tiles{display:flex;gap:10px;justify-content:center;margin:40px auto 0}
+  .tiles span{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff}
+  .tiles .A{background:var(--A)} .tiles .B{background:var(--B)} .tiles .C{background:var(--C);color:#2a2400} .tiles .D{background:var(--D);color:#06220f}
+  .how{max-width:900px;margin:0 auto;padding:0 20px 8vh}
+  .how h2{text-align:center;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 18px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .step b{display:block;font-size:16px;margin-bottom:6px}
+  .step p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:20px;border-top:1px solid var(--line)}
+  footer a{color:var(--muted)}
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
-<div class="net" id="net">Connection lost — retrying…</div>
-
-<script src="vendor-supabase.js"></script>
-<script src="config.js"></script>
-<script>
-const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
-const app = document.getElementById('app'), net = document.getElementById('net');
-
-const AVATARS = ['🐶','🐱','🐼','🦁','🐯','🐨','🐰','🦊','🐻','🐸'];
-let name = localStorage.getItem('quiz_name') || '';
-let avatar = localStorage.getItem('quiz_avatar') || '';
-let lbDismissed = null;        // question number whose leaderboard popup was closed
-let st = null, mine = {}, correct = null, knownSession = null, titleCache = localStorage.getItem('quiz_title') || 'Quiz';
-let selected = null, busy = false, errMsg = '';
-let clockOffset = 0;           // serverNow ≈ Date.now() - clockOffset
-let board = [];                // leaderboard (after each reveal and at the end)
-
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-const serverNow = () => Date.now() - clockOffset;
-
-async function syncClock(){
-  try{ const t0=Date.now(); const {data}=await sb.rpc('server_now'); const t1=Date.now();
-       if(data) clockOffset = (t0+t1)/2 - new Date(data).getTime(); }catch(e){}
-}
-
-async function load(){
-  try{
-    const {data:s, error} = await sb.from('quiz_state').select('*').eq('id',1).single();
-    if(error) throw error;
-    if(st && st.current_question!==s.current_question) { selected=null; errMsg=''; }
-    st = s; titleCache = s.quiz_title || 'Quiz'; try{localStorage.setItem('quiz_title', titleCache);}catch(e){}
-    if(name){
-      const storedSession = localStorage.getItem('quiz_session');
-      if((knownSession && knownSession !== s.session_id) || (!knownSession && storedSession && storedSession !== s.session_id)){
-        // host started a new session: back to the join screen
-        exit(); return;
-      }
-      if(knownSession !== s.session_id){ await sb.rpc('join_quiz',{p_player:name,p_avatar:avatar}); knownSession = s.session_id; try{localStorage.setItem('quiz_session', s.session_id);}catch(e){} selected=null; }
-      const {data:a} = await sb.from('answers').select('question,choice,is_correct,points,elapsed_ms')
-        .eq('session_id', s.session_id).eq('player', name);
-      mine = {}; (a||[]).forEach(r=>mine[r.question]=r);
-      correct = s.revealed ? (await sb.rpc('revealed_answer',{p_question:s.current_question})).data : null;
-      if(s.ended || s.revealed){
-        const [g,all] = await Promise.all([
-          sb.from('players').select('name,avatar').eq('session_id',s.session_id),
-          sb.from('answers').select('player,points,is_correct').eq('session_id',s.session_id)
-        ]);
-        const avs = {}; (g.data||[]).forEach(r=>avs[r.name]=r.avatar||'');
-        board = (g.data||[]).map(r=>r.name).map(n=>({n, a:avs[n],
-          p:(all.data||[]).filter(x=>x.player===n).reduce((t,x)=>t+(x.points||0),0),
-          c:(all.data||[]).filter(x=>x.player===n&&x.is_correct===true).length}))
-          .sort((x,y)=>y.p-x.p||y.c-x.c||x.n.localeCompare(y.n));
-      }
-    }
-    net.style.display='none';
-  }catch(e){ net.style.display='block'; }
-  render();
-}
-
-const totalPts = () => Object.values(mine).reduce((t,r)=>t+(r.points||0),0);
-const totalCorrect = () => Object.values(mine).filter(r=>r.is_correct===true).length;
-function remaining(){
-  if(!st || !st.timer_seconds || !st.question_opened_at) return null;
-  return Math.max(0, st.timer_seconds - (serverNow() - new Date(st.question_opened_at).getTime())/1000);
-}
-const expired = () => { const r=remaining(); return r!==null && r<=0; };
-
-function render(){
-  if(!name){
-    document.body.classList.add('centered');
-    const closed = !st || st.ended;
-    if(document.getElementById('g')){ const h=document.getElementById('jt'); if(h) h.textContent=titleCache;
-      const jb=document.getElementById('join'); if(jb){ jb.disabled=closed; jb.textContent=closed?'Waiting for the host to start a quiz…':'Join quiz'; } return; }
-    app.innerHTML = `
-      <div class="center"><div class="card join">
-        <h2 id="jt" style="margin-bottom:16px">${esc(titleCache)}</h2>
-        <div class="small" style="text-align:left;margin:0 0 6px">Type your name</div>
-        <input id="g" placeholder="Your name" maxlength="40" autocomplete="off" value="${esc(name)}">
-        <div class="small" style="text-align:left;margin:14px 0 0">Pick your avatar</div>
-        <div class="avatars">${AVATARS.map(a=>`<button class="${a===avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div>
-        <button class="btn" id="join" ${closed?'disabled':''}>${closed?'Waiting for the host to start a quiz…':'Join quiz'}</button>
-        <p class="small" style="margin:12px 0 0">Keep this page open. If you lose connection, just reload — you'll land back on the current question.</p>
-      </div></div>`;
-    const inp = document.getElementById('g'); inp.focus();
-    app.querySelectorAll('.avatars button').forEach(b=>b.onclick=()=>{ avatar=b.dataset.a; try{localStorage.setItem('quiz_avatar',avatar);}catch(e){} app.querySelectorAll('.avatars button').forEach(x=>x.classList.toggle('sel',x.dataset.a===avatar)); });
-    const join = async()=>{ const v=inp.value.trim(); if(!v || !st || st.ended) return; if(!avatar){ avatar=AVATARS[Math.floor(Math.random()*AVATARS.length)]; } name=v; localStorage.setItem('quiz_name',v); localStorage.setItem('quiz_avatar',avatar); try{localStorage.removeItem('quiz_session');}catch(e){} knownSession=null; lbDismissed=null; await load(); };
-    document.getElementById('join').onclick = join;
-    inp.addEventListener('keydown',e=>{if(e.key==='Enter') join();});
-    return;
-  }
-  document.body.classList.remove('centered');
-  if(!st){ app.innerHTML = `<div class="banner wait">Connecting…</div>`; return; }
-
-  if(st.ended){
-    const rank = board.findIndex(x=>x.n===name)+1;
-    const medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
-    app.innerHTML = `
-      <div class="card final">
-        <div style="font-size:40px">🎉</div>
-        <div style="font-size:26px;font-weight:800;margin-bottom:4px">Quiz complete!</div>
-        <div class="small">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
-        <div class="pts">${totalPts()} pts</div>
-        <div style="font-size:18px">${medal} ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''} · ${totalCorrect()} of ${st.total_questions} correct</div>
-        <div class="lb">${board.slice(0,10).map((x,i)=>`<div class="${x.n===name?'me':''}"><span>${i+1}. <span class="av">${x.a||''}</span>${esc(x.n)}</span><span>${x.p}</span></div>`).join('')}</div>
-        <button class="btn" id="exit">Exit quiz</button>
-      </div>`;
-    document.getElementById('exit').onclick = exit;
-    return;
-  }
-
-  const q = st.current_question, my = mine[q];
-  if(!st.question_opened_at && q===1 && !st.revealed){
-    document.body.classList.add('centered');
-    app.innerHTML = `
-      <div class="center"><div class="card join">
-        <div style="font-size:52px;line-height:1">${avatar}</div>
-        <div style="font-size:20px;font-weight:700;margin:6px 0 2px">${esc(name)}</div>
-        <div class="small">you're in</div>
-        <h2 style="margin-top:16px">${esc(st.quiz_title)}</h2>
-        <ul style="text-align:left;margin:14px auto 0;padding-left:22px;line-height:1.7;max-width:320px">
-          <li><b>${st.total_questions}</b> question${st.total_questions===1?'':'s'}</li>
-          <li><b>${st.timer_seconds?st.timer_seconds+' seconds':'No time limit'}</b> per question</li>
-          <li><b>4</b> answer options (A–D), one correct</li>
-          <li>${st.scoring==='flat'?'100 points per correct answer':'Faster correct answers score more — <b>submit as quickly as you can</b>'}</li>
-        </ul>
-        <div class="banner wait" style="margin-top:16px">Waiting for the host to start…</div>
-        <div style="font-size:22px;font-weight:800;margin-top:14px">Good luck! 🍀</div>
-        <div class="small" style="margin-top:10px"><a href="#" id="exitlink" style="color:var(--muted)">Exit quiz</a></div>
-      </div></div>`;
-    document.getElementById('exitlink').onclick=(e)=>{e.preventDefault(); exit();};
-    return;
-  }
-  const open = !st.locked && !st.revealed && st.question_opened_at && !expired();
-  let banner='';
-  if(st.revealed){
-    if(!my) banner = `<div class="banner bad">No answer submitted. Correct answer: ${correct||'?'}</div>`;
-    else if(my.is_correct) banner = `<div class="banner ok">Correct! +${my.points} pts</div>`;
-    else banner = `<div class="banner bad">Not quite — correct answer: ${correct||'?'}</div>`;
-    banner += q>=st.total_questions ? `<div class="banner wait">That was the last question — final results coming up…</div>` : `<div class="banner wait">Waiting for the next question…</div>`;
-  } else if(my){
-    banner = `<div class="banner wait">Submitted <b>${my.choice}</b>${my.elapsed_ms!=null?` in ${(my.elapsed_ms/1000).toFixed(1)} s`:''}. Waiting for the reveal…</div>`;
-  } else if(!st.question_opened_at){
-    banner = `<div class="banner wait">Waiting for the host to open the question…</div>`;
-  } else if(st.locked || expired()){
-    banner = `<div class="banner lock">${expired()&&!st.locked?"Time's up":'Answers locked'} — you did not answer</div>`;
-  } else if(selected){
-    banner = `<button class="submit" id="submit">Submit ${selected}</button>`;
-  } else {
-    banner = `<div class="banner wait">Tap an answer, then Submit</div>`;
-  }
-
-  const opts = ['A','B','C','D'].map(o=>{
-    let cls='opt';
-    if(st.revealed){ if(o===correct) cls+=' correct'; else if(my&&o===my.choice) cls+=' wrong'; else cls+=' dim'; }
-    else if(my){ cls += o===my.choice?' sel':' dim'; }
-    else if(o===selected) cls+=' sel';
-    return `<button class="${cls}" data-o="${o}" ${open&&!my?'':'disabled'}>${o}</button>`;
-  }).join('');
-
-  app.innerHTML = `
-    <div class="top"><span><span class="av">${avatar}</span><b>${esc(name)}</b></span><span><b>${totalPts()}</b> pts · ${totalCorrect()} correct</span></div>
-    <div class="head"><div class="q">Q${q} <small>of ${st.total_questions}</small></div><div class="timer" id="timer"></div></div>
-    <div class="status">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
-    <div class="grid">${opts}</div>
-    ${banner}
-    <div class="err">${esc(errMsg)}</div>
-    <div class="small"><a href="#" id="exitlink" style="color:var(--muted)">Exit quiz</a></div>
-    ${st.revealed && lbDismissed!==q ? leaderboardModal(q, my) : ''}`;
-  const cl=document.getElementById('lbclose'); if(cl) cl.onclick=()=>{ lbDismissed=q; render(); };
-
-  app.querySelectorAll('button.opt').forEach(b=>b.onclick=()=>{ if(b.disabled) return; selected=b.dataset.o; errMsg=''; render(); });
-  const sub=document.getElementById('submit'); if(sub) sub.onclick=submit;
-  document.getElementById('exitlink').onclick=(e)=>{e.preventDefault(); exit();};
-  tick();
-}
-
-function leaderboardModal(q, my){
-  const rank = board.findIndex(x=>x.n===name)+1;
-  const res = !my ? `<div class="res bad">No answer · correct: ${correct||'?'}</div>` : my.is_correct ? `<div class="res ok">Correct! +${my.points} pts</div>` : `<div class="res bad">Not quite · correct: ${correct||'?'}</div>`;
-  const last = q>=st.total_questions;
-  return `<div class="modal"><div class="box">
-    ${res}
-    <div class="small">${rank?`You are ${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length} · ${totalPts()} pts`:''}</div>
-    <h3>Leaderboard after Q${q}</h3>
-    <div class="lb">${board.slice(0,8).map((x,i)=>`<div class="${x.n===name?'me':''}"><span>${i+1}. <span class="av">${x.a||''}</span>${esc(x.n)}</span><span>${x.p}</span></div>`).join('')}</div>
-    <div class="small">${last?'That was the last question — final results coming up…':'Next question coming up…'}</div>
-    <button class="close" id="lbclose">Hide</button>
-  </div></div>`;
-}
-function tick(){
-  const el=document.getElementById('timer'); if(!el||!st) return;
-  const r=remaining();
-  if(r===null){ el.textContent = st.timer_seconds?'':'no timer'; el.className='timer off'; return; }
-  if(st.revealed || st.locked){ el.textContent=''; return; }
-  el.textContent = Math.ceil(r);
-  el.className = 'timer' + (r<=10?' low':'') + (r<=5?' blink':'');
-  if(r<=0 && !mine[st.current_question] && !app.dataset.expiredRendered){ app.dataset.expiredRendered='1'; selected=null; render(); }
-}
-setInterval(tick, 250);
-
-async function submit(){
-  if(busy||!selected) return; busy=true;
-  const choice=selected;
-  document.getElementById('submit')?.setAttribute('disabled','');
-  const {error} = await sb.rpc('submit_answer',{p_player:name,p_choice:choice});
-  busy=false;
-  if(error){ errMsg=error.message; selected=null; }
-  await load();
-}
-
-function exit(){
-  try{localStorage.removeItem('quiz_session');}catch(e){}
-  localStorage.removeItem('quiz_name'); name=''; mine={}; selected=null; knownSession=null; render();
-}
-
-sb.channel('cand')
-  .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},()=>{ delete app.dataset.expiredRendered; load(); })
-  .on('postgres_changes',{event:'*',schema:'public',table:'answers'},(p)=>{ if(p.new && p.new.player===name) load(); })
-  .subscribe();
-setInterval(load, QUIZ_CONFIG.pollMs);
-setInterval(syncClock, 60000);
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ syncClock(); load(); } });
-window.addEventListener('online', ()=>{ syncClock(); load(); });
-syncClock().then(load);
-</script>
+<div class="top"><span class="brand">QuizApp</span><nav><a href="play/">Join a quiz</a><a href="host.html">Host login</a></nav></div>
+<section class="hero">
+  <h1>Live quizzes for teaching sessions</h1>
+  <p class="lead">Candidates answer on their phones. The host runs the questions, a timer counts down, faster correct answers score more, and the leaderboard updates live.</p>
+  <div class="cta"><a class="btn join" href="play/">▶ Join a quiz</a><a class="btn host" href="host.html">Host login</a></div>
+  <div class="tiles"><span class="A">A</span><span class="B">B</span><span class="C">C</span><span class="D">D</span></div>
+</section>
+<section class="how">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="step"><b>1 · Candidates join</b><p>Scan the QR code or open the join link, pick an avatar and enter a name. No account, no app to install.</p></div>
+    <div class="step"><b>2 · Host runs the quiz</b><p>Questions live in your slide deck. The host opens each question, the timer runs, and candidates submit A–D from their phones.</p></div>
+    <div class="step"><b>3 · Reveal and rank</b><p>Reveal the answer, see who got it and how fast, and follow the leaderboard through to the final podium.</p></div>
+  </div>
+</section>
+<footer>Victoria Hospital Emergency Centre · <a href="https://github.com/vic-ec/QuizApp">source</a></footer>
 </body>
 </html>

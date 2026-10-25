@@ -27,7 +27,7 @@
 <script src="config.js"></script>
 <script>
 const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
-const url = location.origin + location.pathname.replace(/join\.html$/,'');
+const url = location.origin + location.pathname.replace(/join\.html$/,'') + 'play/';
 document.getElementById('url').textContent = url.replace(/^https?:\/\//,'');
 new QRCode(document.getElementById('qr'),{text:url,width:Math.min(window.innerHeight*0.45,520),height:Math.min(window.innerHeight*0.45,520)});
 async function load(){
