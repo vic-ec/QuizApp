@@ -93,6 +93,17 @@
   .qz .actions button{padding:8px 0;font-size:13px}
   button.grey{background:#5b6775;color:#fff}
   .ed-actions button{padding:8px 14px;font-size:13px}
+  .layout.slides{grid-template-columns:minmax(0,1.5fr) minmax(380px,1fr)}
+  @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}}
+  .slidecol{position:sticky;top:12px;align-self:start}
+  .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
+  .slidewrap iframe{width:100%;height:100%;border:0;display:block}
+  .slidebar{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .slidebar .muted{flex:1}
+  .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--muted);user-select:none}
+  .toggle .sw{width:34px;height:20px;border-radius:999px;background:#2b3642;position:relative;transition:.15s}
+  .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#8d9aa8;transition:.15s}
+  .toggle.on .sw{background:var(--accent)} .toggle.on .sw::after{left:17px;background:#fff}
   .modalbg{position:fixed;inset:0;background:rgba(5,8,12,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
   .modalbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;max-width:380px;width:100%;text-align:center}
   .modalbox p{margin:0 0 16px;font-size:16px}
@@ -163,7 +174,7 @@ const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
-let quizzes=[], editing=null, confirmReset=false;              // editing = working copy of a quiz in the editor
+let quizzes=[], editing=null, confirmReset=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
 let view = 'home';                          // home | edit | play | settings
 const candidateUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const joinUrl = candidateUrl + 'join.html';
@@ -206,7 +217,7 @@ function route(){
   const h = location.hash.replace('#','');
   if(h==='play'){ if(liveActive()||(st&&st.session_id)) view='play'; else { view='home'; toast('No live session — press Play on a quiz'); } }
   else if(h==='settings') view='settings';
-  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : activeQuizzes().find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{}} : (q?JSON.parse(JSON.stringify(q)):null); view = editing?'edit':'home'; }
+  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : activeQuizzes().find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{},embed_url:''} : (q?JSON.parse(JSON.stringify(q)):null); view = editing?'edit':'home'; }
   else view='home';
   lastSig=''; render(true);
 }
@@ -257,11 +268,13 @@ const liveActive = () => st && !st.ended && st.session_id;
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
+  const oldFrame=document.getElementById('slides');
   app.innerHTML = topbar() + (view==='home'?home():view==='edit'?editor():view==='settings'?settings():play());
+  const newFrame=document.getElementById('slides'); if(oldFrame&&newFrame&&oldFrame.src===newFrame.src) newFrame.replaceWith(oldFrame);
   Object.entries(keep).forEach(([id,v])=>{const el=document.getElementById(id); if(el){el.value=v; el.focus();}});
   bind();
 }
@@ -308,6 +321,8 @@ function editor(){
       <div class="row ed-actions"><button id="save" class="ok">Save quiz</button><button id="saveplay" class="primary">Save &amp; play</button><button class="grey" data-go="home">Cancel</button></div></div>
     <div class="card"><div class="form">
       <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz"></label>
+      <label class="f wide">Presentation embed link (optional)<input id="e_embed" value="${esc(q.embed_url||'')}" placeholder="Paste a Canva / PowerPoint / Google Slides share or embed link"></label>
+      <div class="wide muted" style="margin-top:-6px">Shows your slides inside the live session page so you can run everything from one window. <b>Canva:</b> Share → More → Embed → copy (or just paste the design's view link). <b>PowerPoint:</b> OneDrive → File → Share → Embed. <b>Google Slides:</b> File → Share → Publish to web → Embed. The deck must be shared as viewable by link. You advance slides inside the pane; the app's buttons control the quiz only.</div>
       <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
       <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
       <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 90, 80… (min 50)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
@@ -320,6 +335,15 @@ function editor(){
     </div>`;
 }
 
+function normalizeEmbed(v){
+  v=(v||'').trim(); if(!v) return '';
+  const m=v.match(/src\s*=\s*["']([^"']+)["']/i); if(m) v=m[1];              // pasted <iframe …> code
+  try{ const u=new URL(v);
+    if(/canva\.com$/.test(u.hostname)||u.hostname.endsWith('.canva.com')){ u.pathname=u.pathname.replace(/\/(edit|watch)$/,'/view'); if(!u.pathname.endsWith('/view')) u.pathname=u.pathname.replace(/\/?$/,'/view'); u.search='?embed'; return u.toString(); }
+    if(u.hostname==='docs.google.com' && u.pathname.includes('/presentation/')){ u.pathname=u.pathname.replace(/\/(edit|pub|present).*$/,'/embed'); return u.origin+u.pathname+'?start=false&loop=false'; }
+    return u.toString();
+  }catch(e){ return v; }
+}
 let pinShown=false;
 const ICON_EXT='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
 const ICON_COPY='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
@@ -366,7 +390,12 @@ function play(){
       ${st.ended?'<p class="muted">Candidates are seeing their final score and rank.</p>':'<p class="muted">Press <b>End session</b> to show candidates their final score and rank.</p>'}
     </div>` : '';
 
-  return `<div class="layout"><div>
+  const embed = quiz && quiz.embed_url;
+  const showSlides = embed && slidesOn;
+  const slidePane = showSlides ? `<div class="slidecol"><div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
+      <div class="slidebar"><span class="muted">Click inside the slides, then use ← → to move. The quiz buttons on the right do not change slides.</span>
+        <button class="sm" id="slidesfs">Full screen</button><button class="sm" id="slidesnew">Open in new window</button></div></div>` : '';
+  return `<div class="layout ${showSlides?'slides':''}">${slidePane}<div>
     <div class="card">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
         <div><h1>${esc(st.quiz_title)} <span style="color:var(--muted);font-weight:500">· ${esc(st.session_name)}</span></h1>
@@ -396,8 +425,8 @@ function play(){
       ${scores.map(x=>`<div class="bar"><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}</div>
     <div class="card"><h2>Answer spread — question ${q}</h2>
       <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div></div>
-  </div>
-  <div>
+  ${showSlides?'':'</div><div>'}
+    ${embed?`<div class="card"><label class="toggle ${slidesOn?'on':''}" id="slidestoggle"><span class="sw"></span><span>Show slides in this page</span></label></div>`:''}
     <div class="card"><h2>Session</h2>
       <p class="muted" style="margin-top:0">${esc(st.session_name)} · ${players.length} joined</p>
       <div class="row" style="display:grid;grid-template-columns:1fr 1fr"><button class="purple sm" id="newround">New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button></div>
@@ -427,15 +456,15 @@ function bind(){
   app.querySelectorAll('[data-restore]').forEach(b=>b.onclick=async()=>{ const {error}=await sb.rpc('quiz_restore',{p_pin:pin,p_id:+b.dataset.restore}); if(error) return toast(error.message,true); await loadQuizzes(); toast('Restored'); render(true); });
   app.querySelectorAll('[data-delete]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.delete); if(!confirm(`Permanently delete "${q.title}" and its answer key? This cannot be undone.`)) return; const {error}=await sb.rpc('quiz_delete_forever',{p_pin:pin,p_id:+b.dataset.delete}); if(error) return toast(error.message,true); await loadQuizzes(); toast('Deleted'); render(true); });
   // editor
-  const readForm=()=>{ editing.title=document.getElementById('e_title').value; editing.total_questions=+document.getElementById('e_total').value||1; editing.timer_seconds=+document.getElementById('e_timer').value||0; editing.scoring=document.getElementById('e_scoring').value; };
-  ['e_title','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el) el.onchange=readForm;});
+  const readForm=()=>{ editing.title=document.getElementById('e_title').value; editing.embed_url=normalizeEmbed(document.getElementById('e_embed').value); editing.total_questions=+document.getElementById('e_total').value||1; editing.timer_seconds=+document.getElementById('e_timer').value||0; editing.scoring=document.getElementById('e_scoring').value; };
+  ['e_title','e_embed','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el) el.onchange=readForm;});
   const et=document.getElementById('e_total'); if(et) et.onchange=()=>{ readForm(); render(true); };
   app.querySelectorAll('[data-kq]').forEach(b=>b.onclick=()=>{ readForm(); const i=b.dataset.kq,o=b.dataset.ko; if(editing.answer_key[i]===o) delete editing.answer_key[i]; else editing.answer_key[i]=o; render(true); });
   on('resetkey',()=>{ readForm(); confirmReset=true; render(true); });
   on('resetno',()=>{ confirmReset=false; render(true); });
   const rm=document.getElementById('resetmodal'); if(rm){ rm.onclick=(e)=>{ if(e.target===rm){ confirmReset=false; render(true); } }; document.getElementById('resetno').focus(); }
   on('resetyes',()=>{ editing.answer_key={}; confirmReset=false; render(true); toast('Answer key cleared — remember to save'); });
-  const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); return null; } const q=await act('save_quiz',editing); editing.id=q.id; await loadQuizzes(); toast('Saved'); return q; };
+  const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); return null; } const q=await act('save_quiz',editing); editing.id=q.id; const {error:ee}=await sb.rpc('quiz_set_embed',{p_pin:pin,p_id:q.id,p_url:editing.embed_url||''}); if(ee){ toast(ee.message,true); } await loadQuizzes(); toast('Saved'); return q; };
   on('save',async()=>{ const q=await save(); if(q) render(true); });
   on('saveplay',async()=>{ const q=await save(); if(!q) return; if(liveActive() && !confirm(`A session of "${st.quiz_title}" is still running. Start this quiz instead?`)) return; await act('play',{id:q.id}); await load(); go('play'); });
   // settings
@@ -450,6 +479,9 @@ function bind(){
   on('endsess',end); on('endsess2',end);
   on('newround',()=>{ if(confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
+  on('slidestoggle',()=>{ slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
+  on('slidesfs',()=>{ const f=document.getElementById('slides'); if(f&&f.requestFullscreen) f.requestFullscreen(); });
+  on('slidesnew',()=>{ const quiz=quizzes.find(x=>x.id===st.quiz_id); if(quiz) window.open(quiz.embed_url,'quizslides'); });
   on('openjoin',()=>window.open(joinUrl,'quizjoin','width=900,height=700'));
   app.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ if(confirm('Remove "'+x.dataset.rm+'" from this session?')) act('remove_player',{name:x.dataset.rm}).then(load); });
   tick();
