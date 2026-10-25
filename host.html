@@ -340,7 +340,7 @@ function normalizeEmbed(v){
   const m=v.match(/src\s*=\s*["']([^"']+)["']/i); if(m) v=m[1];              // pasted <iframe …> code
   try{ const u=new URL(v);
     if(/canva\.com$/.test(u.hostname)||u.hostname.endsWith('.canva.com')){ u.pathname=u.pathname.replace(/\/(edit|watch)$/,'/view'); if(!u.pathname.endsWith('/view')) u.pathname=u.pathname.replace(/\/?$/,'/view'); u.search='?embed'; return u.toString(); }
-    if(u.hostname==='docs.google.com' && u.pathname.includes('/presentation/')){ u.pathname=u.pathname.replace(/\/(edit|pub|present).*$/,'/embed'); return u.origin+u.pathname+'?start=false&loop=false'; }
+    if(u.hostname==='docs.google.com' && u.pathname.includes('/presentation/')){ const id=(u.pathname.match(/\/presentation\/d\/(e\/)?([^/]+)/)||[])[0]; if(id) return u.origin+id+'/embed?start=false&loop=false'; }
     return u.toString();
   }catch(e){ return v; }
 }
