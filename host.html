@@ -95,12 +95,12 @@
   .qz .actions button{padding:8px 0;font-size:13px}
   button.grey{background:#5b6775;color:#fff}
   .ed-actions button{padding:8px 14px;font-size:13px}
-  .layout.slides{grid-template-columns:minmax(0,1.3fr) minmax(420px,1fr)}
-  .layout.slides .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .layout.slides .controls button{height:clamp(44px,4vw,56px);font-size:clamp(14px,1.2vw,18px)}
-  .layout.slides .controls #prev{grid-column:1/-1;order:9;height:38px;font-size:14px}
+  .layout.slides{grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr)}
+  .layout.slides .slidewrap{margin-top:0}
+  .layout.slides .slidebar{margin-bottom:16px}
+  .under{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}.under{grid-template-columns:1fr}}
   @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}}
-  .slidecol{position:sticky;top:12px;align-self:start}
   .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
   .slidewrap iframe{width:100%;height:100%;border:0;display:block}
   .slidebar{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
@@ -400,11 +400,8 @@ function play(){
 
   const embed = quiz && quiz.embed_url;
   const showSlides = embed && slidesOn;
-  const slidePane = showSlides ? `<div class="slidecol"><div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
-      <div class="slidebar"><span class="muted">Click inside the slides, then use ← → to move. The quiz buttons on the right do not change slides.</span>
-        <button class="sm" id="slidesfs">Full screen</button><button class="sm" id="slidesnew">Open in new window</button></div></div>` : '';
-  return `<div class="layout ${showSlides?'slides':''}">${slidePane}<div>
-    <div class="card">
+  const toggle = embed ? `<label class="toggle ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span class="sw"></span><span>Slides</span></label>` : '';
+  const controlsCard = `<div class="card">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
         <div><h1>${esc(st.quiz_title)} <span style="color:var(--muted);font-weight:500">· ${esc(st.session_name)}</span></h1>
           <div style="margin-top:6px"><span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No answer key for Q'+q+'</span>'}
@@ -421,34 +418,43 @@ function play(){
         <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
         ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="magenta xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
       </div>
-      <p class="muted" style="margin:10px 0 0">Show the question in your deck → <b>Open question</b> (timer starts) → candidates submit → <b>Reveal</b> → advance deck → <b>Next</b> opens the next question immediately.</p>
-    </div>
-    ${completeCard}
-    <div class="card"><h2>Candidates — question ${q}</h2>
-      ${players.length?'':'<p class="muted">Nobody has joined yet. Open the join screen (right) on a second display.</p>'}
+      <div class="row" style="margin:10px 0 0;justify-content:space-between"><p class="muted" style="margin:0;flex:1;min-width:200px">Show the question → <b>Open question</b> (timer starts) → candidates submit → <b>Reveal</b> → advance → <b>Next</b> opens the next question immediately.</p>${toggle}</div>
+    </div>`;
+  const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
+      <div class="slidebar"><span class="muted">Click inside the slides, then use ← → to move. The quiz buttons do not change slides.</span>
+        <button class="sm" id="slidesfs">Full screen</button><button class="sm" id="slidesnew">Open in new window</button></div>` : '';
+  const candidatesCard = `<div class="card"><h2>Candidates — question ${q}</h2>
+      ${players.length?'':'<p class="muted">Nobody has joined yet. Open the join screen on a second display.</p>'}
       <div class="players">${players.map(g=>{ const a=cur[g]; let cls='g'; if(a) cls += st.revealed?(a.is_correct?' right':' wrong'):' done';
         const main = a?(st.revealed||st.locked?a.choice:'✓'):'…'; const sub = a?(st.revealed?`+${a.points} pts · ${(a.elapsed_ms/1000).toFixed(1)} s`:`${(a.elapsed_ms/1000).toFixed(1)} s`):'';
-        return `<div class="${cls}"><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span>${avatars[g]||''} ${esc(g)}<span class="c">${main}</span><span class="t">${sub}</span></div>`;}).join('')}</div></div>
-    <div class="card"><h2>Leaderboard <span class="muted" style="text-transform:none">(${revealedN} of ${st.total_questions} revealed)</span></h2>
-      ${scores.map(x=>`<div class="bar"><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}</div>
-    <div class="card"><h2>Answer spread — question ${q}</h2>
-      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div></div>
-  ${showSlides?'':'</div><div>'}
-    ${embed?`<div class="card"><label class="toggle ${slidesOn?'on':''}" id="slidestoggle"><span class="sw"></span><span>Show slides in this page</span></label></div>`:''}
-    <div class="card"><h2>Session</h2>
+        return `<div class="${cls}"><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span>${avatars[g]||''} ${esc(g)}<span class="c">${main}</span><span class="t">${sub}</span></div>`;}).join('')}</div></div>`;
+  const leaderboardCard = `<div class="card"><h2>Leaderboard <span class="muted" style="text-transform:none">(${revealedN} of ${st.total_questions} revealed)</span></h2>
+      ${scores.map(x=>`<div class="bar"><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}</div>`;
+  const spreadCard = `<div class="card"><h2>Answer spread — question ${q}</h2>
+      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div></div>`;
+  const sessionCard = `<div class="card"><h2>Session</h2>
       <p class="muted" style="margin-top:0">${esc(st.session_name)} · ${players.length} joined</p>
       <div class="row" style="display:grid;grid-template-columns:1fr 1fr"><button class="purple sm" id="newround">New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button></div>
       <p class="muted">New round: same quiz, fresh players and scores (for the next group).</p>
-      <div class="row" style="margin-top:6px"><label class="muted">Jump to question</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:70px"><button class="primary sm" id="gotobtn">Go</button></div></div>
-    <div class="card"><h2>Screens</h2>
-      ${[{t:'Join screen',d:'Full-screen QR code and link for candidates to scan. Put it on the projector or a second display — the host page stays private.',u:joinUrl,win:'quizjoin'},
-         {t:'Leaderboard',d:'Full-screen live scores for the projector. Switches to final results when you end the session.',u:baseUrl+'board.html',win:'quizboard'}]
+      <div class="row" style="margin-top:6px"><label class="muted">Jump to question</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:70px"><button class="primary sm" id="gotobtn">Go</button></div></div>`;
+  const screensCard = `<div class="card"><h2>Screens</h2>
+      ${[{t:'Join screen',u:joinUrl,win:'quizjoin'},{t:'Leaderboard',u:baseUrl+'board.html',win:'quizboard'}]
         .map(l=>`<div class="scr"><span class="t">${l.t}</span>
           <button class="iconbtn" data-open="${l.u}" data-win="${l.win}" data-tip="Open in new window" aria-label="Open ${l.t} in new window">${ICON_EXT}</button>
           <button class="iconbtn" data-copy="${l.u}" data-tip="Copy link" aria-label="Copy ${l.t} link">${ICON_COPY}</button></div>`).join('')}
-    </div>
-    <div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>
-  </div></div>`;
+    </div>`;
+  const backCard = `<div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>`;
+
+  if(showSlides){
+    return `<div class="layout slides">
+      <div>${controlsCard}${slidePane}<div class="under">${sessionCard}<div>${screensCard}${backCard}</div></div></div>
+      <div>${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
+    </div>`;
+  }
+  return `<div class="layout">
+    <div>${controlsCard}${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
+    <div>${sessionCard}${screensCard}${backCard}</div>
+  </div>`;
 }
 
 // ---------- events ----------
