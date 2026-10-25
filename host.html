@@ -33,7 +33,14 @@
   .pinrow{display:flex;align-items:center;gap:10px}
   .pinrow code{font-size:22px;letter-spacing:.2em;background:#0f1419;border:1px solid var(--line);border-radius:8px;padding:8px 14px;min-width:120px;text-align:center}
   .iconbtn{background:transparent;border:1px solid var(--line);border-radius:8px;padding:8px;line-height:0;color:var(--muted)}
-  .iconbtn:hover{color:var(--text)}
+  .iconbtn:hover{color:var(--text);border-color:var(--accent)}
+  .scr{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+  .scr:first-of-type{border-top:0;padding-top:0}
+  .scr .t{flex:1;font-weight:600}
+  [data-tip]{position:relative}
+  [data-tip]:hover::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 8px);width:240px;background:#0f1419;border:1px solid var(--line);color:var(--text);font-size:12px;font-weight:400;line-height:1.4;padding:8px 10px;border-radius:8px;z-index:30;text-align:left;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .lk{justify-content:space-between}
+  .lk .row{margin-top:auto}
   .page{max-width:1100px;margin:0 auto;padding:20px}
   .layout{display:grid;grid-template-columns:1fr 300px;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
   @media(max-width:900px){.layout{grid-template-columns:1fr}}
@@ -303,6 +310,8 @@ function editor(){
 }
 
 let pinShown=false;
+const ICON_EXT='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+const ICON_COPY='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 const EYE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYEOFF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 function settings(){
@@ -378,14 +387,19 @@ function play(){
       <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div></div>
   </div>
   <div>
-    <div class="card"><h2>Join screen</h2>
-      <div class="qrmini" id="openjoin" title="Open the join screen in a new window"><div id="qr"></div><div><div style="font-weight:600">Open on a second display ↗</div><div class="muted hint">Full-screen QR and link for candidates — the host page stays private.</div></div></div></div>
     <div class="card"><h2>Session</h2>
       <p class="muted" style="margin-top:0">${esc(st.session_name)} · ${players.length} joined</p>
       <div class="row"><button class="primary sm" id="newround">↻ New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button></div>
       <p class="muted">New round: same quiz, fresh players and scores (for the next group).</p>
       <div class="row" style="margin-top:6px"><label class="muted">Jump to Q</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:70px"><button class="sm" id="gotobtn">Go</button></div></div>
-    <div class="card"><h2>Screens</h2><p class="muted" style="margin:0"><a href="board.html" target="_blank">Projector leaderboard ↗</a><br><a href="#home">← Back to my quizzes</a> (session keeps running)</p></div>
+    <div class="card"><h2>Screens</h2>
+      ${[{t:'Join screen',d:'Full-screen QR code and link for candidates to scan. Put it on the projector or a second display — the host page stays private.',u:joinUrl,win:'quizjoin'},
+         {t:'Leaderboard',d:'Full-screen live scores for the projector. Switches to final results when you end the session.',u:candidateUrl+'board.html',win:'quizboard'}]
+        .map(l=>`<div class="scr"><span class="t">${l.t}</span>
+          <button class="iconbtn" data-open="${l.u}" data-win="${l.win}" data-tip="Open ${l.t.toLowerCase()} in a new window. ${l.d}" aria-label="Open ${l.t} in new window">${ICON_EXT}</button>
+          <button class="iconbtn" data-copy="${l.u}" data-tip="Copy the ${l.t.toLowerCase()} link to the clipboard, e.g. to paste into a browser on another computer." aria-label="Copy ${l.t} link">${ICON_COPY}</button></div>`).join('')}
+    </div>
+    <div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>
   </div></div>`;
 }
 
@@ -423,7 +437,6 @@ function bind(){
   on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
   on('openjoin',()=>window.open(joinUrl,'quizjoin','width=900,height=700'));
   app.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ if(confirm('Remove "'+x.dataset.rm+'" from this session?')) act('remove_player',{name:x.dataset.rm}).then(load); });
-  const qr=document.getElementById('qr'); if(qr) new QRCode(qr,{text:candidateUrl,width:72,height:72});
   tick();
 }
 
