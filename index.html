@@ -54,7 +54,7 @@
   .center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
   .join{width:100%;max-width:440px;text-align:center}
   .join h2{font-size:26px;margin:0 0 4px}
-  .avatars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+  .avatars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:6px 0 14px}
   .avatars button{font-size:30px;padding:10px 0;border-radius:12px;border:2px solid var(--line);background:#0f1419;cursor:pointer;line-height:1}
   .avatars button.sel{border-color:var(--accent);background:#1d2f4d;box-shadow:0 0 0 3px rgba(79,140,255,.35)}
   .av{font-size:1.2em;margin-right:6px}
@@ -140,14 +140,16 @@ function render(){
   if(!name){
     document.body.classList.add('centered');
     const closed = !st || st.ended;
-    if(document.getElementById('g')){ const h=document.querySelector('.join h2'); if(h) h.textContent=titleCache;
+    if(document.getElementById('g')){ const h=document.getElementById('jt'); if(h) h.textContent=titleCache;
       const jb=document.getElementById('join'); if(jb){ jb.disabled=closed; jb.textContent=closed?'Waiting for the host to start a quiz…':'Join quiz'; } return; }
     app.innerHTML = `
       <div class="center"><div class="card join">
-        <h2>${esc(titleCache)}</h2>
-        <p class="small">Pick an avatar and enter your name</p>
-        <div class="avatars">${AVATARS.map(a=>`<button class="${a===avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div>
+        <h2>Join quiz</h2>
+        <div style="font-size:17px;color:var(--muted);margin-bottom:16px" id="jt">${esc(titleCache)}</div>
+        <div class="small" style="text-align:left;margin:0 0 6px">Type your name</div>
         <input id="g" placeholder="Your name" maxlength="40" autocomplete="off" value="${esc(name)}">
+        <div class="small" style="text-align:left;margin:14px 0 0">Pick your avatar</div>
+        <div class="avatars">${AVATARS.map(a=>`<button class="${a===avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div>
         <button class="btn" id="join" ${closed?'disabled':''}>${closed?'Waiting for the host to start a quiz…':'Join quiz'}</button>
         <p class="small" style="margin:12px 0 0">Keep this page open. If you lose connection, just reload — you'll land back on the current question.</p>
       </div></div>`;
