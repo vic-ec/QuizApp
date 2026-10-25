@@ -91,6 +91,10 @@
   .qz .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto}
   .qz .actions button{padding:8px 0;font-size:13px}
   button.grey{background:#5b6775;color:#fff}
+  .ed-actions button{padding:8px 14px;font-size:13px}
+  .modalbg{position:fixed;inset:0;background:rgba(5,8,12,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .modalbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;max-width:380px;width:100%;text-align:center}
+  .modalbox p{margin:0 0 16px;font-size:16px}
   /* editor */
   .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
   .form .wide{grid-column:1/-1}
@@ -157,7 +161,7 @@ const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
-let quizzes=[], editing=null;              // editing = working copy of a quiz in the editor
+let quizzes=[], editing=null, confirmReset=false;              // editing = working copy of a quiz in the editor
 let view = 'home';                          // home | edit | play | settings
 const candidateUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const joinUrl = candidateUrl + 'join.html';
@@ -251,7 +255,7 @@ const liveActive = () => st && !st.ended && st.session_id;
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
@@ -299,17 +303,19 @@ function editor(){
   const q = editing, n = Math.max(1, Math.min(100, +q.total_questions||1));
   return `<div class="page">
     <div class="row" style="justify-content:space-between;margin-bottom:14px"><h1>${q.id?'Edit quiz':'New quiz'}</h1>
-      <div class="row"><button id="save" class="ok">💾 Save quiz</button><button id="saveplay" class="primary">▶ Save &amp; play</button><button class="ghost" data-go="home">Cancel</button></div></div>
+      <div class="row ed-actions"><button id="save" class="ok">Save quiz</button><button id="saveplay" class="primary">Save &amp; play</button><button class="grey" data-go="home">Cancel</button></div></div>
     <div class="card"><div class="form">
       <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz"></label>
       <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
       <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
       <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 90, 80… (min 50)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
     </div></div>
-    <div class="card"><h2>Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2>
+    <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="remove sm" id="resetkey">Reset answer key</button></div>
       <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
       <div class="key">${Array.from({length:n},(_,i)=>i+1).map(i=>`<div class="k"><span>${i}</span>${['A','B','C','D'].map(o=>`<button class="${q.answer_key[i]===o?'on '+o:''}" data-kq="${i}" data-ko="${o}">${o}</button>`).join('')}</div>`).join('')}</div>
-    </div></div>`;
+    </div>
+    ${confirmReset?`<div class="modalbg" id="resetmodal"><div class="modalbox"><p>Are you sure you want to clear all answers?</p><div class="row" style="justify-content:center"><button class="danger" id="resetyes">Yes, clear</button><button class="grey" id="resetno">No</button></div></div></div>`:''}
+    </div>`;
 }
 
 let pinShown=false;
@@ -423,6 +429,9 @@ function bind(){
   ['e_title','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el) el.onchange=readForm;});
   const et=document.getElementById('e_total'); if(et) et.onchange=()=>{ readForm(); render(true); };
   app.querySelectorAll('[data-kq]').forEach(b=>b.onclick=()=>{ readForm(); const i=b.dataset.kq,o=b.dataset.ko; if(editing.answer_key[i]===o) delete editing.answer_key[i]; else editing.answer_key[i]=o; render(true); });
+  on('resetkey',()=>{ readForm(); confirmReset=true; render(true); });
+  on('resetno',()=>{ confirmReset=false; render(true); });
+  on('resetyes',()=>{ editing.answer_key={}; confirmReset=false; render(true); toast('Answer key cleared — remember to save'); });
   const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); return null; } const q=await act('save_quiz',editing); editing.id=q.id; await loadQuizzes(); toast('Saved'); return q; };
   on('save',async()=>{ const q=await save(); if(q) render(true); });
   on('saveplay',async()=>{ const q=await save(); if(!q) return; if(liveActive() && !confirm(`A session of "${st.quiz_title}" is still running. Start this quiz instead?`)) return; await act('play',{id:q.id}); await load(); go('play'); });
