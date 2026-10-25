@@ -16,7 +16,7 @@
   .hero{max-width:900px;margin:0 auto;padding:9vh 20px 6vh;text-align:center}
   h1{font-size:clamp(28px,5vw,46px);margin:0 0 10px;line-height:1.1}
   .lead{color:var(--muted);font-size:clamp(15px,2vw,19px);margin:0 auto 32px;max-width:560px}
-  .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:28px}
   .btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:18px;padding:16px 28px;border-radius:14px;text-decoration:none;color:#fff;border:0}
   .btn.join{background:var(--accent)} .btn.host{background:var(--purple)}
   .btn:hover{filter:brightness(1.1)}
@@ -37,9 +37,7 @@
 <div class="top"><span class="brand">QuizApp</span><nav><a href="play/">Join a quiz</a><a href="host.html">Host login</a></nav></div>
 <section class="hero">
   <h1>Live quizzes for teaching sessions</h1>
-  <p class="lead">Candidates answer on their phones. The host runs the questions, a timer counts down, faster correct answers score more, and the leaderboard updates live.</p>
   <div class="cta"><a class="btn join" href="play/">▶ Join a quiz</a><a class="btn host" href="host.html">Host login</a></div>
-  <div class="tiles"><span class="A">A</span><span class="B">B</span><span class="C">C</span><span class="D">D</span></div>
 </section>
 <section class="how">
   <h2>How it works</h2>
@@ -49,6 +47,13 @@
     <div class="step"><b>3 · Reveal and rank</b><p>Reveal the answer, see who got it and how fast, and follow the leaderboard through to the final podium.</p></div>
   </div>
 </section>
-<footer>Victoria Hospital Emergency Centre · <a href="https://github.com/vic-ec/QuizApp">source</a></footer>
+<footer>© vic-ec <span id="ver"></span></footer>
+<script src="version.js"></script>
+<script>
+// Version = date of the most recent update (ddmmyyyy). Static fallback from version.js; refreshed from the repo's latest commit when reachable.
+const fmt=d=>'v'+String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+document.getElementById('ver').textContent = window.APP_VERSION || '';
+fetch('https://api.github.com/repos/vic-ec/QuizApp/commits?per_page=1').then(r=>r.ok?r.json():null).then(j=>{ if(j&&j[0]) document.getElementById('ver').textContent=fmt(new Date(j[0].commit.committer.date)); }).catch(()=>{});
+</script>
 </body>
 </html>

@@ -1,0 +1,1 @@
+window.APP_VERSION="v25102026";
