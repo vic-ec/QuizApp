@@ -656,7 +656,7 @@ function presenterBar(){
       <button class="ok" id="open" title="${st.question_opened_at&&!st.revealed?'Restart timer':'Open question'}" ${canOpen?'':'disabled'}>${st.question_opened_at&&!st.revealed?PI.restart:PI.open}</button>
       <button class="warn" id="lock" title="Lock answers" ${status==='open'?'':'disabled'}>${PI.lock}</button>
       <button class="orange" id="reveal" title="Reveal answer" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>${PI.eye}</button>
-      ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button class="magenta" id="next" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}>${PI.next}</button>`}
+      ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button id="next" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}>${PI.next}</button>`}
     </div>
     <div class="pgrp sess">
       <button class="purple" id="newround" title="New round (same quiz, fresh players and scores)">${PI.round}</button>
