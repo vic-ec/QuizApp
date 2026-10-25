@@ -38,7 +38,7 @@
   .scr:first-of-type{border-top:0;padding-top:0}
   .scr .t{flex:1;font-weight:600}
   [data-tip]{position:relative}
-  [data-tip]:hover::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 8px);width:240px;background:#0f1419;border:1px solid var(--line);color:var(--text);font-size:12px;font-weight:400;line-height:1.4;padding:8px 10px;border-radius:8px;z-index:30;text-align:left;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  [data-tip]:hover::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 8px);width:max-content;background:#0f1419;border:1px solid var(--line);color:var(--text);font-size:12px;font-weight:400;line-height:1.4;padding:8px 10px;border-radius:8px;z-index:30;text-align:left;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.4)}
   .lk{justify-content:space-between}
   .lk .row{margin-top:auto}
   .page{max-width:1100px;margin:0 auto;padding:20px}
@@ -396,8 +396,8 @@ function play(){
       ${[{t:'Join screen',d:'Full-screen QR code and link for candidates to scan. Put it on the projector or a second display — the host page stays private.',u:joinUrl,win:'quizjoin'},
          {t:'Leaderboard',d:'Full-screen live scores for the projector. Switches to final results when you end the session.',u:candidateUrl+'board.html',win:'quizboard'}]
         .map(l=>`<div class="scr"><span class="t">${l.t}</span>
-          <button class="iconbtn" data-open="${l.u}" data-win="${l.win}" data-tip="Open ${l.t.toLowerCase()} in a new window. ${l.d}" aria-label="Open ${l.t} in new window">${ICON_EXT}</button>
-          <button class="iconbtn" data-copy="${l.u}" data-tip="Copy the ${l.t.toLowerCase()} link to the clipboard, e.g. to paste into a browser on another computer." aria-label="Copy ${l.t} link">${ICON_COPY}</button></div>`).join('')}
+          <button class="iconbtn" data-open="${l.u}" data-win="${l.win}" data-tip="Open in new window" aria-label="Open ${l.t} in new window">${ICON_EXT}</button>
+          <button class="iconbtn" data-copy="${l.u}" data-tip="Copy link" aria-label="Copy ${l.t} link">${ICON_COPY}</button></div>`).join('')}
     </div>
     <div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>
   </div></div>`;
