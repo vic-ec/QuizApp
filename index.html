@@ -8,7 +8,9 @@
   :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;--accent:#4f8cff;--ok:#2ecc71;--purple:#8e5cf6;
         --A:#e74c3c;--B:#3498db;--C:#f1c40f;--D:#2ecc71}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;min-height:100vh}
+  main{flex:1}
   .top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);background:#121920}
   .brand{font-weight:800;font-size:20px}
   .top a{color:var(--muted);text-decoration:none;font-size:14px;border:1px solid var(--line);border-radius:9px;padding:7px 12px;margin-left:8px}
@@ -35,6 +37,7 @@
 </head>
 <body>
 <div class="top"><span class="brand">QuizApp</span><nav><a href="play/">Join a quiz</a><a href="host.html">Host login</a></nav></div>
+<main>
 <section class="hero">
   <h1>Live quizzes for teaching sessions</h1>
   <div class="cta"><a class="btn join" href="play/">▶ Join a quiz</a><a class="btn host" href="host.html">Host login</a></div>
@@ -47,6 +50,7 @@
     <div class="step"><b>3 · Reveal and rank</b><p>Reveal the answer, see who got it and how fast, and follow the leaderboard through to the final podium.</p></div>
   </div>
 </section>
+</main>
 <footer>© vic-ec <span id="ver"></span></footer>
 <script src="version.js"></script>
 <script>
