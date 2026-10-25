@@ -309,7 +309,7 @@ function editor(){
     <div class="card"><div class="form">
       <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz"></label>
       <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
-      <label class="f">Timer per question (s, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
+      <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
       <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 90, 80… (min 50)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
     </div></div>
     <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="remove sm" id="resetkey">Reset answer key</button></div>
