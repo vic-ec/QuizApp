@@ -125,6 +125,7 @@
   .toggle .sw{width:34px;height:20px;border-radius:999px;background:#2b3642;position:relative;transition:.15s}
   .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#8d9aa8;transition:.15s}
   .toggle.on .sw{background:var(--accent)} .toggle.on .sw::after{left:17px;background:#fff}
+  .toggle.rev{flex-direction:row}
   .modalbg{position:fixed;inset:0;background:rgba(5,8,12,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
   .modalbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;max-width:380px;width:100%;text-align:center}
   .modalbox p{margin:0 0 16px;font-size:16px}
@@ -197,7 +198,7 @@ const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
-let quizzes=[], editing=null, confirmReset=false, sessOpen=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
+let quizzes=[], editing=null, confirmReset=false, sessOpen=false, linkShown='', slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
 let view = 'home';                          // home | edit | play | settings
 const baseUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const candidateUrl = baseUrl + 'play/';
@@ -292,7 +293,7 @@ const liveActive = () => st && !st.ended && st.session_id;
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,sessOpen]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,sessOpen,linkShown]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
@@ -370,6 +371,7 @@ function normalizeEmbed(v){
 }
 let pinShown=false;
 const ICON_EXT='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+const ICON_LINK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
 const ICON_COPY='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 const EYE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYEOFF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
@@ -416,7 +418,7 @@ function play(){
 
   const embed = quiz && quiz.embed_url;
   const showSlides = embed && slidesOn;
-  const toggle = embed ? `<label class="toggle ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span class="sw"></span><span>Show slides</span></label>` : '';
+  const toggle = embed ? `<label class="toggle rev ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span>Show slides</span><span class="sw"></span></label>` : '';
   const controlsCard = `<div class="card">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
         <div><h1>${esc(st.quiz_title)} <span style="color:var(--muted);font-weight:500">· ${esc(st.session_name)}</span></h1>
@@ -434,7 +436,7 @@ function play(){
         <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
         ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="magenta xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
       </div>
-      <div class="row" style="margin:10px 0 0;justify-content:flex-end;gap:14px">${toggle}<button class="sm purple" id="pipbtn" title="Floating always-on-top control bar">Presenter bar ↗</button></div>
+      <div class="row" style="margin:10px 0 0;justify-content:flex-end;gap:14px">${toggle}<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top control bar"><span>Presenter bar</span><span class="sw"></span></label></div>
     </div>`;
   const buttons = `<button id="prev" ${q<=1||st.ended?'disabled':''}>◀ Previous</button>
         ${st.question_opened_at&&!st.revealed
@@ -451,7 +453,7 @@ function play(){
         <div class="timer" id="timer"></div>
         <div class="cq">Q${q}<small> / ${st.total_questions}</small><span class="muted"> · ${done}/${players.length} answered</span></div>
       </div>
-      <div class="crow"><div class="controls" style="flex:1">${buttons}</div>${toggle}<button class="sm" id="sessbtn">Session &amp; screens</button><button class="sm purple" id="pipbtn" title="Floating always-on-top control bar">Presenter bar ↗</button></div>
+      <div class="crow"><div class="controls" style="flex:1">${buttons}</div>${toggle}<button class="sm" id="sessbtn">Session &amp; screens</button><label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top control bar"><span>Presenter bar</span><span class="sw"></span></label></div>
     </div>`;
   const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
       <div class="slidebar"><span class="muted">Click inside the slides, then use ← → to move. The quiz buttons do not change slides.</span>
@@ -474,8 +476,10 @@ function play(){
       ${[{t:'Join screen',u:joinUrl,win:'quizjoin'},{t:'Leaderboard',u:baseUrl+'board.html',win:'quizboard'}]
         .map(l=>`<div class="scr"><span class="t">${l.t}</span>
           <button class="iconbtn" data-open="${l.u}" data-win="${l.win}" data-tip="Open in new window" aria-label="Open ${l.t} in new window">${ICON_EXT}</button>
-          <button class="iconbtn" data-copy="${l.u}" data-tip="Copy link" aria-label="Copy ${l.t} link">${ICON_COPY}</button></div>`).join('')}
-    </div>`;
+          <button class="iconbtn" data-copy="${l.u}" data-tip="Copy link" aria-label="Copy ${l.t} link">${ICON_COPY}</button>
+          <button class="iconbtn" data-showlink="${l.u}" data-tip="Show link" aria-label="Show ${l.t} link">${ICON_LINK}</button></div>`).join('')}
+    </div>
+    ${linkShown?`<div class="modalbg" id="linkmodal" style="z-index:60"><div class="modalbox"><p style="margin-bottom:8px">Link</p><input readonly value="${esc(linkShown)}" style="width:100%;text-align:center" onfocus="this.select()"><div class="row" style="justify-content:center;margin-top:12px"><button class="primary sm" data-copy="${esc(linkShown)}">Copy link</button><button class="grey sm" id="linkclose">Close</button></div></div></div>`:''}`;
   const backCard = `<div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>`;
 
   if(showSlides){
@@ -486,10 +490,11 @@ function play(){
       <div class="a-side">${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
     </div>${modal}`;
   }
+  const modal2 = sessOpen ? `<div class="modalbg" id="sessmodal"><div class="modalbox sess"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>Session &amp; screens</b><button class="iconbtn" id="sessclose" aria-label="Close">✕</button></div>${sessionCard}${screensCard}${backCard}</div></div>` : '';
   return `<div class="layout">
     <div>${controlsCard}${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
     <div>${sessionCard}${screensCard}${backCard}</div>
-  </div>`;
+  </div>${modal2}`;
 }
 
 // ---------- events ----------
@@ -529,7 +534,10 @@ function bind(){
   on('newround',()=>{ if(confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
   on('sessbtn',()=>{ sessOpen=true; render(true); });
-  on('pipbtn',openPresenter);
+  app.querySelectorAll('[data-showlink]').forEach(b=>b.onclick=()=>{ linkShown=b.dataset.showlink; render(true); });
+  on('linkclose',()=>{ linkShown=''; render(true); });
+  const lm=document.getElementById('linkmodal'); if(lm){ lm.onclick=(e)=>{ if(e.target===lm){ linkShown=''; render(true); } }; lm.querySelector('input').select(); }
+  on('piptoggle',()=>{ if(pipWin&&!pipWin.closed){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
   on('sessclose',()=>{ sessOpen=false; render(true); });
   const sm=document.getElementById('sessmodal'); if(sm) sm.onclick=(e)=>{ if(e.target===sm){ sessOpen=false; render(true); } };
   on('slidestoggle',()=>{ slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
@@ -545,7 +553,15 @@ function bind(){
 let pipWin=null, pipSig='', pipSess=false;
 const PIP_CSS = `
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
-  .pbar{display:flex;align-items:center;gap:8px;padding:8px 10px;height:100vh;box-sizing:border-box}
+  .pbar{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;box-sizing:border-box;min-height:100vh}
+  .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .prow .sp{flex:1}
+  .pctl button{width:84px;padding:0}
+  .pctl #prev{width:40px}
+  .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#8d9aa8;user-select:none;white-space:nowrap}
+  .toggle .sw{width:30px;height:18px;border-radius:999px;background:#2b3642;position:relative}
+  .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#8d9aa8}
+  .toggle.on .sw{background:#4f8cff} .toggle.on .sw::after{left:15px;background:#fff}
   .pq{font-weight:800;font-size:22px;white-space:nowrap} .pq small{font-size:12px;color:#8d9aa8}
   .ptimer{font-weight:800;font-size:24px;min-width:44px;text-align:center;color:#4f8cff;font-variant-numeric:tabular-nums}
   .ptimer.low{color:#e74c3c} .ptimer.up{color:#f1c40f;font-size:12px}
@@ -555,7 +571,7 @@ const PIP_CSS = `
   .ok{background:#2ecc71;color:#06220f} .warn{background:#f1c40f;color:#2a2400} .orange{background:#e67e22;color:#fff} .magenta{background:#e0409a;color:#fff}
   .purple{background:#8e5cf6;color:#fff} .danger{background:#e74c3c;color:#fff} .primary{background:#4f8cff;color:#fff}
   .sm{height:30px;padding:0 10px;font-size:12px}
-  .plb{flex:1;display:flex;gap:6px;flex-wrap:wrap;overflow:hidden;align-items:center;min-width:0}
+  .plb{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-width:0}
   .chip{display:inline-flex;align-items:center;gap:5px;background:#1a2129;border:1px solid #2b3642;border-radius:999px;padding:3px 9px 3px 7px;white-space:nowrap;font-weight:600}
   .chip b{color:#f1c40f;font-weight:800} .chip i{font-style:normal;font-size:11px;color:#8d9aa8}
   .chip.done{border-color:#4f8cff} .chip.right{border-color:#2ecc71} .chip.right i{color:#2ecc71} .chip.wrong{border-color:#e74c3c} .chip.wrong i{color:#ff8a7f}
@@ -574,12 +590,12 @@ async function openPresenter(){
   if(pipWin && !pipWin.closed){ pipWin.focus(); return; }
   if(!('documentPictureInPicture' in window)){ toast('The floating bar needs Microsoft Edge or Chrome (version 116 or newer).', true); return; }
   try{
-    pipWin = await documentPictureInPicture.requestWindow({width:1150,height:130});
+    pipWin = await documentPictureInPicture.requestWindow({width:Math.max(900,(screen.availWidth||1400)-60),height:150});
   }catch(e){ toast('Could not open the floating bar: '+e.message, true); return; }
   const st=pipWin.document.createElement('style'); st.textContent=PIP_CSS; pipWin.document.head.appendChild(st);
   pipWin.document.title='QuizApp presenter bar';
-  pipWin.addEventListener('pagehide',()=>{ pipWin=null; pipSig=''; });
-  pipSig=''; renderPip();
+  pipWin.addEventListener('pagehide',()=>{ pipWin=null; pipSig=''; try{render(true);}catch(e){} });
+  pipSig=''; renderPip(); render(true);
 }
 function presenterBar(){
   const q=st.current_question, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
@@ -592,7 +608,7 @@ function presenterBar(){
   const done = players.filter(g=>cur[g]).length;
   const chips = scoresFor().map(x=>{ const a=cur[x.g]; const cls=a?(st.revealed?(a.is_correct?'right':'wrong'):'done'):''; const mark=a?(st.revealed||st.locked?a.choice:'✓'):'…';
     return `<span class="chip ${cls}">${avatars[x.g]||''} ${esc(x.g)} <b>${x.p}</b><i>${mark}</i></span>`; }).join('');
-  const bar = `<div class="pbar">
+  const bar = `<div class="pbar"><div class="prow">
     <div class="pq">Q${q}<small>/${st.total_questions}</small></div>
     <div class="ptimer" id="ptimer"></div>
     <span class="status ${status}">${label}</span>
@@ -603,22 +619,17 @@ function presenterBar(){
       <button class="orange" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
       ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess">Finish</button>`:`<button class="magenta" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
     </div>
-    <div class="plb">${chips||'<span class="muted">No candidates yet</span>'}<span class="muted">${done}/${players.length}</span></div>
-    <button class="sm" id="psess" title="Session &amp; screens">⋯</button>
+    <span class="sp"></span>
+    <button class="sm" id="psess" title="Session &amp; screens">⋯ Session &amp; screens</button>
+    <label class="toggle on" id="pclosetoggle" title="Close the presenter bar"><span>Presenter bar</span><span class="sw"></span></label>
+  </div>
+  <div class="prow"><div class="plb">${chips||'<span class="muted">No candidates yet</span>'}<span class="muted">${done}/${players.length} answered</span></div></div>
   </div>`;
-  const modal = pipSess ? `<div class="modalbg" id="pmodal"><div class="modalbox">
-      <div class="row"><b>Session &amp; screens</b><button class="iconbtn closex" id="pclose">✕</button></div>
-      <h2>Session</h2><div class="muted">${esc(st.session_name)} · ${players.length} joined</div>
-      <div class="row" style="margin-top:6px"><button class="purple sm" id="newround">New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button>
-        <span class="muted">Jump to</span><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}"><button class="primary sm" id="gotobtn">Go</button></div>
-      <h2>Screens</h2>
-      ${[{t:'Join screen',u:joinUrl,win:'quizjoin'},{t:'Leaderboard',u:baseUrl+'board.html',win:'quizboard'}].map(l=>`<div class="scr"><span class="t">${l.t}</span><button class="iconbtn" data-open="${l.u}" data-win="${l.win}">Open</button><button class="iconbtn" data-copy="${l.u}">Copy link</button></div>`).join('')}
-    </div></div>` : '';
-  return bar+modal;
+  return bar;
 }
 function renderPip(){
   if(!pipWin||pipWin.closed||!st) return;
-  const sig=JSON.stringify([st,players,answers,avatars,pipSess,quizzes.map(x=>[x.id,x.answer_key])]);
+  const sig=JSON.stringify([st,players,answers,avatars,quizzes.map(x=>[x.id,x.answer_key])]);
   if(sig===pipSig) return; pipSig=sig;
   const d=pipWin.document; d.body.innerHTML=presenterBar();
   const on=(id,fn)=>{const el=d.getElementById(id); if(el) el.onclick=fn;};
@@ -628,12 +639,13 @@ function renderPip(){
   on('endsess2',()=>{ if(pipWin.confirm('End this session?')) act('end_session').then(load); });
   on('newround',()=>{ if(pipWin.confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+d.getElementById('goto').value}).then(load));
-  on('psess',()=>{ pipSess=true; pipSig=''; renderPip(); });
-  on('pclose',()=>{ pipSess=false; pipSig=''; renderPip(); });
-  const pm=d.getElementById('pmodal'); if(pm) pm.onclick=(e)=>{ if(e.target===pm){ pipSess=false; pipSig=''; renderPip(); } };
-  d.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>window.open(b.dataset.open,b.dataset.win,'width=1000,height=720'));
-  d.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent='Copied'; }catch(e){ b.textContent='Copy failed'; } });
-  tickPip();
+  on('psess',()=>{ sessOpen=true; if(location.hash!=='#play') location.hash='#play'; render(true); window.focus(); });
+  on('pclosetoggle',()=>{ pipWin.close(); });
+  tickPip(); fitPip();
+}
+function fitPip(){
+  // grow/shrink the floating window to its content when the browser allows it
+  try{ const d=pipWin.document; const want=Math.min(Math.max(d.body.scrollHeight+2,90),600); if(Math.abs(pipWin.innerHeight-want)>6) pipWin.resizeTo(pipWin.outerWidth, want+(pipWin.outerHeight-pipWin.innerHeight)); }catch(e){}
 }
 function tickPip(){
   if(!pipWin||pipWin.closed||!st) return; const el=pipWin.document.getElementById('ptimer'); if(!el) return;
