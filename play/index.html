@@ -154,6 +154,7 @@ function render(){
         <div class="avatars">${AVATARS.map(a=>`<button class="${a===avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div>
         <button class="btn" id="join" ${closed?'disabled':''}>${closed?'Waiting for the host to start a quiz…':'Join quiz'}</button>
         <p class="small" style="margin:12px 0 0">Keep this page open. If you lose connection, just reload — you'll land back on the current question.</p>
+        <p class="small" style="margin:14px 0 0"><a href="../" style="color:var(--muted)">← Back to QuizApp home</a></p>
       </div></div>`;
     const inp = document.getElementById('g'); inp.focus();
     app.querySelectorAll('.avatars button').forEach(b=>b.onclick=()=>{ avatar=b.dataset.a; try{localStorage.setItem('quiz_avatar',avatar);}catch(e){} app.querySelectorAll('.avatars button').forEach(x=>x.classList.toggle('sel',x.dataset.a===avatar)); });
