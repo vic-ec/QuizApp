@@ -173,14 +173,17 @@ function route(){
   const h = location.hash.replace('#','');
   if(h==='play') view='play';
   else if(h==='settings') view='settings';
-  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : quizzes.find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{}} : (q?JSON.parse(JSON.stringify(q)):null); view = editing?'edit':'home'; }
+  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : activeQuizzes().find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{}} : (q?JSON.parse(JSON.stringify(q)):null); view = editing?'edit':'home'; }
   else view='home';
   lastSig=''; render(true);
 }
 const go = (h) => { location.hash = h; };
 
 // ---------- data ----------
-async function loadQuizzes(){ quizzes = await act('list_quizzes'); }
+let binOpen=false;
+async function loadQuizzes(){ const {data,error}=await sb.rpc('quiz_library',{p_pin:pin}); if(error){toast(error.message,true);throw error;} quizzes = data||[]; }
+const activeQuizzes = () => quizzes.filter(q=>!q.archived);
+const binnedQuizzes = () => quizzes.filter(q=>q.archived);
 async function load(){
   try{
     const {data:s,error} = await sb.from('quiz_state').select('*').eq('id',1).single();
@@ -221,7 +224,7 @@ const liveActive = () => st && !st.ended && st.session_id;
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
@@ -243,13 +246,23 @@ function home(){
     <h1 style="margin:${live?'16px':'0'} 0 14px">My quizzes</h1>
     <div class="quizzes">
       <div class="qz new" data-go="edit-new"><div style="font-size:34px">＋</div><div>Create new quiz</div></div>
-      ${quizzes.map(q=>`<div class="qz">
+      ${activeQuizzes().map(q=>`<div class="qz">
         <h3>${esc(q.title)}</h3>
         <div class="meta"><span>${q.total_questions} questions</span><span>${q.timer_seconds?q.timer_seconds+' s timer':'no timer'}</span><span>${q.scoring==='flat'?'flat':'speed'} scoring</span></div>
         <div>${keyCount(q)>=q.total_questions?'<span class="pill done">Answer key complete</span>':'<span class="pill nokey">Key: '+keyCount(q)+' of '+q.total_questions+'</span>'}</div>
-        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button data-go="edit-${q.id}">Edit</button><button class="ghost sm" data-archive="${q.id}" title="Remove from list">✕</button></div>
+        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button data-go="edit-${q.id}">Edit</button><button class="ghost sm" data-archive="${q.id}" title="Move to bin">Remove</button></div>
       </div>`).join('')}
-    </div></div>`;
+    </div>
+    ${binnedQuizzes().length?`<div style="margin-top:28px">
+      <a href="#" id="togglebin" class="muted" style="font-size:14px">${binOpen?'▾':'▸'} Bin (${binnedQuizzes().length})</a>
+      ${binOpen?`<div class="quizzes" style="margin-top:12px;opacity:.85">${binnedQuizzes().map(q=>`<div class="qz">
+        <h3>${esc(q.title)}</h3>
+        <div class="meta"><span>${q.total_questions} questions</span><span>${q.timer_seconds?q.timer_seconds+' s timer':'no timer'}</span><span>removed ${new Date(q.updated_at).toLocaleDateString()}</span></div>
+        <div class="actions"><button data-restore="${q.id}">Restore</button><button class="danger sm" data-delete="${q.id}">Delete permanently</button></div>
+      </div>`).join('')}</div>
+      <p class="muted">Removed quizzes keep their answer key and can be restored. Permanent deletion cannot be undone; past session results are kept.</p>`:''}
+    </div>`:''}
+    </div>`;
 }
 
 function editor(){
@@ -350,8 +363,11 @@ function bind(){
   on('logout',(e)=>{e.preventDefault();sessionStorage.removeItem('quiz_pin');location.hash='';location.reload();});
   // home
   app.querySelectorAll('[data-play]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.play); if(liveActive() && !confirm(`A session of "${st.quiz_title}" is still running. Start "${q.title}" instead?`)) return; await act('play',{id:+b.dataset.play}); await load(); go('play'); });
-  app.querySelectorAll('[data-archive]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.archive); if(!confirm(`Remove "${q.title}" from your list?`)) return; await act('archive_quiz',{id:+b.dataset.archive}); await loadQuizzes(); render(true); });
+  app.querySelectorAll('[data-archive]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.archive); if(!confirm(`Move "${q.title}" to the bin? You can restore it later.`)) return; await act('archive_quiz',{id:+b.dataset.archive}); await loadQuizzes(); toast('Moved to bin'); render(true); });
   on('endlive',()=>{ if(confirm('End the live session?')) act('end_session').then(load); });
+  on('togglebin',(e)=>{ e.preventDefault(); binOpen=!binOpen; render(true); });
+  app.querySelectorAll('[data-restore]').forEach(b=>b.onclick=async()=>{ const {error}=await sb.rpc('quiz_restore',{p_pin:pin,p_id:+b.dataset.restore}); if(error) return toast(error.message,true); await loadQuizzes(); toast('Restored'); render(true); });
+  app.querySelectorAll('[data-delete]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.delete); if(!confirm(`Permanently delete "${q.title}" and its answer key? This cannot be undone.`)) return; const {error}=await sb.rpc('quiz_delete_forever',{p_pin:pin,p_id:+b.dataset.delete}); if(error) return toast(error.message,true); await loadQuizzes(); toast('Deleted'); render(true); });
   // editor
   const readForm=()=>{ editing.title=document.getElementById('e_title').value; editing.total_questions=+document.getElementById('e_total').value||1; editing.timer_seconds=+document.getElementById('e_timer').value||0; editing.scoring=document.getElementById('e_scoring').value; };
   ['e_title','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el) el.onchange=readForm;});
