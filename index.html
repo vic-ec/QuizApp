@@ -18,7 +18,9 @@
   .q{font-size:30px;font-weight:700}
   .q small{color:var(--muted);font-size:18px;font-weight:500}
   .timer{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
-  .timer.low{color:var(--bad)}
+  .timer.low{color:var(--bad);animation:blink 1s steps(1,end) infinite}
+  @keyframes blink{50%{opacity:0}}
+  @media(prefers-reduced-motion:reduce){.timer.low{animation:none}}
   .timer.off{color:var(--muted);font-size:16px;font-weight:500}
   .status{text-align:center;font-size:14px;color:var(--muted)}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -264,7 +266,7 @@ function tick(){
   if(r===null){ el.textContent = st.timer_seconds?'':'no timer'; el.className='timer off'; return; }
   if(st.revealed || st.locked){ el.textContent=''; return; }
   el.textContent = Math.ceil(r);
-  el.className = 'timer' + (r<=5?' low':'');
+  el.className = 'timer' + (r<=10?' low':'');
   if(r<=0 && !mine[st.current_question] && !app.dataset.expiredRendered){ app.dataset.expiredRendered='1'; selected=null; render(); }
 }
 setInterval(tick, 250);

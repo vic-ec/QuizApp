@@ -236,7 +236,7 @@ function tick(){
   const r=remaining();
   if(r===null || st.revealed || st.locked || st.ended){ el.textContent=''; return; }
   el.textContent = r>0 ? Math.ceil(r) : "TIME UP";
-  el.className = 'timer' + (r<=0?' up':r<=5?' low':'');
+  el.className = 'timer' + (r<=0?' up':r<=10?' low':'');
   if((r<=0)!==wasExpired){ wasExpired=(r<=0); render(true); }
 }
 function scoresFor(){
