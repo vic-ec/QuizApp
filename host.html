@@ -550,14 +550,26 @@ function bind(){
 
 
 // ================= Presenter bar (Document Picture-in-Picture: stays above all windows) =================
+const PI = {
+  prev:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+  next:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  open:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
+  restart:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
+  lock:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  eye:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  flag:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+  round:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+  stop:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6"/></svg>'
+};
 let pipWin=null, pipSig='', pipSess=false;
 const PIP_CSS = `
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
   .pbar{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;box-sizing:border-box;min-height:100vh}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .prow .sp{flex:1}
-  .pctl button{width:84px;padding:0}
-  .pctl #prev{width:40px}
+  .pgrp{display:flex;gap:4px;padding:4px;border:1px solid #2b3642;border-radius:10px;background:#141a21}
+  .pgrp button{width:44px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+  .pgrp button svg{display:block}
   .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#8d9aa8;user-select:none;white-space:nowrap}
   .toggle .sw{width:30px;height:18px;border-radius:999px;background:#2b3642;position:relative}
   .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#8d9aa8}
@@ -612,15 +624,18 @@ function presenterBar(){
     <div class="pq">Q${q}<small>/${st.total_questions}</small></div>
     <div class="ptimer" id="ptimer"></div>
     <span class="status ${status}">${label}</span>
-    <div class="pctl">
-      <button id="prev" ${q<=1||st.ended?'disabled':''}>◀</button>
-      <button class="ok" id="open" ${canOpen?'':'disabled'}>${st.question_opened_at&&!st.revealed?'Restart':'Open'}</button>
-      <button class="warn" id="lock" ${status==='open'?'':'disabled'}>Lock</button>
-      <button class="orange" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
-      ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess">Finish</button>`:`<button class="magenta" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}
+    <div class="pgrp pctl">
+      <button id="prev" title="Previous question" ${q<=1||st.ended?'disabled':''}>${PI.prev}</button>
+      <button class="ok" id="open" title="${st.question_opened_at&&!st.revealed?'Restart timer':'Open question'}" ${canOpen?'':'disabled'}>${st.question_opened_at&&!st.revealed?PI.restart:PI.open}</button>
+      <button class="warn" id="lock" title="Lock answers" ${status==='open'?'':'disabled'}>${PI.lock}</button>
+      <button class="orange" id="reveal" title="Reveal answer" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>${PI.eye}</button>
+      ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button class="magenta" id="next" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}>${PI.next}</button>`}
+    </div>
+    <div class="pgrp">
+      <button class="purple" id="newround" title="New round (same quiz, fresh players and scores)">${PI.round}</button>
+      <button class="danger" id="endsess2" title="End session" ${st.ended?'disabled':''}>${PI.stop}</button>
     </div>
     <span class="sp"></span>
-    <button class="sm" id="psess" title="Session &amp; screens">⋯ Session &amp; screens</button>
     <label class="toggle on" id="pclosetoggle" title="Close the presenter bar"><span>Presenter bar</span><span class="sw"></span></label>
   </div>
   <div class="prow"><div class="plb">${chips||'<span class="muted">No candidates yet</span>'}<span class="muted">${done}/${players.length} answered</span></div></div>
@@ -639,7 +654,6 @@ function renderPip(){
   on('endsess2',()=>{ if(pipWin.confirm('End this session?')) act('end_session').then(load); });
   on('newround',()=>{ if(pipWin.confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+d.getElementById('goto').value}).then(load));
-  on('psess',()=>{ sessOpen=true; if(location.hash!=='#play') location.hash='#play'; render(true); window.focus(); });
   on('pclosetoggle',()=>{ pipWin.close(); });
   tickPip(); fitPip();
 }
