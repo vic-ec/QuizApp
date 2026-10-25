@@ -102,6 +102,18 @@
   .layout.slides .big,.layout.slides .timer{font-size:clamp(24px,2.8vw,40px)}
   .layout.slides h1{font-size:clamp(15px,1.4vw,20px)}
   @media(max-width:1100px){.layout.slides{grid-template-columns:1fr;grid-template-areas:"ctrl" "slides" "side"}}
+  .card.compact{padding:10px 12px;margin-bottom:10px}
+  .crow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .crow + .crow{margin-top:8px}
+  .crow .sp{flex:1}
+  .ctitle{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%}
+  .cq{font-size:18px;font-weight:800;white-space:nowrap} .cq small{font-size:12px;color:var(--muted);font-weight:600} .cq .muted{font-size:12px;font-weight:500}
+  .compact .timer{font-size:22px} .compact .timer.up{font-size:14px}
+  .compact .pill{padding:2px 8px;font-size:11px}
+  .compact .controls{gap:6px}
+  .compact .controls button.xl{height:34px;font-size:13px;padding:0 8px}
+  .compact .controls #prev{height:34px;font-size:12px;padding:0 8px}
+  .compact .toggle{font-size:12px} .compact #sessbtn{padding:7px 10px;font-size:12px;white-space:nowrap}
   .modalbox.sess{max-width:520px;text-align:left;max-height:90vh;overflow:auto}
   .modalbox.sess .card{margin-bottom:12px}
   @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}}
@@ -424,6 +436,23 @@ function play(){
       </div>
       ${(embed||showSlides)?`<div class="row" style="margin:10px 0 0;justify-content:flex-end;gap:14px">${toggle}${showSlides?'<button class="sm" id="sessbtn">Session &amp; screens</button>':''}</div>`:''}
     </div>`;
+  const buttons = `<button id="prev" ${q<=1||st.ended?'disabled':''}>◀ Previous</button>
+        ${st.question_opened_at&&!st.revealed
+          ? `<button class="ok xl" id="open" ${canOpen?'':'disabled'}>Restart timer</button>`
+          : `<button class="ok xl" id="open" ${canOpen?'':'disabled'}>Open question</button>`}
+        <button class="warn xl" id="lock" ${status==='open'?'':'disabled'}>Lock</button>
+        <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
+        ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="magenta xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next ▶</button>`}`;
+  const compactCard = `<div class="card compact">
+      <div class="crow">
+        <div class="ctitle"><b>${esc(st.quiz_title)}</b><span class="muted"> · ${esc(st.session_name)}</span></div>
+        <span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No key for Q'+q+'</span>'}
+        <span class="sp"></span>
+        <div class="timer" id="timer"></div>
+        <div class="cq">Q${q}<small> / ${st.total_questions}</small><span class="muted"> · ${done}/${players.length} answered</span></div>
+      </div>
+      <div class="crow"><div class="controls" style="flex:1">${buttons}</div>${toggle}<button class="sm" id="sessbtn">Session &amp; screens</button></div>
+    </div>`;
   const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
       <div class="slidebar"><span class="muted">Click inside the slides, then use ← → to move. The quiz buttons do not change slides.</span>
         <button class="sm" id="slidesfs">Full screen</button><button class="sm" id="slidesnew">Open in new window</button></div>` : '';
@@ -452,7 +481,7 @@ function play(){
   if(showSlides){
     const modal = sessOpen ? `<div class="modalbg" id="sessmodal"><div class="modalbox sess"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>Session &amp; screens</b><button class="iconbtn" id="sessclose" aria-label="Close">✕</button></div>${sessionCard}${screensCard}${backCard}</div></div>` : '';
     return `<div class="layout slides">
-      <div class="a-ctrl">${controlsCard}</div>
+      <div class="a-ctrl">${compactCard}</div>
       <div class="a-slides">${slidePane}</div>
       <div class="a-side">${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
     </div>${modal}`;
