@@ -567,7 +567,7 @@ const PIP_CSS = `
   .pbar{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;box-sizing:border-box;min-height:100vh}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .prow .sp{flex:1}
-  .pgrp{display:flex;gap:4px;padding:4px;border:1px solid #2b3642;border-radius:10px;background:#141a21}
+  .pgrp{display:flex;gap:6px;padding:6px;border:1px solid #2b3642;border-radius:10px;background:#141a21}
   .pgrp button{width:44px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center}
   .pgrp button svg{display:block}
   .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#8d9aa8;user-select:none;white-space:nowrap}
@@ -603,10 +603,12 @@ const PIP_CSS = `
     .pbar{gap:10px}
     .prow.top{justify-content:space-between}
     .pq{font-size:26px} .ptimer{font-size:30px;min-width:56px}
-    .pgrp{width:100%;justify-content:space-between}
-    .pgrp button{flex:1 1 0;min-width:0;height:40px}
+    .pgrp{width:100%;gap:6px;padding:6px;flex-wrap:wrap}
+    .pgrp button{min-width:0;height:40px}
+    .pctl #prev,.pctl #next,.pctl #endsess{order:-1;flex:1 1 calc(50% - 3px)}
+    .pctl #open,.pctl #lock,.pctl #reveal{flex:1 1 calc(33.333% - 4px)}
     .pgrp.sess{width:100%}
-    .pgrp.sess button{flex:1 1 0}
+    .pgrp.sess button{flex:1 1 calc(50% - 3px)}
     .prow.ctl .toggle{width:100%;justify-content:flex-end}
     .prow.ctl{flex-wrap:wrap}
     .plb{display:none}
