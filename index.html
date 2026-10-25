@@ -144,8 +144,7 @@ function render(){
       const jb=document.getElementById('join'); if(jb){ jb.disabled=closed; jb.textContent=closed?'Waiting for the host to start a quiz…':'Join quiz'; } return; }
     app.innerHTML = `
       <div class="center"><div class="card join">
-        <h2>Join quiz</h2>
-        <div style="font-size:17px;color:var(--muted);margin-bottom:16px" id="jt">${esc(titleCache)}</div>
+        <h2 id="jt" style="margin-bottom:16px">${esc(titleCache)}</h2>
         <div class="small" style="text-align:left;margin:0 0 6px">Type your name</div>
         <input id="g" placeholder="Your name" maxlength="40" autocomplete="off" value="${esc(name)}">
         <div class="small" style="text-align:left;margin:14px 0 0">Pick your avatar</div>
