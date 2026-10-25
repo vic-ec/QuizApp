@@ -7,7 +7,9 @@
 <style>
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:5vh 6vw}
   h1{font-size:5vw;margin:0 0 1vh}
-  .sub{color:#8d9aa8;font-size:2.2vw;margin-bottom:4vh}
+  .sub{color:#8d9aa8;font-size:2.2vw}
+  .lbh{display:flex;align-items:baseline;gap:2vw;margin:4vh 0 2vh;font-size:3vw;font-weight:700}
+  .lbh .sub{font-weight:400;font-size:1.8vw}
   .bar{display:flex;align-items:center;gap:2vw;margin:2.2vh 0}
   .n{width:28vw;font-size:3.2vw;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .t{flex:1;background:#1a2129;border-radius:1.5vw;height:7vh;overflow:hidden}
@@ -19,8 +21,9 @@
 </style>
 </head>
 <body>
-<h1 id="title">Leaderboard</h1>
-<div class="sub" id="sub"></div>
+<h1 id="title"></h1>
+<div class="sub" id="date"></div>
+<div class="lbh"><span id="lbtitle">Leaderboard</span><span class="sub" id="sub"></span></div>
 <div id="list"></div>
 <script src="vendor-supabase.js"></script>
 <script src="config.js"></script>
@@ -38,8 +41,10 @@ async function load(){
   const revealedN=(st.current_question-1)+(st.revealed?1:0);
   const scores=groups.map(n=>{const m=answers.filter(x=>x.player===n);return {n,s:m.reduce((t,x)=>t+(x.points||0),0),c:m.filter(x=>x.is_correct===true).length}}).sort((x,y)=>y.s-x.s||y.c-x.c||x.n.localeCompare(y.n));
   const maxP=Math.max(1,...scores.map(x=>x.s));
-  document.getElementById('title').textContent=(st.ended?'🎉 Quiz complete — ':'')+st.quiz_title;
-  document.getElementById('sub').textContent=st.ended?'Final results':revealedN+' of '+st.total_questions+' questions revealed';
+  document.getElementById('title').textContent=st.quiz_title;
+  document.getElementById('date').textContent=st.session_name;
+  document.getElementById('lbtitle').textContent=st.ended?'🎉 Final results':'Leaderboard';
+  document.getElementById('sub').textContent=st.ended?'':revealedN+' of '+st.total_questions+' revealed';
   document.getElementById('list').innerHTML=scores.map((x,i)=>`<div class="bar">${st.ended&&i<3?'<div class="m">'+['🥇','🥈','🥉'][i]+'</div>':''}<div class="n">${avs[x.n]||''} ${esc(x.n)}</div><div class="t"><div class="f" style="width:${(x.s/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.s}</div></div>`).join('');
 }
 sb.channel('board')
