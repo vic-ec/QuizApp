@@ -389,9 +389,9 @@ function play(){
   <div>
     <div class="card"><h2>Session</h2>
       <p class="muted" style="margin-top:0">${esc(st.session_name)} · ${players.length} joined</p>
-      <div class="row"><button class="primary sm" id="newround">↻ New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button></div>
+      <div class="row" style="display:grid;grid-template-columns:1fr 1fr"><button class="purple sm" id="newround">New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button></div>
       <p class="muted">New round: same quiz, fresh players and scores (for the next group).</p>
-      <div class="row" style="margin-top:6px"><label class="muted">Jump to Q</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:70px"><button class="sm" id="gotobtn">Go</button></div></div>
+      <div class="row" style="margin-top:6px"><label class="muted">Jump to question</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:70px"><button class="primary sm" id="gotobtn">Go</button></div></div>
     <div class="card"><h2>Screens</h2>
       ${[{t:'Join screen',d:'Full-screen QR code and link for candidates to scan. Put it on the projector or a second display — the host page stays private.',u:joinUrl,win:'quizjoin'},
          {t:'Leaderboard',d:'Full-screen live scores for the projector. Switches to final results when you end the session.',u:candidateUrl+'board.html',win:'quizboard'}]
