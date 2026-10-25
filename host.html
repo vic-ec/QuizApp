@@ -89,7 +89,7 @@
   .qz h3{margin:0;font-size:18px}
   .qz .meta{font-size:13px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
   .qz .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto}
-  .qz .actions button{padding-left:0;padding-right:0}
+  .qz .actions button{padding:8px 0;font-size:13px}
   button.grey{background:#5b6775;color:#fff}
   /* editor */
   .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
@@ -271,7 +271,7 @@ function topbar(){
 }
 
 function home(){
-  const live = st && !st.ended ? `<div class="banner"><b>Live session in progress:</b> ${esc(st.quiz_title)} · ${esc(st.session_name)} · Q${st.current_question}/${st.total_questions} · ${players.length} joined<span class="sp"></span><button class="primary sm" data-go="play">Resume ▸</button><button class="ghost sm" id="endlive">End session</button></div>` : '';
+  const live = st && !st.ended ? `<div class="banner"><b>Live session in progress:</b> ${esc(st.quiz_title)} · ${esc(st.session_name)} · Q${st.current_question}/${st.total_questions} · ${players.length} joined<span class="sp"></span><button class="primary sm" data-go="play">Resume ▸</button><button class="danger sm" id="endlive">End session</button></div>` : '';
   return `<div class="page">${live}
     <h1 style="margin:${live?'16px':'0'} 0 14px">My quizzes</h1>
     <div class="quizzes">
