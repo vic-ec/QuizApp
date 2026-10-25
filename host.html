@@ -270,7 +270,7 @@ function home(){
         <h3>${esc(q.title)}</h3>
         <div class="meta"><span>${q.total_questions} questions</span><span>${q.timer_seconds?q.timer_seconds+' s timer':'no timer'}</span><span>${q.scoring==='flat'?'flat':'speed'} scoring</span></div>
         <div>${keyCount(q)>=q.total_questions?'<span class="pill done">Answer key complete</span>':'<span class="pill nokey">Key: '+keyCount(q)+' of '+q.total_questions+'</span>'}</div>
-        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button data-go="edit-${q.id}">Edit</button><button class="remove sm" data-archive="${q.id}" title="Move to bin">Remove</button></div>
+        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button data-go="edit-${q.id}">Edit</button><button class="remove" data-archive="${q.id}" title="Move to bin">Remove</button></div>
       </div>`).join('')}
     </div>
     ${binnedQuizzes().length?`<div style="margin-top:28px">
