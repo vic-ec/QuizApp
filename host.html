@@ -93,7 +93,10 @@
   .qz .actions button{padding:8px 0;font-size:13px}
   button.grey{background:#5b6775;color:#fff}
   .ed-actions button{padding:8px 14px;font-size:13px}
-  .layout.slides{grid-template-columns:minmax(0,1.5fr) minmax(380px,1fr)}
+  .layout.slides{grid-template-columns:minmax(0,1.3fr) minmax(420px,1fr)}
+  .layout.slides .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .layout.slides .controls button{height:clamp(44px,4vw,56px);font-size:clamp(14px,1.2vw,18px)}
+  .layout.slides .controls #prev{grid-column:1/-1;order:9;height:38px;font-size:14px}
   @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}}
   .slidecol{position:sticky;top:12px;align-self:start}
   .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
