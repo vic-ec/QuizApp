@@ -74,7 +74,8 @@
   button.sm{padding:8px 12px;font-size:13px}
   button:disabled{opacity:.35;cursor:default}
   input,select{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
-  label.f{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+  label.f{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;font-size:13px;color:var(--muted);min-width:0}
+  label.f input,label.f select{width:100%}
   label.f input,label.f select{font-size:16px;color:var(--text)}
   .muted{color:var(--muted);font-size:13px}
   .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;margin-right:4px}
@@ -96,7 +97,8 @@
   .modalbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;max-width:380px;width:100%;text-align:center}
   .modalbox p{margin:0 0 16px;font-size:16px}
   /* editor */
-  .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+  .form{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:700px){.form{grid-template-columns:1fr}}
   .form .wide{grid-column:1/-1}
   .key{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:8px}
   .key .k{display:flex;align-items:center;gap:5px;font-size:13px}
@@ -307,7 +309,7 @@ function editor(){
     <div class="card"><div class="form">
       <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz"></label>
       <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
-      <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
+      <label class="f">Timer per question (s, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
       <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 90, 80… (min 50)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
     </div></div>
     <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="remove sm" id="resetkey">Reset answer key</button></div>
