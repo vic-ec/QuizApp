@@ -10,22 +10,37 @@
         --A:#e74c3c;--B:#3498db;--C:#f1c40f;--D:#2ecc71;}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
-  .wrap{max-width:520px;width:100%;margin:0 auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .wrap{max-width:520px;width:100%;margin:0 auto;padding:12px 16px calc(96px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
   body.centered .wrap{max-width:none;padding:0}
-  .top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted)}
-  .top b{color:var(--text)}
-  .head{display:flex;justify-content:space-between;align-items:center}
-  .q{font-size:30px;font-weight:700}
-  .q small{color:var(--muted);font-size:18px;font-weight:500}
-  .timer{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+  /* header: who I am + score, menu */
+  .top{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+  .top .me{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+  .top .me b{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top .score{font-variant-numeric:tabular-nums;white-space:nowrap} .top .score b{color:var(--text)}
+  .menubtn{height:40px;width:40px;padding:0;border:0;border-radius:10px;background:#2b3642;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;font:inherit}
+  .menubtn[aria-expanded="true"]{background:#3a4654;color:var(--text)}
+  .mwrap{position:relative}
+  .menu{position:absolute;right:0;top:calc(100% + 6px);min-width:200px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px;z-index:30;box-shadow:0 12px 32px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:2px}
+  .menu button{width:100%;text-align:left;height:40px;padding:0 10px;background:transparent;border:0;border-radius:8px;color:var(--text);font:inherit}
+  .menu button:hover,.menu button:focus-visible{background:#2b3642}
+  .menu button.dang{color:#ff8a7f}
+  /* question line */
+  .head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .q{font-size:20px;font-weight:800}
+  .state{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#2b3642;color:var(--muted);white-space:nowrap}
+  .state.open{background:#1d2f4d;color:#9cc0ff} .state.revealed{background:#163d2b;color:var(--ok)}
+  .state.locked,.state.timeup{background:#3a3415;color:var(--warn)} .state.answered{background:#1d2f4d;color:#9cc0ff}
+  .timer{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;min-width:48px;text-align:right;margin-left:auto;color:var(--accent)}
   .timer.low{color:var(--bad)}
   .timer.blink{animation:blink 1s steps(1,end) infinite}
   @keyframes blink{50%{opacity:0}}
-  @media(prefers-reduced-motion:reduce){.timer.blink{animation:none}}
-  .timer.off{color:var(--muted);font-size:16px;font-weight:500}
-  .status{text-align:center;font-size:14px;color:var(--muted)}
+  @media(prefers-reduced-motion:reduce){.timer.blink{animation:none} button.opt{transition:none}}
+  .timer.off{color:var(--muted);font-size:13px;font-weight:500}
+  .status{font-size:13px;color:var(--muted)}
+  /* answers */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  button.opt{font-size:44px;font-weight:800;padding:30px 0;border-radius:16px;border:4px solid transparent;color:#fff;cursor:pointer;transition:.12s;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  button.opt{position:relative;font-size:40px;font-weight:800;min-height:112px;padding:0;border-radius:14px;border:4px solid transparent;color:#fff;cursor:pointer;transition:.12s;text-shadow:0 1px 2px rgba(0,0,0,.35);font-family:inherit}
   button.opt[data-o="A"]{background:var(--A)} button.opt[data-o="B"]{background:var(--B)}
   button.opt[data-o="C"]{background:var(--C);color:#2a2400;text-shadow:none} button.opt[data-o="D"]{background:var(--D);color:#06220f;text-shadow:none}
   button.opt:active{transform:scale(.97)}
@@ -34,49 +49,55 @@
   button.opt.correct{border-color:#fff;box-shadow:0 0 0 4px var(--ok)}
   button.opt.wrong{opacity:.55}
   button.opt:disabled{cursor:default}
-  .submit{font-size:22px;font-weight:700;padding:18px;border-radius:14px;border:0;background:#fff;color:#0f1419;width:100%}
-  .submit:disabled{opacity:.35}
-  .banner{border-radius:12px;padding:14px;text-align:center;font-size:17px;font-weight:600}
+  button.opt .mk{position:absolute;top:8px;right:10px;font-size:16px;font-weight:700;line-height:1;background:rgba(0,0,0,.35);color:#fff;border-radius:999px;padding:4px 8px;text-shadow:none}
+  .sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  /* persistent bottom action */
+  .actbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#121920;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+  .actbar .in{max-width:520px;margin:0 auto}
+  .submit{display:flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:18px;font-weight:700;height:52px;border-radius:12px;border:0;background:var(--accent);color:#fff;width:100%}
+  .submit:disabled{opacity:.5}
+  .submit.quiet{background:#2b3642;color:var(--muted);font-weight:600}
+  .banner{border-radius:12px;padding:12px 14px;text-align:center;font-size:16px;font-weight:600}
   .banner.lock{background:#3a3415;color:var(--warn)}
   .banner.ok{background:#163d2b;color:var(--ok)}
   .banner.bad{background:#4a1f1b;color:#ff8a7f}
   .banner.wait{background:var(--card);color:var(--muted);font-weight:500}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-  input{width:100%;font-size:20px;padding:14px;border-radius:10px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
-  .btn{width:100%;font-size:18px;font-weight:600;padding:14px;border-radius:10px;border:0;background:var(--accent);color:#fff;margin-top:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  input{width:100%;font-size:18px;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0f1419;color:var(--text);font-family:inherit}
+  .btn{width:100%;font-size:17px;font-weight:600;height:48px;border-radius:10px;border:0;background:var(--accent);color:#fff;margin-top:10px;font-family:inherit}
   .btn:disabled{opacity:.45}
-  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:14px;padding:10px}
-  .net{position:fixed;left:0;right:0;bottom:0;background:#4a1f1b;color:#ff8a7f;text-align:center;padding:8px;font-size:14px;display:none}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:14px;height:40px}
+  .net{position:fixed;left:0;right:0;bottom:0;background:#4a1f1b;color:#ff8a7f;text-align:center;padding:8px;font-size:14px;display:none;z-index:25}
   .small{font-size:13px;color:var(--muted);text-align:center}
   .final{text-align:center}
-  .final .pts{font-size:56px;font-weight:800;color:var(--warn)}
-  /* leaderboard table — same look as the host's candidates table */
+  .final .pts{font-size:52px;font-weight:800;color:var(--warn);line-height:1.1}
+  /* leaderboard: two-line rows (same information as the host table) */
   .lb{display:flex;flex-direction:column;margin:12px 0;text-align:left}
-  .lb.final .tr{grid-template-columns:26px minmax(0,1fr) 52px 68px 56px}
-  .lb .tr{display:grid;grid-template-columns:26px minmax(0,1fr) 52px 48px 56px;gap:8px;align-items:center;min-height:34px;padding:3px 6px;font-size:14px;border-radius:6px}
+  .lb .tr{display:grid;grid-template-columns:28px minmax(0,1fr) auto;grid-template-areas:"rk nm tot" "rk sub sub";column-gap:8px;align-items:center;padding:8px 6px;font-size:15px;border-radius:8px}
   .lb .tr + .tr{border-top:1px solid var(--line)}
-  .lb .tr.th{min-height:0;padding-bottom:4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-  .lb .rk{color:var(--muted);text-align:right;font-size:12px}
+  .lb .rk{grid-area:rk;color:var(--muted);text-align:center;font-size:12px;font-variant-numeric:tabular-nums}
   .lb .rk .md{font-size:16px;line-height:1}
-  .lb .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--text)}
-  .lb .n{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--text)}
-  .lb .tot{font-weight:800;color:var(--warn)}
+  .lb .nm{grid-area:nm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--text)}
+  .lb .tot{grid-area:tot;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text)}
+  .lb .tr.lead .tot{color:var(--warn)}
+  .lb .sub{grid-area:sub;display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-top:3px;font-variant-numeric:tabular-nums}
   .lb .tr.me{background:#1d2f4d;box-shadow:inset 0 0 0 2px var(--accent)}
+  .chip{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 7px;border-radius:6px;font-weight:700;font-size:12px;background:#2b3642;color:var(--muted)}
+  .chip.right{background:#163d2b;color:var(--ok)} .chip.wrong{background:#4a1f1b;color:#ff8a7f} .chip.none{background:transparent;border:1px dashed var(--line);font-weight:500}
   .err{color:#ff8a7f;font-size:14px;text-align:center;min-height:18px}
   .center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
   .join{width:100%;max-width:440px;text-align:center}
-  .join h2{font-size:26px;margin:0 0 4px}
+  .join h2{font-size:24px;margin:0 0 4px}
   .avatars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:6px 0 14px}
-  .avatars button{font-size:30px;padding:10px 0;border-radius:12px;border:2px solid var(--line);background:#0f1419;cursor:pointer;line-height:1}
+  .avatars button{font-size:28px;min-height:48px;padding:0;border-radius:12px;border:2px solid var(--line);background:#0f1419;cursor:pointer;line-height:1}
   .avatars button.sel{border-color:var(--accent);background:#1d2f4d;box-shadow:0 0 0 3px rgba(79,140,255,.35)}
   .av{font-size:1.2em;margin-right:6px}
-  .modal{position:fixed;inset:0;background:rgba(5,8,12,.82);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
-  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;width:100%;max-width:440px;text-align:center}
+  .modal{position:fixed;inset:0;background:rgba(5,8,12,.82);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;width:100%;max-width:440px;text-align:center;max-height:calc(100vh - 32px);overflow:auto}
   .modal .res{font-size:22px;font-weight:800;margin-bottom:2px}
   .modal .res.ok{color:var(--ok)} .modal .res.bad{color:#ff8a7f}
-  .modal h3{margin:12px 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-  .modal .lb .tr:not(.th){font-size:15px}
-  .modal .close{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 14px;font:inherit}
+  .modal h3{margin:12px 0 4px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .modal .close{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;height:44px;padding:0 18px;font:inherit}
 </style>
 </head>
 <body>
@@ -94,7 +115,7 @@ let name = localStorage.getItem('quiz_name') || '';
 let avatar = localStorage.getItem('quiz_avatar') || '';
 let lbDismissed = null;        // question number whose leaderboard popup was closed
 let st = null, mine = {}, correct = null, knownSession = null, titleCache = localStorage.getItem('quiz_title') || 'Quiz';
-let selected = null, busy = false, errMsg = '';
+let selected = null, busy = false, errMsg = '', menuOpen = false, rulesOpen = false;
 let clockOffset = 0;           // serverNow ≈ Date.now() - clockOffset
 let board = [];                // leaderboard (after each reveal and at the end)
 
@@ -157,11 +178,11 @@ function rulesList(){
         </ul>`;
 }
 function lbTable(rows, final){
-  // after a reveal: this question's time and points; final results: number correct and total time (the tie-breaker)
-  const head = final ? `<span class="n">Correct</span><span class="n">Total time</span>` : `<span class="n">Time</span><span class="n">Q pts</span>`;
-  const cells = x => final ? `<span class="n">${x.c}</span><span class="n">${(x.t/1000).toFixed(1)} s</span>`
-    : `<span class="n">${x.q?(x.q.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${x.q?(x.q.points?'+'+x.q.points:'0'):''}</span>`;
-  return `<div class="lb${final?' final':''}"><div class="tr th"><span class="rk">#</span><span>Candidate</span>${head}<span class="n">Total</span></div>${rows.map((x,i)=>`<div class="tr${x.n===name?' me':''}"><span class="rk">${x.p>0&&i<3?'<span class="md">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm"><span class="av">${x.a||''}</span>${esc(x.n)}</span>${cells(x)}<span class="n tot">${x.p}</span></div>`).join('')}</div>`;
+  // after a reveal: this question's answer, time and points; final results: number correct and total time (the tie-breaker)
+  const sub = x => final ? `<span>${x.c} correct</span><span>·</span><span>${(x.t/1000).toFixed(1)} s total</span>`
+    : !x.q ? `<span class="chip none">No answer</span>`
+    : `<span class="chip ${x.q.is_correct?'right':'wrong'}">${x.q.is_correct?'✓':'✕'} ${x.q.choice}<span class="sr">${x.q.is_correct?' correct':' incorrect'}</span></span><span>${(x.q.elapsed_ms/1000).toFixed(1)} s</span><span>·</span><span>+${x.q.points||0}</span>`;
+  return `<div class="lb" role="list">${rows.map((x,i)=>`<div class="tr${x.n===name?' me':''}${i===0&&x.p>0?' lead':''}" role="listitem"><span class="rk">${x.p>0&&i<3?'<span class="md" aria-label="rank '+(i+1)+'">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm"><span class="av" aria-hidden="true">${x.a||''}</span>${esc(x.n)}${x.n===name?'<span class="sr"> (you)</span>':''}</span><span class="tot">${x.p}<span class="sr"> points</span></span><span class="sub">${sub(x)}</span></div>`).join('')}</div>`;
 }
 const totalPts = () => Object.values(mine).reduce((t,r)=>t+(r.points||0),0);
 const totalCorrect = () => Object.values(mine).filter(r=>r.is_correct===true).length;
@@ -207,7 +228,8 @@ function render(){
         <div style="font-size:26px;font-weight:800;margin-bottom:4px">Quiz complete!</div>
         <div class="small">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
         <div class="pts">${totalPts()} pts</div>
-        <div style="font-size:18px">${medal} ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''} · ${totalCorrect()} of ${st.total_questions} correct</div>
+        <div style="font-size:17px">${medal} ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''} · ${totalCorrect()} of ${st.total_questions} correct</div>
+        <h3 style="margin:14px 0 0;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Final leaderboard</h3>
         ${lbTable(board.slice(0,10), true)}
         <button class="btn" id="exit">Exit quiz</button>
       </div>`;
@@ -229,62 +251,73 @@ function render(){
         <div style="font-size:22px;font-weight:800;margin-top:14px">Good luck! 🍀</div>
         <div class="small" style="margin-top:10px"><a href="#" id="exitlink" style="color:var(--muted)">Exit quiz</a></div>
       </div></div>`;
-    document.getElementById('exitlink').onclick=(e)=>{e.preventDefault(); exit();};
+    document.getElementById('exitlink').onclick=(e)=>{e.preventDefault(); if(confirm('Leave this quiz? You can rejoin with the same name.')) exit();};
     try{localStorage.setItem('quiz_intro_'+st.session_id,'1');}catch(e){}
     return;
   }
   const open = !st.locked && !st.revealed && st.question_opened_at && !expired();
-  const introKey = 'quiz_intro_'+st.session_id, showIntro = !localStorage.getItem(introKey);   // joined after the quiz started: show the rules once
-  let banner='';
+  const introKey = 'quiz_intro_'+st.session_id, showIntro = rulesOpen || !localStorage.getItem(introKey);   // joined after the quiz started: show the rules once
+  // state badge, from the same flags the host uses
+  const state = st.revealed?'revealed':!st.question_opened_at?'waiting':my?'answered':st.locked?'locked':expired()?'timeup':'open';
+  const stateLabel = {waiting:'Not opened yet',open:'Answer now',answered:'Answered',timeup:'Time up',locked:'Answers locked',revealed:'Answer revealed'}[state];
+  let banner='', action='';
   if(st.revealed){
-    if(!my) banner = `<div class="banner bad">No answer submitted. Correct answer: ${correct||'?'}</div>`;
-    else if(my.is_correct) banner = `<div class="banner ok">Correct! +${my.points} pts</div>`;
-    else banner = `<div class="banner bad">You chose ${my.choice}. Correct = ${correct||'?'}</div>`;
-    banner += q>=st.total_questions ? `<div class="banner wait">That was the last question — final results coming up…</div>` : `<div class="banner wait">Waiting for the next question…</div>`;
+    if(!my) banner = `<div class="banner bad">No answer submitted · correct answer: ${correct||'?'}</div>`;
+    else if(my.is_correct) banner = `<div class="banner ok">✓ Correct — +${my.points} pts</div>`;
+    else banner = `<div class="banner bad">✕ You chose ${my.choice} · correct answer: ${correct||'?'}</div>`;
+    banner += `<div class="banner wait">${q>=st.total_questions?'That was the last question — final results coming up…':'Waiting for the next question…'}</div>`;
+    action = `<button class="submit quiet" id="showlb">Show leaderboard</button>`;
   } else if(my){
-    banner = `<div class="banner wait">Submitted <b>${my.choice}</b>${my.elapsed_ms!=null?` in ${(my.elapsed_ms/1000).toFixed(1)} s`:''}. Waiting for the reveal…</div>`;
+    banner = `<div class="banner wait">Submitted <b>${my.choice}</b>${my.elapsed_ms!=null?` in ${(my.elapsed_ms/1000).toFixed(1)} s`:''}</div>`;
+    action = `<button class="submit quiet" disabled>Waiting for the reveal…</button>`;
   } else if(!st.question_opened_at){
-    banner = `<div class="banner wait">Waiting for the host to open the question…</div>`;
+    action = `<button class="submit quiet" disabled>Waiting for the host to open the question…</button>`;
   } else if(st.locked || expired()){
     banner = `<div class="banner lock">${expired()&&!st.locked?"Time's up":'Answers locked'} — you did not answer</div>`;
+    action = `<button class="submit quiet" disabled>Waiting for the reveal…</button>`;
   } else if(selected){
-    banner = `<button class="submit" id="submit">Submit ${selected}</button>`;
+    action = `<button class="submit" id="submit" ${busy?'disabled':''}>${busy?'Sending…':'Submit '+selected}</button>`;
   } else {
-    banner = `<div class="banner wait">Tap an answer, then Submit</div>`;
+    action = `<button class="submit" disabled>Choose an answer</button>`;
   }
 
   const opts = ['A','B','C','D'].map(o=>{
-    let cls='opt';
-    if(st.revealed){ if(o===correct) cls+=' correct'; else if(my&&o===my.choice) cls+=' wrong'; else cls+=' dim'; }
-    else if(my){ cls += o===my.choice?' sel':' dim'; }
-    else if(o===selected) cls+=' sel';
-    return `<button class="${cls}" data-o="${o}" ${open&&!my?'':'disabled'}>${o}</button>`;
+    let cls='opt', mark='', srt='';
+    if(st.revealed){ if(o===correct){ cls+=' correct'; mark='✓'; srt=' — correct answer'; } else if(my&&o===my.choice){ cls+=' wrong'; mark='✕'; srt=' — your answer, incorrect'; } else cls+=' dim'; }
+    else if(my){ if(o===my.choice){ cls+=' sel'; mark='✓'; srt=' — your answer'; } else cls+=' dim'; }
+    else if(o===selected){ cls+=' sel'; srt=' — selected'; }
+    return `<button class="${cls}" data-o="${o}" aria-pressed="${o===selected||(my&&o===my.choice)?'true':'false'}" ${open&&!my?'':'disabled'}>${o}${mark?`<span class="mk" aria-hidden="true">${mark}</span>`:''}<span class="sr">${srt}</span></button>`;
   }).join('');
 
+  const menu = menuOpen ? `<div class="menu" role="menu" id="pmenu"><button role="menuitem" id="m_rules">How scoring works</button><button role="menuitem" class="dang" id="m_exit">Exit quiz…</button></div>` : '';
   app.innerHTML = `
-    <div class="top"><span><span class="av">${avatar}</span><b>${esc(name)}</b></span><span><b>${totalPts()}</b> pts · ${totalCorrect()} correct</span></div>
-    <div class="head"><div class="q">Q${q} <small>of ${st.total_questions}</small></div><div class="timer" id="timer"></div></div>
+    <div class="top"><span class="me"><span class="av" aria-hidden="true">${avatar}</span><b>${esc(name)}</b></span><span class="score"><b>${totalPts()}</b> pts · ${totalCorrect()} correct</span>
+      <div class="mwrap"><button class="menubtn" id="pmenubtn" aria-label="Menu" aria-haspopup="menu" aria-expanded="${menuOpen}">⋯</button>${menu}</div></div>
+    <div class="head"><h1 class="q" style="margin:0">Question ${q} of ${st.total_questions}</h1><span class="state ${state}">${stateLabel}</span><div class="timer" id="timer" aria-live="off"></div></div>
     <div class="status">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
-    <div class="grid">${opts}</div>
-    ${banner}
-    <div class="err">${esc(errMsg)}</div>
-    <div class="small"><a href="#" id="exitlink" style="color:var(--muted)">Exit quiz</a></div>
+    <div class="grid" role="group" aria-label="Answer options">${opts}</div>
+    <div aria-live="polite">${banner}<div class="err">${esc(errMsg)}</div></div>
+    <div class="actbar"><div class="in">${action}</div></div>
     ${st.revealed && lbDismissed!==q ? leaderboardModal(q, my) : ''}
-    ${showIntro ? `<div class="modal" id="intro"><div class="box"><h2 style="margin:0 0 4px;font-size:22px">${esc(st.quiz_title)}</h2><div class="small">How it works</div>${rulesList()}<button class="btn" id="introok" style="margin-top:16px">Got it</button></div></div>` : ''}`;
-  const io=document.getElementById('introok'); if(io) io.onclick=()=>{ try{localStorage.setItem(introKey,'1');}catch(e){} render(); };
-  const cl=document.getElementById('lbclose'); if(cl) cl.onclick=()=>{ lbDismissed=q; render(); };
+    ${showIntro ? `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="introh"><div class="box"><h2 id="introh" style="margin:0 0 4px;font-size:22px">${esc(st.quiz_title)}</h2><div class="small">How it works</div>${rulesList()}<button class="btn" id="introok" style="margin-top:16px">Got it</button></div></div>` : ''}`;
+  const io=document.getElementById('introok'); if(io){ io.focus(); io.onclick=()=>{ rulesOpen=false; try{localStorage.setItem(introKey,'1');}catch(e){} render(); }; }
+  const cl=document.getElementById('lbclose'); if(cl){ cl.focus(); cl.onclick=()=>{ lbDismissed=q; render(); }; }
+  const sl=document.getElementById('showlb'); if(sl) sl.onclick=()=>{ lbDismissed=null; render(); };
+  const mb=document.getElementById('pmenubtn'); mb.onclick=(e)=>{ e.stopPropagation(); menuOpen=!menuOpen; render(); if(menuOpen){ const f=document.querySelector('#pmenu [role=menuitem]'); if(f) f.focus(); } };
+  const pm=document.getElementById('pmenu'); if(pm){ pm.onclick=(e)=>e.stopPropagation(); pm.onkeydown=(e)=>{ const it=[...pm.querySelectorAll('[role=menuitem]')], i=it.indexOf(document.activeElement); if(e.key==='ArrowDown'){e.preventDefault();(it[i+1]||it[0]).focus();} if(e.key==='ArrowUp'){e.preventDefault();(it[i-1]||it[it.length-1]).focus();} }; }
+  const mr=document.getElementById('m_rules'); if(mr) mr.onclick=()=>{ menuOpen=false; rulesOpen=true; render(); };
+  const me=document.getElementById('m_exit'); if(me) me.onclick=()=>{ menuOpen=false; render(); if(confirm('Leave this quiz? Your answers so far are kept and you can rejoin with the same name.')) exit(); };
 
   app.querySelectorAll('button.opt').forEach(b=>b.onclick=()=>{ if(b.disabled) return; selected=b.dataset.o; errMsg=''; render(); });
   const sub=document.getElementById('submit'); if(sub) sub.onclick=submit;
-  document.getElementById('exitlink').onclick=(e)=>{e.preventDefault(); exit();};
   tick();
 }
 
 function leaderboardModal(q, my){
   const rank = board.findIndex(x=>x.n===name)+1;
-  const res = !my ? `<div class="res bad">No answer · correct: ${correct||'?'}</div>` : my.is_correct ? `<div class="res ok">Correct! +${my.points} pts</div>` : `<div class="res bad">You chose ${my.choice}. Correct = ${correct||'?'}</div>`;
+  const res = !my ? `<div class="res bad">No answer · correct: ${correct||'?'}</div>` : my.is_correct ? `<div class="res ok">✓ Correct — +${my.points} pts</div>` : `<div class="res bad">✕ You chose ${my.choice} · correct: ${correct||'?'}</div>`;
   const last = q>=st.total_questions;
-  return `<div class="modal"><div class="box">
+  return `<div class="modal" role="dialog" aria-modal="true" aria-label="Leaderboard after question ${q}"><div class="box">
     ${res}
     <div class="small">${rank?`You are ${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length} · ${totalPts()} pts`:''}</div>
     <h3>Leaderboard after Q${q}</h3>
@@ -306,8 +339,7 @@ setInterval(tick, 250);
 
 async function submit(){
   if(busy||!selected) return; busy=true;
-  const choice=selected;
-  document.getElementById('submit')?.setAttribute('disabled','');
+  const choice=selected; render();
   const {error} = await sb.rpc('submit_answer',{p_player:name,p_choice:choice});
   busy=false;
   if(error){ errMsg=error.message; selected=null; }
@@ -319,6 +351,8 @@ function exit(){
   localStorage.removeItem('quiz_name'); name=''; mine={}; selected=null; knownSession=null; render();
 }
 
+document.addEventListener('click',()=>{ if(menuOpen){ menuOpen=false; render(); } });
+document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&menuOpen){ menuOpen=false; render(); const b=document.getElementById('pmenubtn'); if(b) b.focus(); } });
 sb.channel('cand')
   .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},()=>{ delete app.dataset.expiredRendered; load(); })
   .on('postgres_changes',{event:'*',schema:'public',table:'answers'},(p)=>{ if(p.new && p.new.player===name) load(); })
