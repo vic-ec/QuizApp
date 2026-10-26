@@ -570,7 +570,8 @@ const PIP_CSS = `
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
   .pbar{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"top top" "ctl bot" "mid mid";gap:8px;padding:8px 10px 10px;box-sizing:border-box;height:100vh}
   .prow.top{grid-area:top} .prow.ctl{grid-area:ctl} .prow.bot{grid-area:bot;align-self:start}
-  .prow.mid{grid-area:mid;min-height:0;overflow:auto;align-content:flex-start}
+  .prow.mid{grid-area:mid;min-height:0;overflow-y:auto;overflow-x:hidden;align-content:flex-start}
+  .prow.mid.hscroll{overflow-x:auto}
   .pgrp.sess button,.pgrp button.wl{width:auto;gap:6px;font-size:12px;padding:0 10px}
   button svg{width:16px;height:16px}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -605,10 +606,12 @@ const PIP_CSS = `
   .ans.done{background:#1d2f4d;border-color:#1d2f4d;color:#9cc0ff}
   .ans.right{background:#2ecc71;border-color:#2ecc71;color:#06220f}
   .ans.wrong{background:#e74c3c;border-color:#e74c3c;color:#fff}
-  .rmx{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:#e74c3c;color:#fff;font-size:12px;border-radius:6px}
-  .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px;gap:6px}
-  .ctab.h1 .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 40px 44px} .ctab.h1 .tr > :nth-child(4){display:none}
-  .ctab.h2 .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 44px} .ctab.h2 .tr > :nth-child(4),.ctab.h2 .tr > :nth-child(5){display:none}
+  .rmx{width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-size:11px;border-radius:8px}
+  .rmx:hover{color:#ff8a7f;border-color:#e74c3c}
+  .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px 24px;gap:6px}
+  .ctab.h1 .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 40px 44px 24px} .ctab.h1 .tr > :nth-child(4){display:none}
+  .ctab.h2 .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 44px 24px}
+  .ctab.h3 .tr{grid-template-columns:14px minmax(var(--nmw,0px),1fr) 30px 34px 24px;gap:4px} .ctab.h3 .tr > :nth-child(4),.ctab.h3 .tr > :nth-child(5){display:none} .ctab.h3 .tr.th .c{font-size:0} .ctab.h3 .tr.th .c::after{content:'Ans';font-size:11px} .ctab.h2 .tr > :nth-child(4),.ctab.h2 .tr > :nth-child(5){display:none}
   .cnt{color:#8d9aa8;font-size:12px;text-align:right;margin-top:4px}
   .status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#2b3642;color:#8d9aa8;white-space:nowrap}
   .status.open{background:#1d2f4d;color:#9cc0ff} .status.revealed{background:#163d2b;color:#2ecc71} .status.locked,.status.timeup{background:#3a3415;color:#f1c40f} .status.ended{background:#4a1f1b;color:#ff8a7f}
@@ -676,7 +679,7 @@ function presenterBar(){
       ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button id="next" class="wl" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}><span>Next</span>${PI.next}</button>`}
     </div>
   </div>
-  <div class="prow mid"><div style="width:100%">${players.length?candTable(false):'<span class="muted">No candidates yet</span>'}<div class="cnt">${done}/${players.length} answered</div></div></div>
+  <div class="prow mid"><div style="width:100%">${players.length?candTable(true):'<span class="muted">No candidates yet</span>'}<div class="cnt">${done}/${players.length} answered</div></div></div>
   <div class="prow bot"><div class="pgrp sess">
       <button class="purple" id="newround" title="New round (same quiz, fresh players and scores)">${PI.round}<span>New round</span></button>
       <button class="danger" id="endsess2" title="End session" ${st.ended?'disabled':''}>${PI.stop}<span>End session</span></button>
@@ -695,16 +698,18 @@ function renderPip(){
   on('endsess',()=>{ if(pipWin.confirm('End this session? Candidates will see their final score and rank.')) act('end_session').then(load); });
   on('endsess2',()=>{ if(pipWin.confirm('End this session?')) act('end_session').then(load); });
   on('newround',()=>{ if(pipWin.confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
+  d.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ if(pipWin.confirm('Remove "'+x.dataset.rm+'" from this session?')) act('remove_player',{name:x.dataset.rm}).then(load); });
   on('gotobtn',()=>act('goto',{question:+d.getElementById('goto').value}).then(load));
   tickPip(); fitPip();
 }
 // Remote: keep names whole — size the name column to the longest name, then hide Time, then Q pts, if the window is too narrow
 function fitPip(){
   if(!pipWin||pipWin.closed) return; const t=pipWin.document.querySelector('.ctab'); if(!t) return;
-  t.classList.remove('h1','h2'); t.style.removeProperty('--nmw');
+  const mid=t.closest('.prow'); t.classList.remove('h1','h2','h3'); t.style.removeProperty('--nmw');
   let w=0; t.querySelectorAll('.nm').forEach(n=>w=Math.max(w,n.scrollWidth));
   t.style.setProperty('--nmw',Math.ceil(w)+'px');
-  for(const c of ['h1','h2']){ if(t.scrollWidth<=t.clientWidth) break; t.classList.add(c); }
+  for(const c of ['h1','h2','h3']){ if(t.scrollWidth<=t.clientWidth) break; t.classList.add(c); }
+  if(mid) mid.classList.toggle('hscroll', t.scrollWidth>t.clientWidth);   // sideways scroll only when even the short table can't fit
 }
 function tickPip(){
   if(!pipWin||pipWin.closed||!st) return; const el=pipWin.document.getElementById('ptimer'); if(!el) return;
