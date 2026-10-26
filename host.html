@@ -22,7 +22,7 @@
   .tabs a:hover{color:var(--text)}
   .tabs a.on{background:#2b3642;color:var(--text)}
   .tabs .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(46,204,113,.25)}
-  .topbar .out{font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .topbar .out{font-size:14px;font-weight:600;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:8px 14px}
   .topbar .out:hover{color:var(--text)}
   .topbar .out .ico{display:none}
   @media(max-width:700px){.topbar .out .lbl{display:none}.topbar .out .ico{display:inline}}
@@ -136,78 +136,78 @@
   .a-main{display:flex;flex-direction:column;gap:var(--gap);min-width:0}
   .a-side{min-width:0}
   @media(max-width:900px){.live.slides{grid-template-columns:1fr}}
-  .sec{display:flex;flex-direction:column;gap:var(--gap)}
-  .sec + .sec{border-top:1px solid var(--line);padding-top:var(--gap);margin-top:var(--gap)}
+  .sec{display:flex;flex-direction:column;gap:var(--gap);min-width:0}
+  .cpanel .sec + .sec{border-top:1px solid var(--line);padding-top:var(--gap);margin-top:var(--gap)}
   .sec h2{margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .sec h2 .muted{text-transform:none;letter-spacing:0;font-weight:500}
   .crow{display:flex;align-items:center;gap:var(--gap);flex-wrap:wrap}
   .crow .sp{flex:1}
   .ctitle{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
-  .cq{font-size:18px;font-weight:800;white-space:nowrap} .cq small{font-size:12px;color:var(--muted);font-weight:600}
-  .live .timer{font-size:26px} .live .timer.up{font-size:14px}
+  .live .timer,.cq{line-height:1;display:flex;align-items:center}
+  .live .timer{font-size:22px}
+  .live .timer:empty{display:none}
+  .cq{font-size:18px;font-weight:800;white-space:nowrap;gap:3px} .cq small{font-size:12px;color:var(--muted);font-weight:600}
   .live .pill{margin:0}
+  /* control row: [controls] [go to] ............ [new round][end session] */
+  .cpanel{container-type:inline-size}
+  .ctlr{display:flex;align-items:center;gap:var(--gap);flex:1 1 auto;flex-wrap:wrap}
   .grp{display:flex;gap:var(--gap)}
   .grp.sess{margin-left:auto}
-  .cbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 20px;font-size:15px;font-weight:700;border-radius:10px;white-space:nowrap}
+  .cbtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 12px;font-size:14px;font-weight:700;border-radius:8px;white-space:nowrap}
   .cbtn svg{flex:none}
-  .grp.sess .cbtn{height:44px;padding:0 16px;font-size:14px}
-  .goto{display:flex;align-items:center;gap:var(--gap);font-weight:600;font-size:14px}
-  .goto input{width:76px;height:44px;padding:0 8px;text-align:center;font-size:16px}
-  .goto button{width:52px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+  .goto{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;white-space:nowrap}
+  .goto input{width:60px;height:38px;padding:0 6px;text-align:center;font-size:15px}
+  .goto button{width:44px;height:38px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px}
+  @container (max-width:620px){
+    .grp.pctl{flex:1 1 100%} .grp.pctl .cbtn{flex:1 1 0;min-width:0;padding:0} .grp.pctl .lbl{display:none}
+  }
+  @container (max-width:540px){ .grp.sess .cbtn{width:44px;padding:0} .grp.sess .lbl{display:none} }
+  /* pill boxes: label + its buttons / toggle grouped together */
+  .pbox{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 4px 0 12px;border:1px solid var(--line);border-radius:10px;background:#141a21;font-size:13px;color:var(--muted);white-space:nowrap}
+  .pbox.toggle{padding:0 12px}
+  .pbox .iconbtn{padding:4px;border-color:transparent}
+  .pbox .iconbtn:hover{border-color:var(--accent)}
   .screens{display:flex;align-items:center;gap:var(--gap);flex-wrap:wrap;margin-left:auto}
-  .scrl{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
-  .scrl .iconbtn{padding:6px}
   .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
   .slidewrap iframe{width:100%;height:100%;border:0;display:block}
   .slidebar{display:flex;gap:var(--gap);align-items:center;flex-wrap:wrap;justify-content:flex-end}
   .slidebar .sm{display:inline-flex;align-items:center;gap:6px}
-  /* quiz panel */
-  .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:var(--gap)}
-  .g{border:2px solid var(--line);border-radius:10px;padding:8px;text-align:center;font-weight:600;font-size:13px;position:relative;min-width:0}
-  .g .nm{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 12px}
+  /* quiz panel: candidates | answers (2x2) | leaderboard */
+  .qcard{container-type:inline-size;display:flex;flex-direction:column;gap:var(--gap)}
+  .qcard .complete{border-bottom:1px solid var(--line);padding-bottom:var(--gap)}
+  .qgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--gap)}
+  .qgrid > .sec + .sec{border-top:1px solid var(--line);padding-top:var(--gap)}
+  @container (min-width:720px){
+    .qgrid{grid-template-columns:minmax(0,1fr) minmax(220px,300px) minmax(0,1fr)}
+    .qgrid > .sec + .sec{border-top:0;padding-top:0;border-left:1px solid var(--line);padding-left:var(--gap)}
+  }
+  .players,.lb{display:flex;flex-direction:column;gap:8px}
+  .g{display:flex;align-items:center;gap:8px;min-height:36px;border:2px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:600;font-size:14px;min-width:0}
+  .g .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .g.done{border-color:var(--accent);background:#1d2f4d}
   .g.right{border-color:var(--ok);background:#163d2b}
   .g.wrong{border-color:var(--bad);background:#4a1f1b}
-  .g .c{font-size:17px;display:block;margin-top:2px;line-height:1.2}
-  .g .t{font-size:11px;color:var(--muted);font-weight:500;display:block;white-space:nowrap}
-  .g .t b{color:var(--warn);font-size:12px}
-  .g .x{position:absolute;top:4px;right:8px;color:var(--muted);cursor:pointer;font-weight:400;font-size:12px}
-  .lb{display:flex;flex-direction:column;gap:var(--gap)}
-  .bar{display:flex;align-items:center;gap:var(--gap)}
-  .bar .n{width:140px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bar .t{flex:1;background:#0f1419;border-radius:8px;height:24px;overflow:hidden;min-width:20px}
+  .g .c{width:18px;text-align:center;font-size:15px}
+  .g .t{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap}
+  .g .t b{color:var(--warn);font-size:14px}
+  .g .x{color:var(--muted);cursor:pointer;font-weight:400;font-size:12px}
+  .bar{display:flex;align-items:center;gap:8px;min-height:36px;padding:0 4px}
+  .bar .rk{width:20px;color:var(--muted);font-size:13px;text-align:right;flex:none}
+  .bar .n{flex:0 1 140px;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar .t{flex:1;background:#0f1419;border-radius:8px;height:14px;overflow:hidden;min-width:20px}
   .bar .f{height:100%;background:var(--accent);border-radius:8px;transition:width .4s;min-width:2px}
   .bar:first-child .f{background:var(--warn)}
-  .bar .s{width:110px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .bar .s{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
   .bar .s small{color:var(--muted);font-weight:500}
-  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap)}
-  .d{border-radius:8px;padding:6px;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid transparent;color:#fff;font-weight:700;font-size:13px}
-  .d b{font-size:18px}
-  .d.A{background:var(--A)} .d.B{background:var(--B)} .d.C{background:var(--C);color:#2a2400} .d.D{background:var(--D);color:#06220f}
-  .d.correct{border-color:#fff} .d.dim{opacity:.3}
-  /* condensed side panel (slides shown, wide screens) */
-  @media(min-width:901px){
-    .a-side .players{grid-template-columns:1fr}
-    .a-side .g{display:flex;align-items:center;gap:8px;text-align:left;padding:6px 10px}
-    .a-side .g .nm{flex:1;padding:0}
-    .a-side .g .c{margin:0;font-size:15px;width:18px;text-align:center}
-    .a-side .g .t{text-align:right}
-    .a-side .g .x{position:static;order:5}
-    .a-side .bar .n{width:auto;flex:0 1 110px;font-size:13px}
-    .a-side .bar .t{height:16px}
-    .a-side .bar .s{width:auto;font-size:13px}
-    .a-side .bar .s small{display:none}
-    .a-side .podium div{width:30%;padding:6px}
-  }
-  @media(max-width:700px){
-    .live{--gap:10px}
-    .ctitle{flex:1 1 100%}
-    .grp.pctl{flex:1 1 100%}
-    .grp .cbtn{flex:1 1 0;min-width:0}
-    .grp.pctl .cbtn{flex-direction:column;gap:4px;height:60px;padding:0;font-size:11px}
-    .grp.sess{flex:1 1 100%;margin-left:0}
-    .screens{margin-left:0}
-  }
+  .dist{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+  .d{border-radius:12px;padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;border:3px solid transparent;color:#fff;font-weight:800;font-size:28px;line-height:1.1;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .d small{font-size:13px;font-weight:600;opacity:.9}
+  .d.A{background:var(--A)} .d.B{background:var(--B)} .d.C{background:var(--C);color:#2a2400;text-shadow:none} .d.D{background:var(--D);color:#06220f;text-shadow:none}
+  .d.correct{border-color:#fff;box-shadow:0 0 0 3px var(--ok)} .d.dim{opacity:.25}
+  .complete .podium div{max-width:30%}
+  @container (max-width:420px){ .bar .s small{display:none} .bar .n{flex-basis:110px} }
+  @container (min-width:720px) and (max-width:1100px){ .bar .s small{display:none} .bar .n{flex-basis:110px} }
+  @media(max-width:700px){ .live{--gap:10px} .ctitle{flex:1 1 100%} .screens{margin-left:0} }
 </style>
 </head>
 <body>
@@ -313,7 +313,7 @@ function tick(){
   const el=document.getElementById('timer'); if(!el||!st) return;
   const r=remaining();
   if(r===null || st.revealed || st.locked || st.ended){ el.textContent=''; return; }
-  el.textContent = r>0 ? Math.ceil(r) : "TIME UP";
+  el.textContent = r>0 ? Math.ceil(r) : "";
   el.className = 'timer' + (r<=0?' up':r<=10?' low':'');
   if((r<=0)!==wasExpired){ wasExpired=(r<=0); render(true); }
 }
@@ -445,7 +445,7 @@ function play(){
   const lastRevealed = st.revealed && q>=st.total_questions;
   const complete = lastRevealed || st.ended;
 
-  const completeCard = complete ? `<div class="sec complete">
+  const completeCard = complete ? `<div class="complete">
       <div class="h">🎉 Quiz complete</div>
       <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} players</div>
       <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span></div>`:'').join('')}</div>
@@ -454,14 +454,14 @@ function play(){
 
   const embed = quiz && quiz.embed_url;
   const showSlides = embed && slidesOn;
-  const toggle = embed ? `<label class="toggle rev ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span>Show slides</span><span class="sw"></span></label>` : '';
-  const remoteToggle = ('documentPictureInPicture' in window) ? `<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Show remote</span><span class="sw"></span></label>` : '';
+  const toggle = embed ? `<label class="toggle pbox ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span>Show slides</span><span class="sw"></span></label>` : '';
+  const remoteToggle = ('documentPictureInPicture' in window) ? `<label class="toggle pbox ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Show remote</span><span class="sw"></span></label>` : '';
   const cb=(id,cls,icon,label,title,dis)=>`<button class="cbtn ${cls}" id="${id}" title="${title}" ${dis?'disabled':''}>${icon}<span class="lbl">${label}</span></button>`;
   const restart = st.question_opened_at && !st.revealed;
-  const scrLink=(t,u,win)=>`<span class="scrl">${t}
+  const scrLink=(t,u,win)=>`<span class="pbox">${t}
       <button class="iconbtn" data-open="${u}" data-win="${win}" data-tip="Open in new window" aria-label="Open ${t} in new window">${ICON_EXT}</button>
       <button class="iconbtn" data-copy="${u}" data-tip="Copy link" aria-label="Copy ${t} link">${ICON_COPY}</button></span>`;
-  const controlPanel = `<div class="card">
+  const controlPanel = `<div class="card cpanel">
       <div class="sec">
         <div class="crow">
           <div class="ctitle"><b>${esc(st.quiz_title)}</b><span class="muted"> · ${esc(st.session_name)}</span></div>
@@ -478,12 +478,14 @@ function play(){
             ${cb('reveal','orange',PI.eye,'Reveal','Reveal answer',st.revealed||!keyCur||!st.question_opened_at||st.ended)}
             ${lastRevealed&&!st.ended?cb('endsess','magenta',PI.flag,'Finish','Finish & show results',false):cb('next','',PI.next,'Next','Next question',q>=st.total_questions||st.ended)}
           </div>
+          <div class="ctlr">
+          <div class="goto"><label for="goto">Go to Question</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" inputmode="numeric"><button class="primary" id="gotobtn" title="Go to question" aria-label="Go to question">${PI.next}</button></div>
           <div class="grp sess">
             ${cb('newround','purple',PI.round,'New round','New round: same quiz, fresh players and scores',false)}
             ${cb('endsess2','danger',PI.stop,'End session','End session',st.ended)}
           </div>
+          </div>
         </div>
-        <div class="goto"><label for="goto">Go to Q</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" inputmode="numeric"><button class="primary" id="gotobtn" title="Go to question" aria-label="Go to question">${PI.next}</button></div>
       </div>
       <div class="sec"><div class="crow">${toggle}${remoteToggle}
         <div class="screens">${scrLink('Join screen',joinUrl,'quizjoin')}${scrLink('Leaderboard',baseUrl+'board.html','quizboard')}</div>
@@ -501,10 +503,10 @@ function play(){
         const main = a?(st.revealed||st.locked?a.choice:'✓'):'…'; const sub = `<b>${total[g]||0}</b> pts` + (a?(st.revealed?` · +${a.points}`:` · ${(a.elapsed_ms/1000).toFixed(1)} s`):'');
         return `<div class="${cls}"><span class="nm">${avatars[g]||''} ${esc(g)}</span><span class="c">${main}</span><span class="t">${sub}</span><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span></div>`;}).join('')}</div>`:''}</div>`;
   const leaderboardSec = `<div class="sec"><h2>Leaderboard <span class="muted">${revealedN} of ${st.total_questions} revealed</span></h2>
-      ${scores.length?`<div class="lb">${scores.map(x=>`<div class="bar"><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')}</div>`:'<p class="muted" style="margin:0">—</p>'}</div>`;
-  const spreadSec = `<div class="sec"><h2>Answer spread <span class="muted">Q${q}</span></h2>
-      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}">${o}<b>${dist[o]}</b></div>`).join('')}</div></div>`;
-  const quizPanel = `<div class="card">${completeCard}${candidatesSec}${leaderboardSec}${spreadSec}</div>`;
+      ${scores.length?`<div class="lb">${scores.map((x,i)=>`<div class="bar"><span class="rk">${i+1}</span><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')}</div>`:'<p class="muted" style="margin:0">—</p>'}</div>`;
+  const spreadSec = `<div class="sec"><h2>Answers <span class="muted">Q${q}</span></h2>
+      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}">${o}<small>${dist[o]} ${dist[o]===1?'answer':'answers'}</small></div>`).join('')}</div></div>`;
+  const quizPanel = `<div class="card qcard">${completeCard}<div class="qgrid">${candidatesSec}${spreadSec}${leaderboardSec}</div></div>`;
   if(showSlides){
     return `<div class="live slides">
       <div class="a-main">${controlPanel}${slidePane}</div>
@@ -579,11 +581,10 @@ const PI = {
 let pipWin=null, pipSig='', pipSess=false;
 const PIP_CSS = `
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
-  .pbar{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;box-sizing:border-box;height:100vh}
-  .pbar > .prow{flex:none}
-  .pbar > .prow.mid{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:flex-start}
-  .prow.bot .pgrp.sess{width:100%;box-sizing:border-box}
-  .pgrp.sess button{flex:1 1 0;width:auto;gap:6px;font-size:12px}
+  .pbar{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"top top" "ctl bot" "mid mid";gap:8px;padding:8px 10px 10px;box-sizing:border-box;height:100vh}
+  .prow.top{grid-area:top} .prow.ctl{grid-area:ctl} .prow.bot{grid-area:bot;align-self:start}
+  .prow.mid{grid-area:mid;min-height:0;overflow-y:auto;align-content:flex-start}
+  .pgrp.sess button{width:auto;gap:6px;font-size:12px;padding:0 10px}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .prow .sp{flex:1}
   .pgrp{display:flex;gap:6px;padding:6px;border:1px solid #2b3642;border-radius:10px;background:#141a21}
@@ -629,8 +630,9 @@ const PIP_CSS = `
     .pgrp button{min-width:0;height:40px}
     .pctl #prev,.pctl #next,.pctl #endsess{order:-1;flex:1 1 calc(50% - 3px)}
     .pctl #open,.pctl #lock,.pctl #reveal{flex:1 1 calc(33.333% - 4px)}
-    .pgrp.sess{width:100%}
-    .pgrp.sess button{flex:1 1 calc(50% - 3px)}
+    .pbar{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"top" "ctl" "mid" "bot"}
+    .pgrp.sess{width:100%;box-sizing:border-box}
+    .pgrp.sess button{flex:1 1 0}
     .prow.ctl{flex-wrap:wrap}
     .plb{display:none}
     .plist{display:flex;flex-direction:column;gap:5px;width:100%}
