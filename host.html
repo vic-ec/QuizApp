@@ -214,7 +214,7 @@
   .slidebar .sm{display:inline-flex;align-items:center;gap:6px;height:36px}
   .complete .podium div{max-width:30%}
   /* side column when the slides pane is shown */
-  .a-side .ptable .tm,.a-side .ptable .qp,.a-side .ptable th.tm,.a-side .ptable th.qp{display:none}
+  .a-side .ptable .qp,.a-side .ptable th.qp,.a-side .ptable td.tm:not(.fin),.a-side .ptable th.tm:not(.fin){display:none}
   .a-side .ptable .nm{min-width:70px} .a-side .ptable th{font-size:10px;padding:0 6px 6px} .a-side .ptable td{padding:4px 6px}
   /* narrow / mobile */
   .mob{display:none}
@@ -605,23 +605,23 @@ function play(){
     return `<span class="chip done">${st.locked?a.choice:'✓'}<span class="sr"> answered</span></span>`;
   };
   const rows = scores.map((x,i)=>{ const a=cur[x.g]; const medal=x.p>0&&i<3?['🥇','🥈','🥉'][i]:null; const key=esc(x.g);
-    const sub = `${chip(a)}${a?`<span>${(a.elapsed_ms/1000).toFixed(1)} s</span>`:''}${a&&st.revealed?`<span>+${a.points} this question</span>`:''}`;
+    const sub = st.ended ? `<span>${x.c} correct</span><span>·</span><span>${(x.t/1000).toFixed(1)} s total</span>`
+      : `${chip(a)}${a?`<span>${(a.elapsed_ms/1000).toFixed(1)} s</span>`:''}${a&&st.revealed?`<span>+${a.points} this question</span>`:''}`;
     const menu = menuOpen==='row:'+x.g ? `<div class="menu" role="menu" aria-label="Actions for ${key}"><button role="menuitem" class="dang" data-rm="${key}">Remove participant…</button></div>` : '';
     return `<tr class="${i===0&&x.p>0?'lead':''}" data-key="${key}">
       <td class="rk">${medal?`<span class="md" aria-label="rank ${i+1}">${medal}</span>`:i+1}</td>
       <td class="nm"><span class="av" aria-hidden="true">${avatars[x.g]||''}</span><span class="t">${key}</span></td>
-      <td class="an">${chip(a)}</td>
-      <td class="num tm">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</td>
-      <td class="num qp">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</td>
+      ${st.ended ? `<td class="num an">${x.c}</td><td class="num tm fin">${(x.t/1000).toFixed(1)} s</td>`
+        : `<td class="an">${chip(a)}</td><td class="num tm">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</td><td class="num qp">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</td>`}
       <td class="num tot">${x.p}</td>
       <td class="sub">${sub}</td>
       <td class="menucell"><div class="mwrap"><button class="rowmenu" data-rowmenu="${key}" aria-label="Actions for ${key}" aria-haspopup="menu" aria-expanded="${menuOpen==='row:'+x.g}">${ICON_DOTS}</button>${menu}</div></td>
     </tr>`; }).join('');
   const table = players.length ? `<div class="ptwrap"><table class="ptable"><thead><tr>
-      <th class="rk num">#</th><th>Participant</th><th class="an">Answer</th><th class="num tm">Time</th><th class="num qp">This question</th><th class="num">Total score</th><th class="sub"></th><th class="menucell"><span class="sr">Actions</span></th>
+      <th class="rk num">#</th><th>Participant</th>${st.ended?`<th class="num an">Correct</th><th class="num tm fin">Total time</th>`:`<th class="an">Answer</th><th class="num tm">Time</th><th class="num qp">This question</th>`}<th class="num">Total score</th><th class="sub"></th><th class="menucell"><span class="sr">Actions</span></th>
     </tr></thead><tbody>${rows}</tbody></table></div>`
     : `<div class="empty">Nobody has joined yet. Open the join screen or share the join link from Session options.</div>`;
-  const partSec = `<div class="sec"><h2>Participants (${players.length}) <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">· ${revealedN} of ${N} revealed</span></h2>${table}</div>`;
+  const partSec = `<div class="sec"><h2>${st.ended?'Final leaderboard':`Participants (${players.length})`} <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">· ${st.ended?`${players.length} participants · ties broken by quicker total time`:`${revealedN} of ${N} revealed`}</span></h2>${table}</div>`;
   const quizPanel = `<div class="card qcard">${completeCard}${partSec}</div>`;
 
   if(showSlides) return `<div class="live slides"><div class="a-main">${controlPanel}${slidePane}</div><div class="a-side">${quizPanel}</div></div>`;
