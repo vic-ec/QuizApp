@@ -26,6 +26,7 @@
   .topbar .out:hover{color:var(--text)}
   .topbar .out .ico{display:none}
   @media(max-width:700px){.topbar .out .lbl{display:none}.topbar .out .ico{display:inline}}
+  @media(max-width:480px){.topbar .brand{display:none}.tabs{min-width:0;overflow-x:auto}}
   button.remove{background:#5a2a26;color:#ffb4ab}
   button.purple{background:#8e5cf6;color:#fff}
   .qz.new{background:linear-gradient(180deg,#2a1f4d,#1a2129);border:1px dashed #8e5cf6;color:#c9b6ff}
@@ -46,8 +47,6 @@
   .lk{justify-content:space-between}
   .lk .row{margin-top:auto}
   .page{max-width:1100px;margin:0 auto;padding:20px}
-  .layout{display:grid;grid-template-columns:1fr 300px;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
-  @media(max-width:900px){.layout{grid-template-columns:1fr}}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
   h1{margin:0;font-size:22px}
   h2{margin:0 0 10px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -67,8 +66,6 @@
   .big{font-size:clamp(28px,3.6vw,48px)}
   .timer{font-size:clamp(28px,3.6vw,48px)}
   h1{font-size:clamp(16px,1.7vw,22px)}
-  @media(max-width:1200px){.layout{grid-template-columns:1fr 260px}}
-  @media(max-width:900px){.layout{grid-template-columns:1fr}}
   .card{min-width:0}
   button.sm{padding:8px 12px;font-size:13px}
   button:disabled{opacity:.35;cursor:default}
@@ -92,49 +89,13 @@
   .qz .actions button{padding:8px 0;font-size:13px}
   button.grey{background:#5b6775;color:#fff}
   .ed-actions button{padding:8px 14px;font-size:13px}
-  .layout.slides{grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);grid-template-areas:"ctrl side" "slides side";align-items:start}
-  .a-ctrl{grid-area:ctrl} .a-slides{grid-area:slides} .a-side{grid-area:side}
-  .layout.slides .big,.layout.slides .timer{font-size:clamp(24px,2.8vw,40px)}
-  .layout.slides h1{font-size:clamp(15px,1.4vw,20px)}
-  @media(max-width:1100px){.layout.slides{grid-template-columns:1fr;grid-template-areas:"ctrl" "slides" "side"}}
-  .card.compact{padding:10px 12px;margin-bottom:12px}
   .page.wide{max-width:1500px}
-  .stats2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:900px){.stats2{grid-template-columns:1fr}}
-  .pgrp{display:flex;gap:6px;padding:5px;border:1px solid var(--line);border-radius:10px;background:#141a21;flex-wrap:nowrap}
-  .cbtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 12px;font-size:14px;font-weight:700;border-radius:8px;white-space:nowrap}
-  .cbtn svg{flex:none}
-  .crow.ctl{gap:10px}
-  .sm .lbl{margin-left:6px}
-  #sessbtn{display:inline-flex;align-items:center}
-  .slidebar .sm{display:inline-flex;align-items:center;gap:6px}
-  .compact .timer{font-size:26px}
   @media(max-width:700px){
-    .cbtn{width:40px;padding:0} .cbtn .lbl{display:none}
-    .sm .lbl,#sessbtn .lbl,.slidebar .lbl{display:none}
+    .slidebar .lbl{display:none}
     .tabs a{padding:6px 10px;font-size:13px;white-space:nowrap} .topbar{gap:8px;padding:10px 12px} .topbar .brand{font-size:16px}
-    .ctitle{max-width:100%;width:100%} .crow .sp{flex:1 1 100%;display:none}
-    .cq{width:100%;font-size:16px}
-    .crow.ctl{gap:8px} .crow.ctl .pgrp{flex:1 1 auto} .crow.ctl .toggle{font-size:12px}
-    .compact .timer{font-size:22px}
     .big{font-size:26px}
-    .layout{padding:12px;gap:12px} .page{padding:12px}
+    .page{padding:12px}
   }
-  .crow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .crow + .crow{margin-top:8px}
-  .crow .sp{flex:1}
-  .ctitle{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%}
-  .cq{font-size:18px;font-weight:800;white-space:nowrap} .cq small{font-size:12px;color:var(--muted);font-weight:600} .cq .muted{font-size:12px;font-weight:500}
-  .compact .timer{font-size:22px} .compact .timer.up{font-size:14px}
-  .compact .pill{padding:2px 8px;font-size:11px}
-  .compact .toggle{font-size:12px} .compact #sessbtn{padding:7px 10px;font-size:12px;white-space:nowrap}
-  .modalbox.sess{max-width:520px;text-align:left;max-height:90vh;overflow:auto}
-  .modalbox.sess .card{margin-bottom:12px}
-  @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}}
-  .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
-  .slidewrap iframe{width:100%;height:100%;border:0;display:block}
-  .slidebar{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-  .slidebar .muted{flex:1}
   .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--muted);user-select:none}
   .toggle .sw{width:34px;height:20px;border-radius:999px;background:#2b3642;position:relative;transition:.15s}
   .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#8d9aa8;transition:.15s}
@@ -155,26 +116,6 @@
   .key .k button.on.A{background:var(--A)} .key .k button.on.B{background:var(--B)}
   .key .k button.on.C{background:var(--C);color:#2a2400} .key .k button.on.D{background:var(--D);color:#06220f}
   /* play */
-  .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:8px}
-  .g{border:2px solid var(--line);border-radius:10px;padding:8px 8px 6px;text-align:center;font-weight:600;font-size:13px;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .g.done{border-color:var(--accent);background:#1d2f4d}
-  .g.right{border-color:var(--ok);background:#163d2b}
-  .g.wrong{border-color:var(--bad);background:#4a1f1b}
-  .g .c{font-size:17px;display:block;margin-top:2px;line-height:1.2}
-  .g .t{font-size:11px;color:var(--muted);font-weight:500;display:block}
-  .g .x{position:absolute;top:4px;right:8px;color:var(--muted);cursor:pointer;font-weight:400;font-size:12px}
-  .bar{display:flex;align-items:center;gap:10px;margin:8px 0}
-  .bar .n{width:140px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bar .t{flex:1;background:#0f1419;border-radius:8px;height:30px;overflow:hidden}
-  .bar .f{height:100%;background:var(--accent);border-radius:8px;transition:width .4s;min-width:2px}
-  .bar:first-of-type .f{background:var(--warn)}
-  .bar .s{width:110px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
-  .bar .s small{color:var(--muted);font-weight:500}
-  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .d{border-radius:10px;padding:12px;text-align:center;border:3px solid transparent;color:#fff;font-weight:700}
-  .d.A{background:var(--A)} .d.B{background:var(--B)} .d.C{background:var(--C);color:#2a2400} .d.D{background:var(--D);color:#06220f}
-  .d.correct{border-color:#fff} .d.dim{opacity:.3}
-  .d b{font-size:26px;display:block}
   .qrmini{display:flex;gap:12px;align-items:center;cursor:pointer}
   .qrmini #qr{background:#fff;padding:4px;border-radius:6px;width:fit-content;line-height:0}
   .qrmini:hover .hint{color:var(--text)}
@@ -188,6 +129,85 @@
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#163d2b;color:var(--ok);padding:10px 16px;border-radius:10px;font-weight:600;display:none}
   .banner{border-radius:12px;padding:12px 14px;background:#1d2f4d;color:#9cc0ff;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .banner .sp{flex:1}
+  /* live session — one spacing value (--gap) for padding, gaps between sections and between buttons */
+  .live{--gap:12px;display:flex;flex-direction:column;gap:var(--gap);padding:var(--gap);max-width:1500px;margin:0 auto}
+  .live .card{padding:var(--gap);margin:0;min-width:0}
+  .live.slides{display:grid;grid-template-columns:minmax(0,1fr) 300px;align-items:start;max-width:none}
+  .a-main{display:flex;flex-direction:column;gap:var(--gap);min-width:0}
+  .a-side{min-width:0}
+  @media(max-width:900px){.live.slides{grid-template-columns:1fr}}
+  .sec{display:flex;flex-direction:column;gap:var(--gap)}
+  .sec + .sec{border-top:1px solid var(--line);padding-top:var(--gap);margin-top:var(--gap)}
+  .sec h2{margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .sec h2 .muted{text-transform:none;letter-spacing:0;font-weight:500}
+  .crow{display:flex;align-items:center;gap:var(--gap);flex-wrap:wrap}
+  .crow .sp{flex:1}
+  .ctitle{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
+  .cq{font-size:18px;font-weight:800;white-space:nowrap} .cq small{font-size:12px;color:var(--muted);font-weight:600}
+  .live .timer{font-size:26px} .live .timer.up{font-size:14px}
+  .live .pill{margin:0}
+  .grp{display:flex;gap:var(--gap)}
+  .grp.sess{margin-left:auto}
+  .cbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 20px;font-size:15px;font-weight:700;border-radius:10px;white-space:nowrap}
+  .cbtn svg{flex:none}
+  .grp.sess .cbtn{height:44px;padding:0 16px;font-size:14px}
+  .goto{display:flex;align-items:center;gap:var(--gap);font-weight:600;font-size:14px}
+  .goto input{width:76px;height:44px;padding:0 8px;text-align:center;font-size:16px}
+  .goto button{width:52px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+  .screens{display:flex;align-items:center;gap:var(--gap);flex-wrap:wrap;margin-left:auto}
+  .scrl{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  .scrl .iconbtn{padding:6px}
+  .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
+  .slidewrap iframe{width:100%;height:100%;border:0;display:block}
+  .slidebar{display:flex;gap:var(--gap);align-items:center;flex-wrap:wrap;justify-content:flex-end}
+  .slidebar .sm{display:inline-flex;align-items:center;gap:6px}
+  /* quiz panel */
+  .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:var(--gap)}
+  .g{border:2px solid var(--line);border-radius:10px;padding:8px;text-align:center;font-weight:600;font-size:13px;position:relative;min-width:0}
+  .g .nm{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 12px}
+  .g.done{border-color:var(--accent);background:#1d2f4d}
+  .g.right{border-color:var(--ok);background:#163d2b}
+  .g.wrong{border-color:var(--bad);background:#4a1f1b}
+  .g .c{font-size:17px;display:block;margin-top:2px;line-height:1.2}
+  .g .t{font-size:11px;color:var(--muted);font-weight:500;display:block;white-space:nowrap}
+  .g .t b{color:var(--warn);font-size:12px}
+  .g .x{position:absolute;top:4px;right:8px;color:var(--muted);cursor:pointer;font-weight:400;font-size:12px}
+  .lb{display:flex;flex-direction:column;gap:var(--gap)}
+  .bar{display:flex;align-items:center;gap:var(--gap)}
+  .bar .n{width:140px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar .t{flex:1;background:#0f1419;border-radius:8px;height:24px;overflow:hidden;min-width:20px}
+  .bar .f{height:100%;background:var(--accent);border-radius:8px;transition:width .4s;min-width:2px}
+  .bar:first-child .f{background:var(--warn)}
+  .bar .s{width:110px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .bar .s small{color:var(--muted);font-weight:500}
+  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap)}
+  .d{border-radius:8px;padding:6px;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid transparent;color:#fff;font-weight:700;font-size:13px}
+  .d b{font-size:18px}
+  .d.A{background:var(--A)} .d.B{background:var(--B)} .d.C{background:var(--C);color:#2a2400} .d.D{background:var(--D);color:#06220f}
+  .d.correct{border-color:#fff} .d.dim{opacity:.3}
+  /* condensed side panel (slides shown, wide screens) */
+  @media(min-width:901px){
+    .a-side .players{grid-template-columns:1fr}
+    .a-side .g{display:flex;align-items:center;gap:8px;text-align:left;padding:6px 10px}
+    .a-side .g .nm{flex:1;padding:0}
+    .a-side .g .c{margin:0;font-size:15px;width:18px;text-align:center}
+    .a-side .g .t{text-align:right}
+    .a-side .g .x{position:static;order:5}
+    .a-side .bar .n{width:auto;flex:0 1 110px;font-size:13px}
+    .a-side .bar .t{height:16px}
+    .a-side .bar .s{width:auto;font-size:13px}
+    .a-side .bar .s small{display:none}
+    .a-side .podium div{width:30%;padding:6px}
+  }
+  @media(max-width:700px){
+    .live{--gap:10px}
+    .ctitle{flex:1 1 100%}
+    .grp.pctl{flex:1 1 100%}
+    .grp .cbtn{flex:1 1 0;min-width:0}
+    .grp.pctl .cbtn{flex-direction:column;gap:4px;height:60px;padding:0;font-size:11px}
+    .grp.sess{flex:1 1 100%;margin-left:0}
+    .screens{margin-left:0}
+  }
 </style>
 </head>
 <body>
@@ -212,7 +232,7 @@ const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
-let quizzes=[], editing=null, confirmReset=false, sessOpen=false, linkShown='', helpOpen=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
+let quizzes=[], editing=null, confirmReset=false, helpOpen=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
 let view = 'home';                          // home | edit | play | settings
 const baseUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const candidateUrl = baseUrl + 'play/';
@@ -307,7 +327,7 @@ const liveActive = () => st && !st.ended && st.session_id;
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,sessOpen,linkShown,helpOpen]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,helpOpen]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
@@ -386,7 +406,6 @@ function normalizeEmbed(v){
 let pinShown=false;
 const ICON_EXT='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
 const ICON_LINK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
-const ICON_MORE='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg>';
 const ICON_HELP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>';
 const ICON_FS='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 const ICON_COPY='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
@@ -426,79 +445,73 @@ function play(){
   const lastRevealed = st.revealed && q>=st.total_questions;
   const complete = lastRevealed || st.ended;
 
-  const completeCard = complete ? `<div class="card complete">
+  const completeCard = complete ? `<div class="sec complete">
       <div class="h">🎉 Quiz complete</div>
       <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} players</div>
       <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span></div>`:'').join('')}</div>
-      ${st.ended?'<p class="muted">Candidates are seeing their final score and rank.</p>':'<p class="muted">Press <b>End session</b> to show candidates their final score and rank.</p>'}
+      ${st.ended?'<p class="muted">Candidates are seeing their final score and rank.</p>':'<p class="muted">Press <b>Finish</b> to show candidates their final score and rank.</p>'}
     </div>` : '';
 
   const embed = quiz && quiz.embed_url;
   const showSlides = embed && slidesOn;
   const toggle = embed ? `<label class="toggle rev ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span>Show slides</span><span class="sw"></span></label>` : '';
-  const remoteToggle = `<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Remote</span><span class="sw"></span></label>`;
+  const remoteToggle = ('documentPictureInPicture' in window) ? `<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Show remote</span><span class="sw"></span></label>` : '';
   const cb=(id,cls,icon,label,title,dis)=>`<button class="cbtn ${cls}" id="${id}" title="${title}" ${dis?'disabled':''}>${icon}<span class="lbl">${label}</span></button>`;
   const restart = st.question_opened_at && !st.revealed;
-  const controlsRow = `<div class="pgrp pctl">
-      ${cb('prev','',PI.prev,'Previous','Previous question',q<=1||st.ended)}
-      ${cb('open','ok',restart?PI.restart:PI.open,restart?'Restart':'Open',restart?'Restart timer':'Open question',!canOpen)}
-      ${cb('lock','warn',PI.lock,'Lock','Lock answers',status!=='open')}
-      ${cb('reveal','orange',PI.eye,'Reveal','Reveal answer',st.revealed||!keyCur||!st.question_opened_at||st.ended)}
-      ${lastRevealed&&!st.ended?cb('endsess','magenta',PI.flag,'Finish','Finish & show results',false):cb('next','',PI.next,'Next','Next question',q>=st.total_questions||st.ended)}
-    </div>
-    <div class="pgrp sess">
-      ${cb('newround','purple',PI.round,'New round','New round: same quiz, fresh players and scores',false)}
-      ${cb('endsess2','danger',PI.stop,'End','End session',st.ended)}
-    </div>`;
-  const headerCard = `<div class="card compact">
-      <div class="crow">
-        <div class="ctitle"><b>${esc(st.quiz_title)}</b><span class="muted"> · ${esc(st.session_name)}</span></div>
-        <span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No key for Q'+q+'</span>'}
-        <span class="sp"></span>
-        <div class="timer" id="timer"></div>
-        <div class="cq">Q${q}<small> / ${st.total_questions}</small><span class="muted"> · ${done}/${players.length} answered</span></div>
+  const scrLink=(t,u,win)=>`<span class="scrl">${t}
+      <button class="iconbtn" data-open="${u}" data-win="${win}" data-tip="Open in new window" aria-label="Open ${t} in new window">${ICON_EXT}</button>
+      <button class="iconbtn" data-copy="${u}" data-tip="Copy link" aria-label="Copy ${t} link">${ICON_COPY}</button></span>`;
+  const controlPanel = `<div class="card">
+      <div class="sec">
+        <div class="crow">
+          <div class="ctitle"><b>${esc(st.quiz_title)}</b><span class="muted"> · ${esc(st.session_name)}</span></div>
+          <span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No key for Q'+q+'</span>'}
+          <span class="sp"></span>
+          <div class="timer" id="timer"></div>
+          <div class="cq">Q${q}<small> / ${st.total_questions}</small></div>
+        </div>
+        <div class="crow">
+          <div class="grp pctl">
+            ${cb('prev','',PI.prev,'Previous','Previous question',q<=1||st.ended)}
+            ${cb('open','ok',restart?PI.restart:PI.open,restart?'Restart':'Open',restart?'Restart timer':'Open question',!canOpen)}
+            ${cb('lock','warn',PI.lock,'Lock','Lock answers',status!=='open')}
+            ${cb('reveal','orange',PI.eye,'Reveal','Reveal answer',st.revealed||!keyCur||!st.question_opened_at||st.ended)}
+            ${lastRevealed&&!st.ended?cb('endsess','magenta',PI.flag,'Finish','Finish & show results',false):cb('next','',PI.next,'Next','Next question',q>=st.total_questions||st.ended)}
+          </div>
+          <div class="grp sess">
+            ${cb('newround','purple',PI.round,'New round','New round: same quiz, fresh players and scores',false)}
+            ${cb('endsess2','danger',PI.stop,'End session','End session',st.ended)}
+          </div>
+        </div>
+        <div class="goto"><label for="goto">Go to Q</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" inputmode="numeric"><button class="primary" id="gotobtn" title="Go to question" aria-label="Go to question">${PI.next}</button></div>
       </div>
-      <div class="crow ctl">${controlsRow}<span class="sp"></span>${toggle}${remoteToggle}<button class="sm" id="sessbtn" title="Session &amp; screens">${ICON_MORE}<span class="lbl">Session &amp; screens</span></button></div>
+      <div class="sec"><div class="crow">${toggle}${remoteToggle}
+        <div class="screens">${scrLink('Join screen',joinUrl,'quizjoin')}${scrLink('Leaderboard',baseUrl+'board.html','quizboard')}</div>
+      </div></div>
     </div>`;
   const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
-      <div class="slidebar"><span class="sp"></span>
+      <div class="slidebar">
         <button class="iconbtn" id="slideshelp" title="How the slides pane works">${ICON_HELP}</button>
         <button class="sm" id="slidesfs">${ICON_FS}<span class="lbl">Full screen</span></button><button class="sm" id="slidesnew">${ICON_EXT}<span class="lbl">New window</span></button></div>
       ${helpOpen?`<div class="modalbg" id="helpmodal"><div class="modalbox" style="text-align:left"><p><b>Slides pane</b></p><p class="muted" style="margin:0 0 10px">Click inside the slides, then use ← → (or Canva's own arrows) to move between slides. The quiz buttons control the quiz only — they do not change slides.</p><p class="muted" style="margin:0 0 14px">Full screen shows the pane on this screen; New window opens the deck in its own window, which you can drag to the projector.</p><div class="row" style="justify-content:flex-end"><button class="grey sm" id="helpclose">Close</button></div></div></div>`:''}` : '';
-  const candidatesCard = `<div class="card"><h2>Candidates — question ${q}</h2>
-      ${players.length?'':'<p class="muted">Nobody has joined yet. Open the join screen on a second display.</p>'}
-      <div class="players">${players.map(g=>{ const a=cur[g]; let cls='g'; if(a) cls += st.revealed?(a.is_correct?' right':' wrong'):' done';
-        const main = a?(st.revealed||st.locked?a.choice:'✓'):'…'; const sub = a?(st.revealed?`+${a.points} pts · ${(a.elapsed_ms/1000).toFixed(1)} s`:`${(a.elapsed_ms/1000).toFixed(1)} s`):'';
-        return `<div class="${cls}"><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span>${avatars[g]||''} ${esc(g)}<span class="c">${main}</span><span class="t">${sub}</span></div>`;}).join('')}</div></div>`;
-  const leaderboardCard = `<div class="card"><h2>Leaderboard <span class="muted" style="text-transform:none">(${revealedN} of ${st.total_questions} revealed)</span></h2>
-      ${scores.map(x=>`<div class="bar"><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}</div>`;
-  const spreadCard = `<div class="card"><h2>Answer spread — question ${q}</h2>
-      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div></div>`;
-  const sessionCard = `<div class="card"><h2>Session</h2>
-      <p class="muted" style="margin-top:0">${esc(st.session_name)} · ${players.length} joined</p>
-      <div class="row" style="display:grid;grid-template-columns:1fr 1fr"><button class="purple sm" id="newround">New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button></div>
-      <p class="muted">New round: same quiz, fresh players and scores (for the next group).</p>
-      <div class="row" style="margin-top:6px"><label class="muted">Jump to question</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:70px"><button class="primary sm" id="gotobtn">Go</button></div></div>`;
-  const screensCard = `<div class="card"><h2>Screens</h2>
-      ${[{t:'Join screen',u:joinUrl,win:'quizjoin'},{t:'Leaderboard',u:baseUrl+'board.html',win:'quizboard'}]
-        .map(l=>`<div class="scr"><span class="t">${l.t}</span>
-          <button class="iconbtn" data-open="${l.u}" data-win="${l.win}" data-tip="Open in new window" aria-label="Open ${l.t} in new window">${ICON_EXT}</button>
-          <button class="iconbtn" data-copy="${l.u}" data-tip="Copy link" aria-label="Copy ${l.t} link">${ICON_COPY}</button>
-          <button class="iconbtn" data-showlink="${l.u}" data-tip="Show link" aria-label="Show ${l.t} link">${ICON_LINK}</button></div>`).join('')}
-    </div>
-    ${linkShown?`<div class="modalbg" id="linkmodal" style="z-index:60"><div class="modalbox"><p style="margin-bottom:8px">Link</p><input readonly value="${esc(linkShown)}" style="width:100%;text-align:center" onfocus="this.select()"><div class="row" style="justify-content:center;margin-top:12px"><button class="primary sm" data-copy="${esc(linkShown)}">Copy link</button><button class="grey sm" id="linkclose">Close</button></div></div></div>`:''}`;
-  const backCard = `<div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>`;
-
-  const modal = sessOpen ? `<div class="modalbg" id="sessmodal"><div class="modalbox sess"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>Session &amp; screens</b><button class="iconbtn" id="sessclose" aria-label="Close">✕</button></div>${sessionCard}${screensCard}${backCard}</div></div>` : '';
-  const stats = `${completeCard}${candidatesCard}<div class="stats2">${leaderboardCard}${spreadCard}</div>`;
+  const total = {}; scores.forEach(x=>total[x.g]=x.p);
+  const candidatesSec = `<div class="sec"><h2>Candidates <span class="muted">${done}/${players.length} answered Q${q}</span></h2>
+      ${players.length?'':'<p class="muted" style="margin:0">Nobody has joined yet. Open the join screen on a second display.</p>'}
+      ${players.length?`<div class="players">${players.map(g=>{ const a=cur[g]; let cls='g'; if(a) cls += st.revealed?(a.is_correct?' right':' wrong'):' done';
+        const main = a?(st.revealed||st.locked?a.choice:'✓'):'…'; const sub = `<b>${total[g]||0}</b> pts` + (a?(st.revealed?` · +${a.points}`:` · ${(a.elapsed_ms/1000).toFixed(1)} s`):'');
+        return `<div class="${cls}"><span class="nm">${avatars[g]||''} ${esc(g)}</span><span class="c">${main}</span><span class="t">${sub}</span><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span></div>`;}).join('')}</div>`:''}</div>`;
+  const leaderboardSec = `<div class="sec"><h2>Leaderboard <span class="muted">${revealedN} of ${st.total_questions} revealed</span></h2>
+      ${scores.length?`<div class="lb">${scores.map(x=>`<div class="bar"><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')}</div>`:'<p class="muted" style="margin:0">—</p>'}</div>`;
+  const spreadSec = `<div class="sec"><h2>Answer spread <span class="muted">Q${q}</span></h2>
+      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}">${o}<b>${dist[o]}</b></div>`).join('')}</div></div>`;
+  const quizPanel = `<div class="card">${completeCard}${candidatesSec}${leaderboardSec}${spreadSec}</div>`;
   if(showSlides){
-    return `<div class="layout slides">
-      <div class="a-ctrl">${headerCard}</div>
-      <div class="a-slides">${slidePane}</div>
-      <div class="a-side">${stats}</div>
-    </div>${modal}`;
+    return `<div class="live slides">
+      <div class="a-main">${controlPanel}${slidePane}</div>
+      <div class="a-side">${quizPanel}</div>
+    </div>`;
   }
-  return `<div class="page wide">${headerCard}${stats}</div>${modal}`;
+  return `<div class="live">${controlPanel}${quizPanel}</div>`;
 }
 
 // ---------- events ----------
@@ -537,15 +550,10 @@ function bind(){
   on('endsess',end); on('endsess2',end);
   on('newround',()=>{ if(confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
-  on('sessbtn',()=>{ sessOpen=true; render(true); });
+  const gi=document.getElementById('goto'); if(gi) gi.onkeydown=(e)=>{ if(e.key==='Enter') document.getElementById('gotobtn').click(); };
   on('slideshelp',()=>{ helpOpen=true; render(true); }); on('helpclose',()=>{ helpOpen=false; render(true); });
   const hm=document.getElementById('helpmodal'); if(hm) hm.onclick=(e)=>{ if(e.target===hm){ helpOpen=false; render(true); } };
-  app.querySelectorAll('[data-showlink]').forEach(b=>b.onclick=()=>{ linkShown=b.dataset.showlink; render(true); });
-  on('linkclose',()=>{ linkShown=''; render(true); });
-  const lm=document.getElementById('linkmodal'); if(lm){ lm.onclick=(e)=>{ if(e.target===lm){ linkShown=''; render(true); } }; lm.querySelector('input').select(); }
   on('piptoggle',()=>{ if(pipWin&&!pipWin.closed){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
-  on('sessclose',()=>{ sessOpen=false; render(true); });
-  const sm=document.getElementById('sessmodal'); if(sm) sm.onclick=(e)=>{ if(e.target===sm){ sessOpen=false; render(true); } };
   on('slidestoggle',()=>{ slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
   on('slidesfs',()=>{ const f=document.getElementById('slides'); if(f&&f.requestFullscreen) f.requestFullscreen(); });
   on('slidesnew',()=>{ const quiz=quizzes.find(x=>x.id===st.quiz_id); if(quiz) window.open(quiz.embed_url,'quizslides'); });
