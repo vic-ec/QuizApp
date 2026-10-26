@@ -611,9 +611,10 @@ const PIP_CSS = `
   .rmx{width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-size:11px;border-radius:8px}
   .rmx:hover{color:#ff8a7f;border-color:#e74c3c}
   .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px 24px;gap:6px}
-  .ctab.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 40px 44px 24px} .ctab.h1 .tr > :nth-child(4){display:none}
-  .ctab.h2 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 44px 24px}
-  .ctab.h3 .tr{grid-template-columns:20px minmax(var(--nmw,0px),1fr) 30px 34px 24px;gap:4px} .ctab.h3 .tr > :nth-child(4),.ctab.h3 .tr > :nth-child(5){display:none} .ctab.h3 .tr.th .c{font-size:0} .ctab.h3 .tr.th .c::after{content:'Ans';font-size:11px} .ctab.h2 .tr > :nth-child(4),.ctab.h2 .tr > :nth-child(5){display:none}
+  /* narrowing order: hide Answer first, then Time, then Q pts; Total always stays */
+  .ctab.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 44px 40px 44px 24px} .ctab.h1 .tr > :nth-child(3){display:none}
+  .ctab.h2 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 40px 44px 24px} .ctab.h2 .tr > :nth-child(3),.ctab.h2 .tr > :nth-child(4){display:none}
+  .ctab.h3 .tr{grid-template-columns:20px minmax(var(--nmw,0px),1fr) 44px 24px;gap:4px} .ctab.h3 .tr > :nth-child(3),.ctab.h3 .tr > :nth-child(4),.ctab.h3 .tr > :nth-child(5){display:none}
   .cnt{color:#8d9aa8;font-size:12px;text-align:right;margin-top:4px}
   .status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#2b3642;color:#8d9aa8;white-space:nowrap}
   .status.open{background:#1d2f4d;color:#9cc0ff} .status.revealed{background:#163d2b;color:#2ecc71} .status.locked,.status.timeup{background:#3a3415;color:#f1c40f} .status.ended{background:#4a1f1b;color:#ff8a7f}
@@ -704,7 +705,7 @@ function renderPip(){
   on('gotobtn',()=>act('goto',{question:+d.getElementById('goto').value}).then(load));
   tickPip(); fitPip();
 }
-// Remote: keep names whole — size the name column to the longest name, then hide Time, then Q pts, if the window is too narrow
+// Remote: keep names whole — size the name column to the longest name, then hide Answer, Time, Q pts (in that order) if the window is too narrow
 function fitPip(){
   if(!pipWin||pipWin.closed) return; const t=pipWin.document.querySelector('.ctab'); if(!t) return;
   const mid=t.closest('.prow'); t.classList.remove('h1','h2','h3'); t.style.removeProperty('--nmw');
