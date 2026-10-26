@@ -143,9 +143,11 @@ async function load(){
 }
 
 function rulesList(){
+  const top=st.speed_top||100, step=st.speed_step??5, min=st.speed_min??10, flat=st.flat_points||100;   // rule stored in quiz_state
   const scoring = st.scoring==='flat'
-    ? '<li><b>100 points</b> per correct answer; wrong or no answer = 0</li>'
-    : '<li>Correct answers score by speed: fastest <b>100</b>, then <b>95</b>, <b>90</b>… (minimum 10). Wrong or no answer = 0</li>';
+    ? `<li><b>${flat} points</b> per correct answer; wrong or no answer = 0</li>`
+    : step ? `<li>Correct answers score by speed: fastest <b>${top}</b>, then <b>${top-step}</b>, <b>${top-2*step}</b>… (minimum ${min}). Wrong or no answer = 0</li>`
+           : `<li><b>${top} points</b> per correct answer; wrong or no answer = 0</li>`;
   return `<ul style="text-align:left;margin:14px auto 0;padding-left:22px;line-height:1.6;max-width:340px">
           <li><b>${st.total_questions}</b> question${st.total_questions===1?'':'s'}</li>
           <li><b>${st.timer_seconds?st.timer_seconds+' seconds':'No time limit'}</b> per question</li>

@@ -304,6 +304,9 @@ function scoresFor(){
 }
 const keyCount = (q) => Object.values(q.answer_key||{}).filter(v=>['A','B','C','D'].includes(v)).length;
 const liveActive = () => st && !st.ended && st.session_id;
+// Scoring rule lives in quiz_state (host-editable in Settings); describe it in words
+const rule = () => ({top:(st&&st.speed_top)||100, step:(st&&st.speed_step)??5, min:(st&&st.speed_min)??10, flat:(st&&st.flat_points)||100});
+function speedText(){ const r=rule(); return r.step?`${r.top}, ${r.top-r.step}, ${r.top-2*r.step}… (min ${r.min})`:`${r.top} each`; }
 function candTable(withRemove){
   const q=st.current_question, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
   const rows = scoresFor().map((x,i)=>{ const a=cur[x.g];
@@ -378,7 +381,7 @@ function editor(){
       <div class="wide muted" style="margin-top:-6px">Shows your slides inside the live session page so you can run everything from one window. <b>Canva:</b> Share → More → Embed → copy (or just paste the design's view link). <b>PowerPoint:</b> OneDrive → File → Share → Embed. <b>Google Slides:</b> File → Share → Publish to web → Embed. The deck must be shared as viewable by link. You advance slides inside the pane; the app's buttons control the quiz only.</div>
       <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
       <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
-      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 95, 90… (min 10)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
+      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — ${speedText()}</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — ${rule().flat} per correct</option></select></label>
     </div></div>
     <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="remove sm" id="resetkey">Reset answer key</button></div>
       <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
@@ -417,6 +420,15 @@ function settings(){
         <button class="iconbtn" id="togglepin" title="${pinShown?'Hide PIN':'Show PIN'}">${pinShown?EYE:EYEOFF}</button></div>
       <div class="row" style="margin-top:12px"><input id="newpin" placeholder="New PIN (min 4 characters)" style="flex:1;max-width:320px"><button id="setpin">Change PIN</button></div>
       <p class="muted">Anyone with the PIN can control the quiz. Change it before each session if candidates may have seen it.</p></div>
+    <div class="card"><h2>Scoring rule</h2>
+      <p class="muted" style="margin-top:0">Applies to every quiz. Speed: the fastest correct answer gets the top score, each later correct answer gets <i>step</i> fewer, never below the minimum. Shown to candidates when they join.</p>
+      <div class="form" style="grid-template-columns:repeat(4,1fr)">
+        <label class="f">Speed: top score<input id="sc_top" type="number" min="1" max="1000" value="${rule().top}"></label>
+        <label class="f">Speed: step down<input id="sc_step" type="number" min="0" max="1000" value="${rule().step}"></label>
+        <label class="f">Speed: minimum<input id="sc_min" type="number" min="0" max="1000" value="${rule().min}"></label>
+        <label class="f">Flat: per correct<input id="sc_flat" type="number" min="1" max="1000" value="${rule().flat}"></label>
+      </div>
+      <div class="row" style="margin-top:10px"><button class="ok" id="savescoring">Save scoring rule</button><span class="muted">Speed scores: ${speedText()} · Flat: ${rule().flat} each · Ties: quicker total time on correct answers ranks higher</span></div></div>
     <div class="card"><h2>Screens &amp; links</h2>
       <div class="links">${links.map((l,i)=>`<div class="lk"><b>${l.t}</b><span class="muted">${l.d}</span>
         <div class="row"><button class="primary sm" data-open="${l.u}" data-win="${l.win||'_blank'}" title="Open in new window">Open</button><button class="sm" data-copy="${l.u}">Copy link</button><button class="sm" data-showlink="${l.u}">Show link</button></div></div>`).join('')}</div></div>
@@ -530,6 +542,7 @@ function bind(){
   on('togglepin',()=>{ pinShown=!pinShown; render(true); });
   app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>window.open(b.dataset.open, b.dataset.win, b.dataset.win==='_blank'?'':'width=1000,height=720'));
   app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); toast('Link copied'); }catch(e){ const ta=document.createElement('textarea'); ta.value=b.dataset.copy; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Link copied'); } });
+  on('savescoring',async()=>{ const v=id=>+document.getElementById(id).value; await act('set_scoring',{speed_top:v('sc_top'),speed_step:v('sc_step'),speed_min:v('sc_min'),flat_points:v('sc_flat')}); await load(); toast('Scoring rule saved'); });
   on('setpin',async()=>{const p=document.getElementById('newpin').value.trim(); await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); toast('PIN changed'); document.getElementById('newpin').value='';});
   // play
   on('open',()=>act('open').then(load)); on('lock',()=>act('lock').then(load)); on('reveal',()=>act('reveal').then(load));
