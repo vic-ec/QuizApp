@@ -25,7 +25,7 @@
   .topbar .out{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:0 10px;height:var(--h);display:inline-flex;align-items:center}
   .topbar .out:hover{color:var(--text)}
   .topbar .out .ico{display:none}
-  @media(max-width:480px){.topbar .brand{display:none}.tabs{min-width:0;overflow-x:auto}.topbar .out .lbl{display:none}.topbar .out .ico{display:inline}}
+  @media(max-width:480px){.tabs{min-width:0;overflow-x:auto}}
   button.remove{background:#5a2a26;color:#ffb4ab}
   button.purple{background:#8e5cf6;color:#fff}
   .qz.new{background:linear-gradient(180deg,#2a1f4d,#1a2129);border:1px dashed #8e5cf6;color:#c9b6ff}
@@ -119,74 +119,142 @@
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#163d2b;color:var(--ok);padding:10px 16px;border-radius:10px;font-weight:600;display:none}
   .banner{border-radius:12px;padding:var(--pad);background:#1d2f4d;color:#9cc0ff;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .banner .sp{flex:1}
-  /* live session — one spacing value (--gap) for padding, gaps between sections and between buttons */
-  .live{--gap:var(--pad);display:flex;flex-direction:column;gap:var(--gap);padding:var(--gap);max-width:1500px;margin:0 auto}
-  .live .card{padding:var(--gap);margin:0;min-width:0}
-  .live.slides{display:grid;grid-template-columns:minmax(0,1fr) 300px;align-items:start;max-width:none}
-  .a-main{display:flex;flex-direction:column;gap:var(--gap);min-width:0}
-  .a-side{min-width:0}
+  /* ===== live session (host dashboard) =====
+     spacing scale 4/8/12/16/24; one accent (blue); green = live/success; red = destructive */
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .live{--gap:12px;display:flex;flex-direction:column;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+  .live .card{padding:16px;margin:0;min-width:0}
+  .live.slides{display:grid;grid-template-columns:minmax(0,1fr) 340px;align-items:start;max-width:none}
+  .a-main{display:flex;flex-direction:column;gap:16px;min-width:0} .a-side{min-width:0}
   @media(max-width:900px){.live.slides{grid-template-columns:1fr}}
-  .sec{display:flex;flex-direction:column;gap:var(--gap);min-width:0}
-  .cpanel .sec + .sec{border-top:1px solid var(--line);padding-top:var(--gap);margin-top:var(--gap)}
-  .sec h2{margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-  .sec h2 .muted{text-transform:none;letter-spacing:0;font-weight:500}
-  .crow{display:flex;align-items:center;gap:var(--gap);flex-wrap:wrap}
-  .crow.hdr{flex-wrap:nowrap} .hdr > :not(.ctitle){flex:none}
-  .crow .sp{flex:1}
-  .ctitle{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
-  .live .timer,.cq{line-height:1;display:flex;align-items:center}
-  .live .timer{font-size:20px}
+  .live h2{margin:0;font-size:12px}
+  .sec{display:flex;flex-direction:column;gap:12px;min-width:0}
+  .cpanel{display:flex;flex-direction:column;gap:16px}
+  .cpanel .sec + .sec{border-top:1px solid var(--line);padding-top:16px}
+  /* A. session context */
+  .ctx{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .ctx .ttl{font-size:18px;font-weight:700;min-width:0;flex:1 1 120px;line-height:1.25}
+  .ctxr{display:flex;align-items:center;gap:12px;flex:none;margin-left:auto}
+  .ctx .ttl small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+  .livedot{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600}
+  .livedot::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(46,204,113,.2)}
+  .livedot.off{color:var(--muted)} .livedot.off::before{background:var(--muted);box-shadow:none}
+  /* B. current question */
+  .qhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .qhead .qn{font-size:22px;font-weight:800;line-height:1}
+  .qhead .state{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#2b3642;color:var(--muted);white-space:nowrap}
+  .state.open{background:#1d2f4d;color:#9cc0ff} .state.revealed{background:#163d2b;color:var(--ok)}
+  .state.locked,.state.timeup{background:#3a3415;color:var(--warn)} .state.ended{background:#4a1f1b;color:#ff8a7f}
+  .qhead .cnt{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+  .qhead .timer{font-size:22px;margin-left:auto;font-variant-numeric:tabular-nums}
   .live .timer:empty{display:none}
-  .cq{font-size:16px;font-weight:800;white-space:nowrap;gap:3px} .cq small{font-size:12px;color:var(--muted);font-weight:600}
-  .live .pill{margin:0}
-  /* control row: [controls] [go to] ............ [new round][end session] */
-  .cpanel{container-type:inline-size}
-  .ctlr{display:flex;align-items:center;gap:var(--gap);flex:1 1 auto;flex-wrap:wrap}
-  .grp{display:flex;gap:var(--gap)}
-  .grp.sess{margin-left:auto}
-  .cbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:var(--h);padding:0 10px;font-size:13px;font-weight:700;border-radius:8px;white-space:nowrap}
-  .cbtn svg{width:16px;height:16px}
-  .cbtn svg{flex:none}
-  .goto{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;white-space:nowrap}
-  .goto input{width:56px;padding:0 6px;text-align:center}
-  .goto button{width:40px;padding:0;display:inline-flex;align-items:center;justify-content:center}
-  @container (max-width:620px){
-    .grp.pctl{flex:1 1 100%} .grp.pctl .cbtn{flex:1 1 0;min-width:0;padding:0} .grp.pctl .lbl{display:none}
-  }
-  @container (max-width:540px){ .grp.sess .cbtn{width:40px;padding:0} .grp.sess .lbl{display:none} }
-  /* pill boxes: label + its buttons / toggle grouped together */
-  .pbox{display:inline-flex;align-items:center;gap:4px;height:var(--h);padding:0 2px 0 10px;border:1px solid var(--line);border-radius:10px;background:#141a21;font-size:13px;color:var(--muted);white-space:nowrap}
-  .pbox.toggle{padding:0 10px;gap:8px}
-  .pbox .toggle .sw,.pbox.toggle .sw{width:30px;height:16px} .pbox.toggle .sw::after{top:2px;width:12px;height:12px} .pbox.toggle.on .sw::after{left:16px}
-  .pbox .iconbtn{width:calc(var(--h) - 4px);height:calc(var(--h) - 4px);border-color:transparent}
-  .pbox .iconbtn:hover{border-color:var(--accent)}
-  .screens{display:flex;align-items:center;gap:var(--gap);flex-wrap:wrap;margin-left:auto}
-  .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
+  .qctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .qctl .pri{height:44px;padding:0 20px;font-size:15px;font-weight:700;background:var(--accent);color:#fff;border-radius:10px;min-width:180px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .qctl .pri.finish{background:var(--ok);color:#06220f}
+  .qctl .pri:disabled{opacity:.45}
+  .qctl .sec-btn{height:44px;padding:0 14px;border-radius:10px;background:#2b3642;display:inline-flex;align-items:center;gap:6px}
+  .qsel{height:44px;min-width:84px;padding:0 32px 0 12px;border-radius:10px;background:#0f1419 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238d9aa8' stroke-width='3' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;-webkit-appearance:none;font-size:14px;font-weight:600;color:var(--text);border:1px solid var(--line)}
+  .qctl .more{height:44px;width:44px;padding:0;border-radius:10px;background:#2b3642;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+  .hint{font-size:12px;color:var(--muted)}
+  .busy .pri::after{content:"";width:14px;height:14px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* results summary */
+  .summary{display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-radius:10px;background:#141a21;border:1px solid var(--line)}
+  .summary .k{font-size:12px;color:var(--muted)} .summary .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+  .summary .v.ok{color:var(--ok)}
+  .summary .dist{display:flex;gap:6px;flex-wrap:wrap}
+  .summary .dist span{padding:2px 8px;border-radius:6px;background:#0f1419;font-variant-numeric:tabular-nums;font-size:13px}
+  .summary .dist span.hit{background:#163d2b;color:var(--ok);font-weight:700}
+  /* C. presentation tools */
+  .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tools .grp{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:4px;border-radius:10px;background:#141a21}
+  .tools .grp .lab{font-size:12px;color:var(--muted);padding:0 4px 0 8px}
+  .tools button{height:36px;padding:0 12px;background:#2b3642;display:inline-flex;align-items:center;gap:6px}
+  .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--muted);user-select:none;height:36px;padding:0 8px}
+  .toggle .sw{width:34px;height:20px;border-radius:999px;background:#2b3642;position:relative;transition:.15s;flex:none}
+  .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#8d9aa8;transition:.15s}
+  .toggle.on .sw{background:var(--accent)} .toggle.on .sw::after{left:17px;background:#fff}
+  .toggle.on{color:var(--text)}
+  @media(prefers-reduced-motion:reduce){.toggle .sw,.toggle .sw::after{transition:none} .busy .pri::after{animation:none}}
+  /* menus */
+  .mwrap{position:relative}
+  .menu{position:absolute;right:0;top:calc(100% + 6px);min-width:220px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px;z-index:40;box-shadow:0 12px 32px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:2px}
+  .menu.left{right:auto;left:0}
+  .menu .mh{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px 4px}
+  .menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+  .menu button{width:100%;text-align:left;height:38px;padding:0 10px;background:transparent;border-radius:8px;font-weight:500;display:flex;align-items:center;gap:10px}
+  .menu button:hover,.menu button:focus-visible{background:#2b3642}
+  .menu button.dang{color:#ff8a7f}
+  .menu button:disabled{opacity:.45}
+  .menubtn{height:36px;width:36px;padding:0;background:#2b3642;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;border-radius:10px}
+  .menubtn[aria-expanded="true"]{background:#3a4654;color:var(--text)}
+  /* participants table */
+  .ptwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative}
+  .ptable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+  .ptable th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:0 8px 8px;white-space:nowrap}
+  .ptable td{padding:6px 8px;border-top:1px solid var(--line);height:44px;vertical-align:middle}
+  .ptable .num,.ptable th.num{text-align:right}
+  .ptable .rk{width:36px;color:var(--muted);text-align:right}
+  .ptable .rk .md{font-size:16px;line-height:1}
+  .ptable .nm{font-weight:600;max-width:0;min-width:120px;white-space:nowrap}
+  .ptable .nm .av{display:inline-block;width:24px;text-align:center;margin-right:6px;font-size:15px}
+  .ptable .nm .t{display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+  .ptable .tot{font-weight:700} .ptable tr.lead .tot{color:var(--warn)}
+  .ptable .menucell{width:44px;text-align:right}
+  .chip{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 8px;border-radius:6px;font-weight:700;font-size:13px;background:#2b3642;color:var(--muted);white-space:nowrap}
+  .chip.done{background:#1d2f4d;color:#9cc0ff} .chip.right{background:#163d2b;color:var(--ok)} .chip.wrong{background:#4a1f1b;color:#ff8a7f}
+  .chip.none{background:transparent;border:1px dashed var(--line);font-weight:500}
+  .sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .rowmenu{height:36px;width:36px;padding:0;background:transparent;color:var(--muted);border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
+  .rowmenu:hover,.rowmenu[aria-expanded="true"]{background:#2b3642;color:var(--text)}
+  .empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
+  .slidewrap{background:#000;border:1px solid var(--line);border-radius:12px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
   .slidewrap iframe{width:100%;height:100%;border:0;display:block}
-  .slidebar{display:flex;gap:var(--gap);align-items:center;flex-wrap:wrap;justify-content:flex-end}
-  .slidebar .sm{display:inline-flex;align-items:center;gap:6px}
-  /* quiz panel: candidates table doubles as the leaderboard (sorted by total) */
-  .qcard{container-type:inline-size;display:flex;flex-direction:column;gap:var(--gap)}
-  .qcard .complete{border-bottom:1px solid var(--line);padding-bottom:var(--gap)}
+  .slidebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+  .slidebar .sm{display:inline-flex;align-items:center;gap:6px;height:36px}
   .complete .podium div{max-width:30%}
-  .ctab{display:flex;flex-direction:column}
-  .tr{display:grid;grid-template-columns:26px minmax(0,1fr) 56px 52px 48px 56px 28px;gap:8px;align-items:center;min-height:calc(var(--h) + 6px);padding:3px 0;font-size:14px}
-  .tr + .tr{border-top:1px solid var(--line)}
-  .tr.th{min-height:0;padding:0 0 4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-  .tr .rk{color:var(--muted);text-align:right;font-size:12px}
-  .rk .md{font-size:16px;line-height:1}
-  .tr .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
-  .tr .c{text-align:center}
-  .tr .n{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .tr .tot{font-weight:800;color:var(--warn)}
-  .ans{height:calc(var(--h) - 4px);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;background:#0f1419;border:1px solid var(--line);color:var(--muted)}
-  .ans.done{background:#1d2f4d;border-color:#1d2f4d;color:#9cc0ff}
-  .ans.right{background:var(--ok);border-color:var(--ok);color:#06220f}
-  .ans.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
-  .rmx{width:var(--h);height:var(--h);padding:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--line);color:var(--muted);font-size:12px;border-radius:8px}
-  .rmx:hover{color:#ff8a7f;border-color:var(--bad)}
-  @container (max-width:380px){ .tr{grid-template-columns:16px minmax(0,1fr) 46px 38px 32px 38px 22px;gap:6px;font-size:12px} .rmx{width:22px;height:22px} }
-  @media(max-width:700px){ .screens{margin-left:0} }
+  /* side column when the slides pane is shown */
+  .a-side .ptable .tm,.a-side .ptable .qp,.a-side .ptable th.tm,.a-side .ptable th.qp{display:none}
+  .a-side .ptable .nm{min-width:70px} .a-side .ptable th{font-size:10px;padding:0 6px 6px} .a-side .ptable td{padding:4px 6px}
+  /* narrow / mobile */
+  .mob{display:none}
+  @media(max-width:700px){
+    .live{padding:12px 16px calc(96px + env(safe-area-inset-bottom,0px));gap:12px}
+    .live .card{padding:12px}
+    .desk{display:none} .mob{display:block}
+    .ctx .ttl{font-size:17px}
+    .qhead .qn{font-size:18px}
+    .qctl{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#121920;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));flex-wrap:nowrap}
+    .qctl .pri{flex:1 1 auto;min-width:0;height:48px}
+    .qctl .sec-btn{height:48px;width:48px;padding:0;justify-content:center} .qctl .sec-btn .lbl{display:none}
+    .qsel{height:48px;flex:0 0 auto}
+    .qctl .more{height:48px;width:48px}
+    .qctl .menu{bottom:calc(100% + 6px);top:auto}
+    .hint{display:none}
+    .summary{gap:8px 16px}
+    /* two-line participant rows instead of a table */
+    .ptable,.ptable tbody,.ptable tr,.ptable td{display:block}
+    .ptable thead{display:none}
+    .ptable tr{display:grid;grid-template-columns:28px minmax(0,1fr) auto 44px;grid-template-areas:"rk nm tot mn" "rk sub sub mn";align-items:center;column-gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+    .ptable td{border:0;height:auto;padding:0;min-height:0}
+    .ptable .rk{grid-area:rk;text-align:center;width:auto}
+    .ptable .nm{grid-area:nm;max-width:none;min-width:0;font-size:15px}
+    .ptable .tot{grid-area:tot;font-size:15px}
+    .ptable .menucell{grid-area:mn;width:auto}
+    .ptable .sub{grid-area:sub;display:flex;gap:10px;align-items:center;color:var(--muted);font-size:13px;margin-top:4px}
+    .ptable .sub:empty{display:none}
+    .ptable .tm,.ptable .qp,.ptable .an{display:none}
+  }
+  @media(min-width:701px){ .ptable .sub{display:none} }
+  @media(max-width:360px){ .qctl{gap:6px;padding-left:10px;padding-right:10px} .qctl .pri{padding:0 10px;font-size:14px;min-width:0} }
+  /* mobile top bar */
+  .mnav{display:none}
+  @media(max-width:700px){
+    .topbar .tabs,.topbar .out{display:none}
+    .mnav{display:block;margin-left:auto}
+    .topbar .brand{display:block;font-size:16px}
+    .topbar .where{font-size:13px;color:var(--muted);margin-left:4px}
+  }
 </style>
 </head>
 <body>
@@ -206,12 +274,13 @@
 <script src="vendor-supabase.js"></script>
 <script src="vendor-qrcode.js"></script>
 <script src="config.js"></script>
+<script src="session-logic.js"></script>
 <script>
 const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
-let quizzes=[], editing=null, confirmReset=false, helpOpen=false, linkShown='', slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
+let quizzes=[], editing=null, confirmReset=false, helpOpen=false, linkShown='', menuOpen=null, busy=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
 let view = 'home';                          // home | edit | play | settings
 const baseUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const candidateUrl = baseUrl + 'play/';
@@ -321,7 +390,7 @@ function candTable(withRemove){
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,helpOpen,linkShown]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,helpOpen,linkShown,menuOpen,busy]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
@@ -336,13 +405,16 @@ function linkModal(){
 }
 function topbar(){
   const tab=(h,label,on,extra='')=>`<a href="#${h}" class="${on?'on':''}">${extra}${label}</a>`;
-  return `<div class="topbar"><span class="brand">QuizApp</span>
+  return `<div class="topbar"><span class="brand">QuizApp</span><span class="where mob">${view==='home'?'My quizzes':view==='play'?'Live session':view==='settings'?'Settings':'Edit quiz'}</span>
     <nav class="tabs">
       ${tab('home','My quizzes',view==='home')}
       ${tab('play','Live session',view==='play',liveActive()?'<span class="dot"></span>':'')}
       ${tab('settings','Settings',view==='settings')}
     </nav>
-    <span class="sp"></span><a href="#" id="logout" class="out" title="Log out"><span class="lbl">Log out</span><span class="ico">⎋</span></a></div>`;
+    <span class="sp"></span><a href="#" id="logout" class="out" title="Log out"><span class="lbl">Log out</span><span class="ico">⎋</span></a>
+    <div class="mnav mwrap"><button class="menubtn" id="navbtn" aria-label="Menu" aria-haspopup="menu" aria-expanded="${menuOpen==='nav'}">${ICON_MENU}</button>
+      ${menuOpen==='nav'?`<div class="menu" role="menu" id="navmenu">
+        <button role="menuitem" data-go="home">My quizzes</button><button role="menuitem" data-go="play">Live session</button><button role="menuitem" data-go="settings">Settings</button><hr><button role="menuitem" id="logout2">Log out</button></div>`:''}</div></div>`;
 }
 
 function home(){
@@ -406,6 +478,8 @@ const ICON_LINK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" str
 const ICON_HELP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>';
 const ICON_FS='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 const ICON_COPY='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const ICON_MENU='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>';
+const ICON_DOTS='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
 const EYE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYEOFF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 function settings(){
@@ -437,80 +511,120 @@ function settings(){
 
 function play(){
   if(!st) return '<div class="page muted">Loading…</div>';
-  const q = st.current_question;
-  const cur = {}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
-  const done = players.filter(g=>cur[g]).length;
-  const r = remaining(), timeUp = r!==null && r<=0;
-  const status = st.ended?'ended':st.revealed?'revealed':st.locked?(st.question_opened_at?'locked':'waiting'):timeUp?'timeup':'open';
-  const statusLabel = {ended:'SESSION ENDED',revealed:'REVEALED',locked:'LOCKED',waiting:'WAITING TO OPEN',timeup:"TIME UP",open:'OPEN'}[status];
-  const quiz = quizzes.find(x=>x.id===st.quiz_id); const keyCur = quiz && quiz.answer_key[q];
-  const revealedN = (q-1)+(st.revealed?1:0);
-  const scores = scoresFor();
-  const canOpen = !st.ended && (!st.question_opened_at || st.locked || timeUp) && !st.revealed;
-  const lastRevealed = st.revealed && q>=st.total_questions;
-  const complete = lastRevealed || st.ended;
+  const L=SessionLogic, q=st.current_question, N=st.total_questions;
+  const cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
+  const done=players.filter(g=>cur[g]).length;
+  const r=remaining(), timeUp=r!==null&&r<=0;
+  const status=L.questionStatus(st,timeUp), stateLabel=L.STATUS_LABEL[status];
+  const quiz=quizzes.find(x=>x.id===st.quiz_id); const keyCur=!!(quiz&&quiz.answer_key[q]);
+  const pri=L.primaryAction(st,keyCur,timeUp), secs=L.secondaryActions(st,keyCur,timeUp);
+  const scores=scoresFor(); const revealedN=(q-1)+(st.revealed?1:0);
+  const complete=(st.revealed&&q>=N)||st.ended;
+  const embed=quiz&&quiz.embed_url, showSlides=embed&&slidesOn;
+  const hasPip='documentPictureInPicture' in window, pipOn=pipWin&&!pipWin.closed;
+  const dis=(x)=>x?'disabled':'';
 
-  const completeCard = complete ? `<div class="complete">
-      <div class="h">🎉 Quiz complete</div>
-      <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} players</div>
-      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span><span class="muted" style="display:block;font-size:11px">${(scores[i].t/1000).toFixed(1)} s total</span></div>`:'').join('')}</div>
-      ${st.ended?'<p class="muted">Candidates are seeing their final score and rank.</p>':'<p class="muted">Press <b>Finish</b> to show candidates their final score and rank.</p>'}
+  // ---- A. session context + options menu
+  const sessMenu = menuOpen==='sess' ? `<div class="menu" role="menu" id="sessmenu" aria-label="Session options">
+      <div class="mh">Presentation</div>
+      <button role="menuitem" data-open="${joinUrl}" data-win="quizjoin">${ICON_EXT}Open join screen</button>
+      <button role="menuitem" data-copy="${joinUrl}">${ICON_COPY}Copy join link</button>
+      <button role="menuitem" data-open="${baseUrl}board.html" data-win="quizboard">${ICON_EXT}Open leaderboard</button>
+      <button role="menuitem" data-copy="${baseUrl}board.html">${ICON_COPY}Copy leaderboard link</button>
+      ${embed?`<button role="menuitem" id="m_slides">${slidesOn?'Hide':'Show'} slides pane</button>`:''}
+      ${hasPip?`<button role="menuitem" id="m_pip">${pipOn?'Close':'Open'} floating remote</button>`:''}
+      <hr><div class="mh">Session</div>
+      <button role="menuitem" id="newround">${PI.round}New round…</button>
+      <button role="menuitem" class="dang" id="endsess2" ${dis(st.ended)}>${PI.stop}End session…</button>
     </div>` : '';
+  const ctx = `<div class="sec"><div class="ctx">
+      <div class="ttl">${esc(st.quiz_title)}<small>${esc(st.session_name)} · ${players.length} joined</small></div>
+      <div class="ctxr"><span class="livedot ${st.ended?'off':''}">${st.ended?'Ended':'Live'}</span>
+      <div class="mwrap"><button class="menubtn" id="sessbtn" aria-label="Session options" aria-haspopup="menu" aria-expanded="${menuOpen==='sess'}">${ICON_DOTS}</button>${sessMenu}</div></div>
+    </div></div>`;
 
-  const embed = quiz && quiz.embed_url;
-  const showSlides = embed && slidesOn;
-  const toggle = embed ? `<label class="toggle pbox ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span>Show slides</span><span class="sw"></span></label>` : '';
-  const remoteToggle = ('documentPictureInPicture' in window) ? `<label class="toggle pbox ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Show remote</span><span class="sw"></span></label>` : '';
-  const cb=(id,cls,icon,label,title,dis)=>`<button class="cbtn ${cls}" id="${id}" title="${title}" ${dis?'disabled':''}>${id==='next'?`<span class="lbl">${label}</span>${icon}`:`${icon}<span class="lbl">${label}</span>`}</button>`;
-  const restart = st.question_opened_at && !st.revealed;
-  const scrLink=(t,u,win)=>`<span class="pbox">${t}
-      <button class="iconbtn" data-open="${u}" data-win="${win}" data-tip="Open in new window" aria-label="Open ${t} in new window">${ICON_EXT}</button>
-      <button class="iconbtn" data-copy="${u}" data-tip="Copy link" aria-label="Copy ${t} link">${ICON_COPY}</button>
-      <button class="iconbtn" data-showlink="${u}" data-tip="Show link" aria-label="Show ${t} link">${ICON_LINK}</button></span>`;
-  const controlPanel = `<div class="card cpanel">
-      <div class="sec">
-        <div class="crow hdr">
-          <div class="ctitle"><b>${esc(st.quiz_title)}</b><span class="muted"> · ${esc(st.session_name)}</span></div>
-          <span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No key for Q'+q+'</span>'}
-          <span class="sp"></span>
-          <div class="timer" id="timer"></div>
-          <div class="cq">Q${q}<small> / ${st.total_questions}</small></div>
-        </div>
-        <div class="crow">
-          <div class="grp pctl">
-            ${cb('prev','',PI.prev,'Previous','Previous question',q<=1||st.ended)}
-            ${cb('open','ok',restart?PI.restart:PI.open,restart?'Restart':'Open',restart?'Restart timer':'Open question',!canOpen)}
-            ${cb('lock','warn',PI.lock,'Lock','Lock answers',status!=='open')}
-            ${cb('reveal','orange',PI.eye,'Reveal','Reveal answer',st.revealed||!keyCur||!st.question_opened_at||st.ended)}
-            ${lastRevealed&&!st.ended?cb('endsess','magenta',PI.flag,'Finish','Finish & show results',false):cb('next','',PI.next,'Next','Next question',q>=st.total_questions||st.ended)}
-          </div>
-          <div class="ctlr">
-          <div class="goto"><label for="goto">Go to Question</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" inputmode="numeric"><button class="primary" id="gotobtn" title="Go to question" aria-label="Go to question">${PI.next}</button></div>
-          <div class="grp sess">
-            ${cb('newround','purple',PI.round,'New round','New round: same quiz, fresh players and scores',false)}
-            ${cb('endsess2','danger',PI.stop,'End session','End session',st.ended)}
-          </div>
-          </div>
-        </div>
-      </div>
-      <div class="sec"><div class="crow">${toggle}${remoteToggle}
-        <div class="screens">${scrLink('Join screen',joinUrl,'quizjoin')}${scrLink('Leaderboard',baseUrl+'board.html','quizboard')}</div>
-      </div></div>
+  // ---- B. current question
+  const priBtn = `<button class="pri ${pri.id==='endsess'?'finish':''}" id="${pri.id}" ${dis(pri.disabled||busy)} ${pri.reason?`title="${pri.reason}"`:''}>${pri.label}${pri.id==='next'?PI.next:''}</button>`;
+  const moreMenu = menuOpen==='more' ? `<div class="menu left" role="menu" id="moremenu" aria-label="More question actions">
+      ${secs.map(a=>`<button role="menuitem" id="${a.id}">${a.label}</button>`).join('')||'<button disabled>No other actions</button>'}</div>` : '';
+  const qsel = `<label class="sr" for="qsel">Go to question</label><select class="qsel" id="qsel" ${dis(st.ended||busy)}>${Array.from({length:N},(_,i)=>i+1).map(i=>`<option value="${i}" ${i===q?'selected':''}>Q${i}</option>`).join('')}</select>`;
+  const controls = `<div class="qctl ${busy?'busy':''}">
+      <button class="sec-btn" id="prev" ${dis(q<=1||st.ended||busy)} aria-label="Previous question">${PI.prev}<span class="lbl">Previous</span></button>
+      ${qsel}
+      ${priBtn}
+      <div class="mwrap"><button class="more" id="morebtn" aria-label="More question actions" aria-haspopup="menu" aria-expanded="${menuOpen==='more'}" ${dis(!secs.length)}>${ICON_DOTS}</button>${moreMenu}</div>
     </div>`;
-  const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
-      <div class="slidebar">
-        <button class="iconbtn" id="slideshelp" title="How the slides pane works">${ICON_HELP}</button>
-        <button class="sm" id="slidesfs">${ICON_FS}<span class="lbl">Full screen</span></button><button class="sm" id="slidesnew">${ICON_EXT}<span class="lbl">New window</span></button></div>
-      ${helpOpen?`<div class="modalbg" id="helpmodal"><div class="modalbox" style="text-align:left"><p><b>Slides pane</b></p><p class="muted" style="margin:0 0 10px">Click inside the slides, then use ← → (or Canva's own arrows) to move between slides. The quiz buttons control the quiz only — they do not change slides.</p><p class="muted" style="margin:0 0 14px">Full screen shows the pane on this screen; New window opens the deck in its own window, which you can drag to the projector.</p><div class="row" style="justify-content:flex-end"><button class="grey sm" id="helpclose">Close</button></div></div></div>`:''}` : '';
-  const candidatesSec = `<div class="sec"><h2>Candidates <span class="muted">${done}/${players.length} answered Q${q} · ${revealedN} of ${st.total_questions} revealed</span></h2>
-      ${players.length?candTable(true):'<p class="muted" style="margin:0">Nobody has joined yet. Open the join screen on a second display.</p>'}</div>`;
-  const quizPanel = `<div class="card qcard">${completeCard}${candidatesSec}</div>`;
-  if(showSlides){
-    return `<div class="live slides">
-      <div class="a-main">${controlPanel}${slidePane}</div>
-      <div class="a-side">${quizPanel}</div>
+  const hint = st.ended ? '' : pri.reason ? `<div class="hint">${pri.reason} — add it under My quizzes → Edit. You can still move on.</div>`
+    : !st.question_opened_at ? '<div class="hint">Moving to another question opens it straight away and starts the timer.</div>' : '';
+  const qblock = `<div class="sec">
+      <div class="qhead"><span class="qn">Question ${q} of ${N}</span><span class="state ${status}">${stateLabel}</span>
+        <span class="cnt">${done} of ${players.length} answered</span><div class="timer" id="timer"></div></div>
+      ${controls}${hint}
+    </div>`;
+
+  // ---- results summary (host only; after reveal)
+  let summary='';
+  if(st.revealed){
+    const sm=L.resultsSummary(players,cur,correct);
+    const opts=['A','B','C','D']; Object.keys(sm.dist).forEach(k=>{ if(!opts.includes(k)) opts.push(k); });
+    summary = `<div class="summary" aria-live="polite">
+      <div><div class="k">Correct answer</div><div class="v ok">${correct?esc(correct):'No key'}</div></div>
+      <div><div class="k">Correct</div><div class="v">${correct?`${sm.right} of ${sm.total} · ${sm.pct}%`:'—'}</div></div>
+      <div><div class="k">Answered</div><div class="v">${sm.answered} of ${sm.total}</div></div>
+      <div><div class="k">Spread</div><div class="dist">${opts.map(o=>`<span class="${o===correct?'hit':''}">${o}: ${sm.dist[o]||0}</span>`).join('')}${sm.total-sm.answered?`<span>No answer: ${sm.total-sm.answered}</span>`:''}</div></div>
     </div>`;
   }
+
+  // ---- C. presentation tools (desktop; the same actions sit in the session menu on mobile)
+  const tools = `<div class="sec desk"><h2>Presentation</h2><div class="tools">
+      <div class="grp"><span class="lab">Join screen</span><button data-open="${joinUrl}" data-win="quizjoin">${ICON_EXT}Open</button><button data-copy="${joinUrl}">${ICON_COPY}Copy link</button><button data-showlink="${joinUrl}">${ICON_LINK}Show link</button></div>
+      <div class="grp"><span class="lab">Leaderboard</span><button data-open="${baseUrl}board.html" data-win="quizboard">${ICON_EXT}Open</button><button data-copy="${baseUrl}board.html">${ICON_COPY}Copy link</button><button data-showlink="${baseUrl}board.html">${ICON_LINK}Show link</button></div>
+      ${embed?`<div class="grp"><label class="toggle ${slidesOn?'on':''}" id="slidestoggle"><input type="checkbox" class="sr" ${slidesOn?'checked':''}><span>Show slides pane on this page</span><span class="sw"></span></label></div>`:''}
+      ${hasPip?`<div class="grp"><label class="toggle ${pipOn?'on':''}" id="piptoggle"><input type="checkbox" class="sr" ${pipOn?'checked':''}><span>Floating remote</span><span class="sw"></span></label></div>`:''}
+    </div></div>`;
+
+  const controlPanel = `<div class="card cpanel">${ctx}${qblock}${summary?`<div class="sec">${summary}</div>`:''}${tools}</div>`;
+
+  // ---- slides pane
+  const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
+      <div class="slidebar">
+        <button class="iconbtn" id="slideshelp" aria-label="How the slides pane works">${ICON_HELP}</button>
+        <button class="sm" id="slidesfs">${ICON_FS}<span class="lbl">Full screen</span></button><button class="sm" id="slidesnew">${ICON_EXT}<span class="lbl">New window</span></button></div>
+      ${helpOpen?`<div class="modalbg" id="helpmodal"><div class="modalbox" style="text-align:left" role="dialog" aria-modal="true" aria-label="Slides pane help"><p><b>Slides pane</b></p><p class="muted" style="margin:0 0 10px">Click inside the slides, then use ← → (or Canva's own arrows) to move between slides. The quiz buttons control the quiz only — they do not change slides.</p><p class="muted" style="margin:0 0 14px">Full screen shows the pane on this screen; New window opens the deck in its own window, which you can drag to the projector.</p><div class="row" style="justify-content:flex-end"><button class="grey sm" id="helpclose">Close</button></div></div></div>`:''}` : '';
+
+  // ---- participants
+  const completeCard = complete ? `<div class="complete">
+      <div class="h">🎉 Quiz complete</div>
+      <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} participants</div>
+      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span><span class="muted" style="display:block;font-size:11px">${(scores[i].t/1000).toFixed(1)} s total</span></div>`:'').join('')}</div>
+      ${st.ended?'<p class="muted">Participants are seeing their final score and rank.</p>':'<p class="muted">Press <b>Finish &amp; show results</b> to show participants their final score and rank.</p>'}
+    </div>` : '';
+  const chip = (a)=>{
+    if(!a) return st.revealed ? '<span class="chip none">No answer</span>' : '<span class="chip">— <span class="sr">waiting</span></span>';
+    if(st.revealed) return a.is_correct ? `<span class="chip right">✓ ${a.choice}<span class="sr"> correct</span></span>` : `<span class="chip wrong">✕ ${a.choice}<span class="sr"> incorrect</span></span>`;
+    return `<span class="chip done">${st.locked?a.choice:'✓'}<span class="sr"> answered</span></span>`;
+  };
+  const rows = scores.map((x,i)=>{ const a=cur[x.g]; const medal=x.p>0&&i<3?['🥇','🥈','🥉'][i]:null; const key=esc(x.g);
+    const sub = `${chip(a)}${a?`<span>${(a.elapsed_ms/1000).toFixed(1)} s</span>`:''}${a&&st.revealed?`<span>+${a.points} this question</span>`:''}`;
+    const menu = menuOpen==='row:'+x.g ? `<div class="menu" role="menu" aria-label="Actions for ${key}"><button role="menuitem" class="dang" data-rm="${key}">Remove participant…</button></div>` : '';
+    return `<tr class="${i===0&&x.p>0?'lead':''}" data-key="${key}">
+      <td class="rk">${medal?`<span class="md" aria-label="rank ${i+1}">${medal}</span>`:i+1}</td>
+      <td class="nm"><span class="av" aria-hidden="true">${avatars[x.g]||''}</span><span class="t">${key}</span></td>
+      <td class="an">${chip(a)}</td>
+      <td class="num tm">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</td>
+      <td class="num qp">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</td>
+      <td class="num tot">${x.p}</td>
+      <td class="sub">${sub}</td>
+      <td class="menucell"><div class="mwrap"><button class="rowmenu" data-rowmenu="${key}" aria-label="Actions for ${key}" aria-haspopup="menu" aria-expanded="${menuOpen==='row:'+x.g}">${ICON_DOTS}</button>${menu}</div></td>
+    </tr>`; }).join('');
+  const table = players.length ? `<div class="ptwrap"><table class="ptable"><thead><tr>
+      <th class="rk num">#</th><th>Participant</th><th class="an">Answer</th><th class="num tm">Time</th><th class="num qp">This question</th><th class="num">Total score</th><th class="sub"></th><th class="menucell"><span class="sr">Actions</span></th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`
+    : `<div class="empty">Nobody has joined yet. Open the join screen or share the join link from Session options.</div>`;
+  const partSec = `<div class="sec"><h2>Participants (${players.length}) <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">· ${revealedN} of ${N} revealed</span></h2>${table}</div>`;
+  const quizPanel = `<div class="card qcard">${completeCard}${partSec}</div>`;
+
+  if(showSlides) return `<div class="live slides"><div class="a-main">${controlPanel}${slidePane}</div><div class="a-side">${quizPanel}</div></div>`;
   return `<div class="live">${controlPanel}${quizPanel}</div>`;
 }
 
@@ -540,29 +654,39 @@ function bind(){
   on('saveplay',async()=>{ const q=await save(); if(!q) return; if(liveActive() && !confirm(`A session of "${st.quiz_title}" is still running. Start this quiz instead?`)) return; await act('play',{id:q.id}); await load(); go('play'); });
   // settings
   on('togglepin',()=>{ pinShown=!pinShown; render(true); });
-  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>window.open(b.dataset.open, b.dataset.win, b.dataset.win==='_blank'?'':'width=1000,height=720'));
-  app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); toast('Link copied'); }catch(e){ const ta=document.createElement('textarea'); ta.value=b.dataset.copy; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Link copied'); } });
+  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{ window.open(b.dataset.open, b.dataset.win, b.dataset.win==='_blank'?'':'width=1000,height=720'); if(menuOpen){ menuOpen=null; render(true); } });
+  app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); toast('Link copied'); }catch(e){ const ta=document.createElement('textarea'); ta.value=b.dataset.copy; document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); ta.remove(); toast(ok?'Link copied':'Could not copy — use Show link instead', !ok); } menuOpen=null; render(true); });
   on('savescoring',async()=>{ const v=id=>+document.getElementById(id).value; await act('set_scoring',{speed_top:v('sc_top'),speed_step:v('sc_step'),speed_min:v('sc_min'),flat_points:v('sc_flat')}); await load(); toast('Scoring rule saved'); });
   on('setpin',async()=>{const p=document.getElementById('newpin').value.trim(); await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); toast('PIN changed'); document.getElementById('newpin').value='';});
   // play
-  on('open',()=>act('open').then(load)); on('lock',()=>act('lock').then(load)); on('reveal',()=>act('reveal').then(load));
-  on('next',()=>act('next').then(load)); on('prev',()=>act('prev').then(load));
-  const end=()=>{ if(confirm('End this session? Candidates will see their final score and rank.')) act('end_session').then(load); };
+  // one in-flight host action at a time (buttons disable while busy)
+  const run=(a,v)=>{ if(busy) return; busy=true; menuOpen=null; render(true); act(a,v).then(load).catch(()=>{}).finally(()=>{ busy=false; render(true); }); };
+  ['open','lock','reveal','next','prev'].forEach(id=>on(id,()=>run(id)));
+  const qs=document.getElementById('qsel'); if(qs) qs.onchange=()=>run('goto',{question:+qs.value});
+  const end=()=>{ menuOpen=null; if(confirm(`End "${st.quiz_title}" now?\n\nAnswers close and every participant sees their final score and rank. The session cannot be reopened; use New round to run this quiz again.`)) run('end_session'); else render(true); };
   on('endsess',end); on('endsess2',end);
-  on('newround',()=>{ if(confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
-  on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
-  const gi=document.getElementById('goto'); if(gi) gi.onkeydown=(e)=>{ if(e.key==='Enter') document.getElementById('gotobtn').click(); };
+  on('newround',()=>{ menuOpen=null; if(confirm(`Start a new round of "${st.quiz_title}"?\n\nThis starts a fresh session from question 1. Participants are sent back to the join screen and must rejoin; all scores restart at 0. This round's results stay in the database.`)) run('new_round'); else render(true); });
+  // menus: open/close, Escape, outside click, focus first item
+  const toggleMenu=(id,name)=>on(id,(e)=>{ e.stopPropagation(); menuOpen=menuOpen===name?null:name; render(true); const m=app.querySelector('.menu [role=menuitem]:not(:disabled)'); if(menuOpen&&m) m.focus(); });
+  toggleMenu('sessbtn','sess'); toggleMenu('morebtn','more'); toggleMenu('navbtn','nav');
+  app.querySelectorAll('[data-rowmenu]').forEach(b=>b.onclick=(e)=>{ e.stopPropagation(); const n='row:'+b.dataset.rowmenu; menuOpen=menuOpen===n?null:n; render(true); const m=app.querySelector('.menu [role=menuitem]'); if(menuOpen&&m) m.focus(); });
+  app.querySelectorAll('.menu').forEach(m=>{ m.onclick=(e)=>e.stopPropagation(); m.onkeydown=(e)=>{ const items=[...m.querySelectorAll('[role=menuitem]:not(:disabled)')]; const i=items.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); (items[i+1]||items[0]).focus(); } if(e.key==='ArrowUp'){ e.preventDefault(); (items[i-1]||items[items.length-1]).focus(); } }; });
+  on('logout2',()=>{ sessionStorage.removeItem('quiz_pin'); location.hash=''; location.reload(); });
+  on('m_slides',()=>{ menuOpen=null; slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
+  on('m_pip',()=>{ menuOpen=null; if(pipOn()){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
   app.querySelectorAll('[data-showlink]').forEach(b=>b.onclick=()=>{ linkShown=b.dataset.showlink; render(true); });
   on('linkclose',()=>{ linkShown=''; render(true); });
   const lm=document.getElementById('linkmodal'); if(lm){ lm.onclick=(e)=>{ if(e.target===lm){ linkShown=''; render(true); } }; lm.querySelector('input').select(); }
   on('slideshelp',()=>{ helpOpen=true; render(true); }); on('helpclose',()=>{ helpOpen=false; render(true); });
   const hm=document.getElementById('helpmodal'); if(hm) hm.onclick=(e)=>{ if(e.target===hm){ helpOpen=false; render(true); } };
-  on('piptoggle',()=>{ if(pipWin&&!pipWin.closed){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
-  on('slidestoggle',()=>{ slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
+  on('piptoggle',(e)=>{ e.preventDefault(); if(pipOn()){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
+  on('slidestoggle',(e)=>{ e.preventDefault(); slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
   on('slidesfs',()=>{ const f=document.getElementById('slides'); if(f&&f.requestFullscreen) f.requestFullscreen(); });
   on('slidesnew',()=>{ const quiz=quizzes.find(x=>x.id===st.quiz_id); if(quiz) window.open(quiz.embed_url,'quizslides'); });
   on('openjoin',()=>window.open(joinUrl,'quizjoin','width=900,height=700'));
-  app.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ if(confirm('Remove "'+x.dataset.rm+'" from this session?')) act('remove_player',{name:x.dataset.rm}).then(load); });
+  app.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ menuOpen=null; const n=x.dataset.rm;
+    if(confirm(`Remove ${n} from this session?\n\nTheir answers and score are taken out of this session's results and they drop off every screen. If they answer another question from the same phone they will reappear with a fresh score.`)) run('remove_player',{name:n}); else render(true); });
   tick();
 }
 
@@ -581,6 +705,9 @@ const PI = {
   power:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>'
 };
 let pipWin=null, pipSig='', pipSess=false;
+const pipOn=()=>!!(pipWin&&!pipWin.closed);
+document.addEventListener('click',()=>{ if(menuOpen){ menuOpen=null; render(true); } });
+document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&menuOpen){ const n=menuOpen; menuOpen=null; render(true); const t=app.querySelector(n==='sess'?'#sessbtn':n==='more'?'#morebtn':n==='nav'?'#navbtn':'[data-rowmenu]'); if(t) t.focus(); } });
 const PIP_CSS = `
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
   .pbar{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"top top" "ctl bot" "mid mid";gap:8px;padding:8px 10px 10px;box-sizing:border-box;height:100vh}
