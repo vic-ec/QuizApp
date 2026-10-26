@@ -50,9 +50,16 @@
   .small{font-size:13px;color:var(--muted);text-align:center}
   .final{text-align:center}
   .final .pts{font-size:56px;font-weight:800;color:var(--warn)}
-  .lb{display:flex;flex-direction:column;gap:6px;margin:12px 0}
-  .lb div{display:flex;justify-content:space-between;padding:8px 12px;border-radius:8px;background:#0f1419}
-  .lb div.me{outline:2px solid var(--accent)}
+  /* leaderboard table — same look as the host's candidates table */
+  .lb{display:flex;flex-direction:column;margin:12px 0;text-align:left}
+  .lb .tr{display:grid;grid-template-columns:22px minmax(0,1fr) 52px 48px 56px;gap:8px;align-items:center;min-height:34px;padding:3px 6px;font-size:14px;border-radius:6px}
+  .lb .tr + .tr{border-top:1px solid var(--line)}
+  .lb .tr.th{min-height:0;padding-bottom:4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .lb .rk{color:var(--muted);text-align:right;font-size:12px}
+  .lb .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--text)}
+  .lb .n{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--text)}
+  .lb .tot{font-weight:800;color:var(--warn)}
+  .lb .tr.me{background:#1d2f4d;box-shadow:inset 0 0 0 2px var(--accent)}
   .err{color:#ff8a7f;font-size:14px;text-align:center;min-height:18px}
   .center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
   .join{width:100%;max-width:440px;text-align:center}
@@ -66,7 +73,7 @@
   .modal .res{font-size:22px;font-weight:800;margin-bottom:2px}
   .modal .res.ok{color:var(--ok)} .modal .res.bad{color:#ff8a7f}
   .modal h3{margin:12px 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-  .modal .lb div{font-size:16px}
+  .modal .lb .tr:not(.th){font-size:15px}
   .modal .close{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 14px;font:inherit}
 </style>
 </head>
@@ -117,12 +124,13 @@ async function load(){
       if(s.ended || s.revealed){
         const [g,all] = await Promise.all([
           sb.from('players').select('name,avatar').eq('session_id',s.session_id),
-          sb.from('answers').select('player,points,is_correct').eq('session_id',s.session_id)
+          sb.from('answers').select('player,question,points,is_correct,elapsed_ms').eq('session_id',s.session_id)
         ]);
         const avs = {}; (g.data||[]).forEach(r=>avs[r.name]=r.avatar||'');
         board = (g.data||[]).map(r=>r.name).map(n=>({n, a:avs[n],
           p:(all.data||[]).filter(x=>x.player===n).reduce((t,x)=>t+(x.points||0),0),
-          c:(all.data||[]).filter(x=>x.player===n&&x.is_correct===true).length}))
+          c:(all.data||[]).filter(x=>x.player===n&&x.is_correct===true).length,
+          q:(all.data||[]).find(x=>x.player===n&&x.question===s.current_question)}))
           .sort((x,y)=>y.p-x.p||y.c-x.c||x.n.localeCompare(y.n));
       }
     }
@@ -131,6 +139,9 @@ async function load(){
   render();
 }
 
+function lbTable(rows){
+  return `<div class="lb"><div class="tr th"><span class="rk">#</span><span>Candidate</span><span class="n">Time</span><span class="n">Q pts</span><span class="n">Total</span></div>${rows.map((x,i)=>`<div class="tr${x.n===name?' me':''}"><span class="rk">${i+1}</span><span class="nm"><span class="av">${x.a||''}</span>${esc(x.n)}</span><span class="n">${x.q?(x.q.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${x.q?(x.q.points?'+'+x.q.points:'0'):''}</span><span class="n tot">${x.p}</span></div>`).join('')}</div>`;
+}
 const totalPts = () => Object.values(mine).reduce((t,r)=>t+(r.points||0),0);
 const totalCorrect = () => Object.values(mine).filter(r=>r.is_correct===true).length;
 function remaining(){
@@ -176,7 +187,7 @@ function render(){
         <div class="small">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
         <div class="pts">${totalPts()} pts</div>
         <div style="font-size:18px">${medal} ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''} · ${totalCorrect()} of ${st.total_questions} correct</div>
-        <div class="lb">${board.slice(0,10).map((x,i)=>`<div class="${x.n===name?'me':''}"><span>${i+1}. <span class="av">${x.a||''}</span>${esc(x.n)}</span><span>${x.p}</span></div>`).join('')}</div>
+        ${lbTable(board.slice(0,10))}
         <button class="btn" id="exit">Exit quiz</button>
       </div>`;
     document.getElementById('exit').onclick = exit;
@@ -257,7 +268,7 @@ function leaderboardModal(q, my){
     ${res}
     <div class="small">${rank?`You are ${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length} · ${totalPts()} pts`:''}</div>
     <h3>Leaderboard after Q${q}</h3>
-    <div class="lb">${board.slice(0,8).map((x,i)=>`<div class="${x.n===name?'me':''}"><span>${i+1}. <span class="av">${x.a||''}</span>${esc(x.n)}</span><span>${x.p}</span></div>`).join('')}</div>
+    ${lbTable(board.slice(0,8))}
     <div class="small">${last?'That was the last question — final results coming up…':'Next question coming up…'}</div>
     <button class="close" id="lbclose">Hide</button>
   </div></div>`;
