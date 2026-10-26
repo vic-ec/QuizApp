@@ -28,8 +28,8 @@
   @media(max-width:480px){.tabs{min-width:0;overflow-x:auto}}
   button.remove{background:#5a2a26;color:#ffb4ab}
   button.purple{background:#8e5cf6;color:#fff}
-  .qz.new{background:linear-gradient(180deg,#2a1f4d,#1a2129);border:1px dashed #8e5cf6;color:#c9b6ff}
-  .qz.new:hover{background:#2f2358;color:#fff}
+  .qz.new{background:#141a21;border:1px dashed var(--accent);color:#9cc0ff}
+  .qz.new:hover{background:#1d2f4d;color:#fff}
   .links{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--pad)}
   .lk{background:#0f1419;border:1px solid var(--line);border-radius:12px;padding:var(--pad);display:flex;flex-direction:column;gap:8px}
   .lk b{font-size:15px}
@@ -59,6 +59,7 @@
   button.warn{background:var(--warn);color:#2a2400}
   button.danger{background:var(--bad);color:#fff}
   button.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+  button.ghost:hover{color:var(--text);border-color:var(--muted)}
   button.orange{background:#e67e22;color:#fff}
   button.magenta{background:#e0409a;color:#fff}
   h1{font-size:18px}
@@ -379,13 +380,13 @@ function speedText(){ const r=rule(); return r.step?`${r.top}, ${r.top-r.step}, 
 function candTable(withRemove){
   const q=st.current_question, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
   const rows = scoresFor().map((x,i)=>{ const a=cur[x.g];
-    let ans='…', cls='';
-    if(a){ if(st.revealed){ ans=a.choice; cls=a.is_correct?'right':'wrong'; } else { ans=st.locked?a.choice:'✓'; cls='done'; } }
+    let ans='—', cls=st.revealed?'none':'';
+    if(a){ if(st.revealed){ ans=(a.is_correct?'✓ ':'✕ ')+a.choice; cls=a.is_correct?'right':'wrong'; } else { ans=st.locked?a.choice:'✓'; cls='done'; } }
     const mid = st.ended   // session over: final standings (Correct · Total time) instead of this question's answer
       ? `<span class="n">${x.c}</span><span class="n">${(x.t/1000).toFixed(1)} s</span><span class="n"></span>`
-      : `<span class="ans ${cls}">${ans}</span><span class="n">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</span>`;
-    return `<div class="tr"><span class="rk">${x.p>0&&i<3?'<span class="md">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span>${mid}<span class="n tot">${x.p}</span>`+
-      (withRemove?`<button class="rmx" data-rm="${esc(x.g)}" title="Remove from session" aria-label="Remove ${esc(x.g)}">✕</button>`:'')+`</div>`; }).join('');
+      : `<span class="ans ${cls}" title="${cls==='right'?'correct':cls==='wrong'?'incorrect':cls==='done'?'answered':st.revealed?'no answer':'waiting'}">${ans}</span><span class="n">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</span>`;
+    return `<div class="tr${i===0&&x.p>0?' lead':''}"><span class="rk">${x.p>0&&i<3?'<span class="md" aria-label="rank '+(i+1)+'">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span>${mid}<span class="n tot">${x.p}</span>`+
+      (withRemove?`<button class="rmx" data-rm="${esc(x.g)}" title="Remove participant" aria-label="Remove ${esc(x.g)} from session">✕</button>`:'')+`</div>`; }).join('');
   const head = st.ended ? `<span class="n" title="Correct answers">✓</span><span class="n" title="Total time on correct answers">Time</span><span class="n"></span>` : `<span class="c">Answer</span><span class="n">Time</span><span class="n">Q pts</span>`;
   return `<div class="ctab${withRemove?'':' norm'}${st.ended?' final':''}"><div class="tr th"><span class="rk">#</span><span class="nm">Candidate</span>${head}<span class="n">Total</span>${withRemove?'<span></span>':''}</div>${rows}</div>`;
 }
@@ -404,7 +405,7 @@ function render(force){
   bind();
 }
 function linkModal(){
-  return linkShown ? `<div class="modalbg" id="linkmodal" style="z-index:60"><div class="modalbox"><p style="margin-bottom:8px">Link</p><input readonly value="${esc(linkShown)}" style="width:100%;text-align:center" onfocus="this.select()"><div class="row" style="justify-content:center;margin-top:12px"><button class="primary sm" data-copy="${esc(linkShown)}">Copy link</button><button class="grey sm" id="linkclose">Close</button></div></div></div>` : '';
+  return linkShown ? `<div class="modalbg" id="linkmodal" style="z-index:60"><div class="modalbox" role="dialog" aria-modal="true" aria-label="Link"><p style="margin-bottom:8px">Link</p><input readonly value="${esc(linkShown)}" style="width:100%;text-align:center" onfocus="this.select()"><div class="row" style="justify-content:center;margin-top:12px"><button class="primary sm" data-copy="${esc(linkShown)}">Copy link</button><button class="grey sm" id="linkclose">Close</button></div></div></div>` : '';
 }
 function topbar(){
   const tab=(h,label,on,extra='')=>`<a href="#${h}" class="${on?'on':''}">${extra}${label}</a>`;
@@ -423,14 +424,14 @@ function topbar(){
 function home(){
   const live = st && !st.ended ? `<div class="banner"><b>Live session in progress:</b> ${esc(st.quiz_title)} · ${esc(st.session_name)} · Q${st.current_question}/${st.total_questions} · ${players.length} joined<span class="sp"></span><button class="primary sm" data-go="play">Resume ▸</button><button class="danger sm" id="endlive">End session</button></div>` : '';
   return `<div class="page">${live}
-    <h1 style="margin:${live?'16px':'0'} 0 14px">My quizzes</h1>
+    <h1 style="margin:${live?'16px':'0'} 0 12px">My quizzes</h1>
     <div class="quizzes">
-      <div class="qz new" data-go="edit-new"><div style="font-size:34px">＋</div><div>Create new quiz</div></div>
+      <button class="qz new" data-go="edit-new" style="font:inherit"><div style="font-size:34px;line-height:1">＋</div><div style="font-weight:600">Create new quiz</div></button>
       ${activeQuizzes().map(q=>`<div class="qz">
         <h3>${esc(q.title)}</h3>
         <div class="meta"><span>${q.total_questions} questions</span><span>${q.timer_seconds?q.timer_seconds+' s timer':'no timer'}</span><span>${q.scoring==='flat'?'flat':'speed'} scoring</span></div>
         <div>${keyCount(q)>=q.total_questions?'<span class="pill done">Answer key complete</span>':'<span class="pill nokey">Key: '+keyCount(q)+' of '+q.total_questions+'</span>'}</div>
-        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button class="grey" data-go="edit-${q.id}">Edit</button><button class="remove" data-archive="${q.id}" title="Move to bin">Remove</button></div>
+        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button class="grey" data-go="edit-${q.id}">Edit</button><button class="ghost" data-archive="${q.id}" title="Move to bin">Remove</button></div>
       </div>`).join('')}
     </div>
     ${binnedQuizzes().length?`<div style="margin-top:28px">
@@ -458,11 +459,11 @@ function editor(){
       <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
       <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — ${speedText()}</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — ${rule().flat} per correct</option></select></label>
     </div></div>
-    <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="remove sm" id="resetkey">Reset answer key</button></div>
+    <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="ghost sm" id="resetkey">Reset answer key</button></div>
       <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
       <div class="key">${Array.from({length:n},(_,i)=>i+1).map(i=>`<div class="k"><span>${i}</span>${['A','B','C','D'].map(o=>`<button class="${q.answer_key[i]===o?'on '+o:''}" data-kq="${i}" data-ko="${o}">${o}</button>`).join('')}</div>`).join('')}</div>
     </div>
-    ${confirmReset?`<div class="modalbg" id="resetmodal"><div class="modalbox"><p>Are you sure you want to clear all answers?</p><div class="row" style="justify-content:center"><button class="danger" id="resetyes">Yes, clear</button><button class="grey" id="resetno">No</button></div></div></div>`:''}
+    ${confirmReset?`<div class="modalbg" id="resetmodal"><div class="modalbox" role="dialog" aria-modal="true" aria-label="Clear answer key"><p>Clear the whole answer key for this quiz?</p><p class="muted" style="margin:-8px 0 16px">All ${n} answers are removed from the editor. Nothing is saved until you press Save quiz.</p><div class="row" style="justify-content:center"><button class="danger" id="resetyes">Yes, clear</button><button class="grey" id="resetno">No</button></div></div></div>`:''}
     </div>`;
 }
 
@@ -682,7 +683,7 @@ function bind(){
   on('linkclose',()=>{ linkShown=''; render(true); });
   const lm=document.getElementById('linkmodal'); if(lm){ lm.onclick=(e)=>{ if(e.target===lm){ linkShown=''; render(true); } }; lm.querySelector('input').select(); }
   on('slideshelp',()=>{ helpOpen=true; render(true); }); on('helpclose',()=>{ helpOpen=false; render(true); });
-  const hm=document.getElementById('helpmodal'); if(hm) hm.onclick=(e)=>{ if(e.target===hm){ helpOpen=false; render(true); } };
+  const hm=document.getElementById('helpmodal'); if(hm){ hm.onclick=(e)=>{ if(e.target===hm){ helpOpen=false; render(true); } }; const c=document.getElementById('helpclose'); if(c) c.focus(); }
   on('piptoggle',(e)=>{ e.preventDefault(); if(pipOn()){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
   on('slidestoggle',(e)=>{ e.preventDefault(); slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
   on('slidesfs',()=>{ const f=document.getElementById('slides'); if(f&&f.requestFullscreen) f.requestFullscreen(); });
@@ -710,89 +711,66 @@ const PI = {
 let pipWin=null, pipSig='', pipSess=false;
 const pipOn=()=>!!(pipWin&&!pipWin.closed);
 document.addEventListener('click',()=>{ if(menuOpen){ menuOpen=null; render(true); } });
-document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&menuOpen){ const n=menuOpen; menuOpen=null; render(true); const t=app.querySelector(n==='sess'?'#sessbtn':n==='more'?'#morebtn':n==='nav'?'#navbtn':'[data-rowmenu]'); if(t) t.focus(); } });
+document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&!menuOpen){ if(linkShown){ linkShown=''; render(true); } else if(confirmReset){ confirmReset=false; render(true); } else if(helpOpen){ helpOpen=false; render(true); } return; }
+  if(e.key==='Escape'&&menuOpen){ const n=menuOpen; menuOpen=null; render(true); const t=app.querySelector(n==='sess'?'#sessbtn':n==='more'?'#morebtn':n==='nav'?'#navbtn':'[data-rowmenu]'); if(t) t.focus(); } });
 const PIP_CSS = `
+  *{box-sizing:border-box}
+  :focus-visible{outline:2px solid #4f8cff;outline-offset:2px}
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
-  .pbar{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"top top" "ctl bot" "mid mid";gap:8px;padding:8px 10px 10px;box-sizing:border-box;height:100vh}
-  .prow.top{grid-area:top} .prow.ctl{grid-area:ctl} .prow.bot{grid-area:bot;align-self:start}
+  .pbar{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto minmax(0,1fr);grid-template-areas:"top top" "ctl bot" "sum sum" "mid mid";gap:8px;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));height:100vh}
+  .prow.top{grid-area:top} .prow.ctl{grid-area:ctl} .prow.bot{grid-area:bot;align-self:start} .prow.sum{grid-area:sum}
   .prow.mid{grid-area:mid;min-height:0;overflow-y:auto;overflow-x:hidden;align-content:flex-start}
   .prow.mid.hscroll{overflow-x:auto}
-  .pgrp.sess button,.pgrp button.wl{width:auto;gap:6px;font-size:12px;padding:0 10px}
-  button svg{width:16px;height:16px}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .prow .sp{flex:1}
-  .pgrp{display:flex;gap:6px;padding:6px;border:1px solid #2b3642;border-radius:10px;background:#141a21}
-  .pgrp button{width:40px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center}
-  .pgrp button svg{display:block}
-  .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#8d9aa8;user-select:none;white-space:nowrap}
-  .toggle .sw{width:30px;height:18px;border-radius:999px;background:#2b3642;position:relative}
-  .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#8d9aa8}
-  .toggle.on .sw{background:#4f8cff} .toggle.on .sw::after{left:15px;background:#fff}
-  .pq{font-weight:800;font-size:22px;white-space:nowrap} .pq small{font-size:12px;color:#8d9aa8}
-  .ptimer{font-weight:800;font-size:24px;min-width:44px;text-align:center;color:#4f8cff;font-variant-numeric:tabular-nums}
-  .ptimer{margin-left:auto}
-  .ptimer.low{color:#e74c3c} .ptimer.up{color:#f1c40f;font-size:12px}
-  .pctl{display:flex;gap:6px}
-  button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:0 12px;height:28px;cursor:pointer;background:#2b3642;color:#e8edf2;white-space:nowrap}
-  button:disabled{opacity:.35;cursor:default}
-  .ok{background:#2ecc71;color:#06220f} .warn{background:#f1c40f;color:#2a2400} .orange{background:#e67e22;color:#fff} .magenta{background:#e0409a;color:#fff}
-  .purple{background:#8e5cf6;color:#fff} .danger{background:#e74c3c;color:#fff} .primary{background:#4f8cff;color:#fff}
-  .sm{height:28px;padding:0 10px;font-size:12px}
-  .ctab{display:flex;flex-direction:column}
-  .tr{display:grid;grid-template-columns:26px minmax(0,1fr) 56px 52px 48px 56px 28px;gap:8px;align-items:center;min-height:calc(28px + 6px);padding:3px 0;font-size:13px}
+  .pq{font-weight:800;font-size:20px;white-space:nowrap} .pq small{font-size:12px;color:#8d9aa8;font-weight:600}
+  .state{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#2b3642;color:#8d9aa8;white-space:nowrap}
+  .state.open{background:#1d2f4d;color:#9cc0ff} .state.revealed{background:#163d2b;color:#2ecc71} .state.locked,.state.timeup{background:#3a3415;color:#f1c40f} .state.ended{background:#4a1f1b;color:#ff8a7f}
+  .cnt2{color:#8d9aa8;font-variant-numeric:tabular-nums}
+  .ptimer{font-weight:800;font-size:22px;min-width:36px;text-align:right;color:#4f8cff;font-variant-numeric:tabular-nums;margin-left:auto}
+  .ptimer.low{color:#e74c3c} .ptimer:empty{display:none}
+  button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:0 12px;height:40px;cursor:pointer;background:#2b3642;color:#e8edf2;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+  button:disabled{opacity:.4;cursor:default}
+  button svg{width:16px;height:16px;flex:none}
+  .pctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .pri{background:#4f8cff;color:#fff;min-width:150px;flex:1 1 auto;font-size:14px}
+  .pri.finish{background:#2ecc71;color:#06220f}
+  .nav{width:44px;padding:0}
+  .quiet{background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-weight:600;height:34px;font-size:12px}
+  .quiet.dang{color:#ff8a7f} .quiet.dang:hover{border-color:#e74c3c}
+  .pgrp.sess{display:flex;gap:6px}
+  .sumbox{display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;padding:6px 10px;border-radius:8px;background:#141a21;border:1px solid #2b3642;font-variant-numeric:tabular-nums}
+  .sumbox b{color:#2ecc71} .sumbox .d{display:flex;gap:4px} .sumbox .d span{padding:1px 6px;border-radius:5px;background:#0f1419} .sumbox .d span.hit{background:#163d2b;color:#2ecc71;font-weight:700}
+  .muted{color:#8d9aa8;font-size:12px}
+  .ctab{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+  .tr{display:grid;grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px 28px;gap:6px;align-items:center;min-height:40px;padding:2px 0;font-size:13px}
+  .ctab.final .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 32px 56px 0 44px 28px}
+  .ctab.final.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 56px 0 44px 28px}
+  .ctab.final.h2 .tr,.ctab.final.h3 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 0 44px 28px}
+  .ctab.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 44px 40px 44px 28px} .ctab.h1 .tr > :nth-child(3){display:none}
+  .ctab.h2 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 40px 44px 28px} .ctab.h2 .tr > :nth-child(3),.ctab.h2 .tr > :nth-child(4){display:none}
+  .ctab.h3 .tr{grid-template-columns:20px minmax(var(--nmw,0px),1fr) 44px 28px;gap:4px} .ctab.h3 .tr > :nth-child(3),.ctab.h3 .tr > :nth-child(4),.ctab.h3 .tr > :nth-child(5){display:none}
   .tr + .tr{border-top:1px solid #2b3642}
-  .tr.th{min-height:0;padding:0 0 4px;font-size:11px;font-weight:700;color:#8d9aa8;text-transform:uppercase;letter-spacing:.04em}
-  .tr .rk{color:#8d9aa8;text-align:right;font-size:12px}
-  .rk .md{font-size:15px;line-height:1}
+  .tr.th{min-height:0;padding:0 0 4px;font-size:10px;font-weight:600;color:#8d9aa8;text-transform:uppercase;letter-spacing:.04em}
+  .tr .rk{color:#8d9aa8;text-align:right;font-size:12px} .rk .md{font-size:15px;line-height:1}
   .tr .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
-  .tr .c{text-align:center}
-  .tr .n{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .tr .tot{font-weight:800;color:#f1c40f}
-  .ans{height:calc(28px - 4px);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;background:#0f1419;border:1px solid #2b3642;color:#8d9aa8}
-  .ans.done{background:#1d2f4d;border-color:#1d2f4d;color:#9cc0ff}
-  .ans.right{background:#2ecc71;border-color:#2ecc71;color:#06220f}
-  .ans.wrong{background:#e74c3c;border-color:#e74c3c;color:#fff}
-  .rmx{width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-size:11px;border-radius:8px}
+  .tr .c{text-align:center} .tr .n{text-align:right;white-space:nowrap}
+  .tr .tot{font-weight:700} .tr.lead .tot{color:#f1c40f}
+  .ans{height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:3px;font-weight:700;font-size:12px;background:#2b3642;color:#8d9aa8}
+  .ans.done{background:#1d2f4d;color:#9cc0ff} .ans.right{background:#163d2b;color:#2ecc71} .ans.wrong{background:#4a1f1b;color:#ff8a7f} .ans.none{background:transparent;border:1px dashed #2b3642;font-weight:500}
+  .rmx{width:28px;height:28px;padding:0;background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-size:11px;border-radius:8px}
   .rmx:hover{color:#ff8a7f;border-color:#e74c3c}
-  .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px 24px;gap:6px}
-  .ctab.final .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 32px 56px 0 44px 24px}
-  .ctab.final.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 52px 0 44px 24px}
-  .ctab.final.h2 .tr,.ctab.final.h3 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 0 44px 24px}
   .fin{font-weight:800;font-size:14px;padding:2px 0 6px}
-  /* narrowing order: hide Answer first, then Time, then Q pts; Total always stays */
-  .ctab.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 44px 40px 44px 24px} .ctab.h1 .tr > :nth-child(3){display:none}
-  .ctab.h2 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 40px 44px 24px} .ctab.h2 .tr > :nth-child(3),.ctab.h2 .tr > :nth-child(4){display:none}
-  .ctab.h3 .tr{grid-template-columns:20px minmax(var(--nmw,0px),1fr) 44px 24px;gap:4px} .ctab.h3 .tr > :nth-child(3),.ctab.h3 .tr > :nth-child(4),.ctab.h3 .tr > :nth-child(5){display:none}
   .cnt{color:#8d9aa8;font-size:12px;text-align:right;margin-top:4px}
-  .status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#2b3642;color:#8d9aa8;white-space:nowrap}
-  .status.open{background:#1d2f4d;color:#9cc0ff} .status.revealed{background:#163d2b;color:#2ecc71} .status.locked,.status.timeup{background:#3a3415;color:#f1c40f} .status.ended{background:#4a1f1b;color:#ff8a7f}
-  .modalbg{position:fixed;inset:0;background:rgba(5,8,12,.85);display:flex;align-items:center;justify-content:center;padding:10px}
-  .modalbox{background:#1a2129;border:1px solid #2b3642;border-radius:12px;padding:12px;width:100%;max-width:560px;max-height:95vh;overflow:auto}
-  .modalbox h2{margin:8px 0 6px;font-size:11px;color:#8d9aa8;text-transform:uppercase;letter-spacing:.06em}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap} .muted{color:#8d9aa8;font-size:12px}
-  input{font:inherit;padding:6px;border-radius:6px;border:1px solid #2b3642;background:#0f1419;color:#e8edf2;width:60px}
-  .scr{display:flex;align-items:center;gap:8px;padding:4px 0} .scr .t{flex:1;font-weight:600}
-  .iconbtn{background:transparent;border:1px solid #2b3642;padding:4px 8px;height:auto;color:#8d9aa8} .iconbtn:hover{color:#fff}
-  .closex{margin-left:auto}
-  .prow.top .sp{display:none}
-  .pgrp{flex-wrap:wrap}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
   @media (max-width:560px){
-    .pbar{gap:10px}
-    .prow.top{justify-content:flex-start}
-    .pq{font-size:26px} .ptimer{font-size:30px;min-width:56px}
-    .pgrp{width:100%;gap:6px;padding:6px;flex-wrap:wrap}
-    .pgrp button{min-width:0;height:28px}
-    .pctl #prev,.pctl #next,.pctl #endsess{order:-1;flex:1 1 calc(50% - 3px)}
-    .pctl #open,.pctl #lock,.pctl #reveal{flex:1 1 calc(33.333% - 4px)}
-    .pbar{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"top" "ctl" "mid" "bot"}
-    .pgrp.sess{width:100%;box-sizing:border-box}
-    .pgrp.sess button{flex:1 1 0}
-    .prow.ctl{flex-wrap:wrap}
+    .pbar{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto;grid-template-areas:"top" "ctl" "sum" "mid" "bot"}
+    .pctl{width:100%} .pri{height:44px} .nav{height:44px}
+    .pgrp.sess{width:100%} .pgrp.sess button{flex:1 1 0;height:40px}
   }
-  @media (max-height:230px){
-    .pbar{gap:6px;padding:6px 8px}
-    .pq{font-size:18px} .ptimer{font-size:18px}
-    .pgrp{padding:4px}
+  @media (max-width:300px){ .pri{min-width:0;font-size:13px;padding:0 8px} .nav{width:40px} .quiet{padding:0 8px} }
+  @media (max-height:260px){
+    .pbar{gap:6px;padding:6px 8px} .pq{font-size:16px} .ptimer{font-size:16px} button{height:32px} .pri{height:32px} .nav{height:32px} .quiet{height:28px}
+    .tr{min-height:30px}
   }`;
 
 async function openPresenter(){
@@ -809,48 +787,49 @@ async function openPresenter(){
   pipSig=''; renderPip(); render(true);
 }
 function presenterBar(){
-  const q=st.current_question, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
+  const L=SessionLogic, q=st.current_question, N=st.total_questions, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
   const r=remaining(), timeUp=r!==null&&r<=0;
-  const status = st.ended?'ended':st.revealed?'revealed':st.locked?(st.question_opened_at?'locked':'waiting'):timeUp?'timeup':'open';
-  const label = {ended:'ENDED',revealed:'REVEALED',locked:'LOCKED',waiting:'WAITING',timeup:'TIME UP',open:'OPEN'}[status];
-  const quiz=quizzes.find(x=>x.id===st.quiz_id); const keyCur=quiz&&quiz.answer_key[q];
-  const canOpen = !st.ended && (!st.question_opened_at || st.locked || timeUp) && !st.revealed;
-  const lastRevealed = st.revealed && q>=st.total_questions;
-  const done = players.filter(g=>cur[g]).length;
-  const bar = `<div class="pbar"><div class="prow top">
-    <div class="pq">Q${q}<small>/${st.total_questions}</small></div>
-    <span class="status ${status}">${label}</span>
+  const status=L.questionStatus(st,timeUp);
+  const quiz=quizzes.find(x=>x.id===st.quiz_id); const keyCur=!!(quiz&&quiz.answer_key[q]);
+  const pri=L.primaryAction(st,keyCur,timeUp), secs=L.secondaryActions(st,keyCur,timeUp);
+  const done=players.filter(g=>cur[g]).length, dis=(x)=>x?'disabled':'';
+  let summary='';
+  if(st.revealed && !st.ended){
+    const sm=L.resultsSummary(players,cur,correct);
+    summary=`<div class="prow sum"><div class="sumbox"><span>Correct <b>${correct?esc(correct):'—'}</b></span><span>${correct?`${sm.right}/${sm.total} · ${sm.pct}%`:'no key'}</span><span class="d">${['A','B','C','D'].map(o=>`<span class="${o===correct?'hit':''}">${o} ${sm.dist[o]||0}</span>`).join('')}</span></div></div>`;
+  }
+  return `<div class="pbar"><div class="prow top">
+    <div class="pq">Q${q}<small> of ${N}</small></div>
+    <span class="state ${status}">${L.STATUS_LABEL[status]}</span>
+    <span class="cnt2">${done}/${players.length} answered</span>
     <div class="ptimer" id="ptimer"></div>
-    </div><div class="prow ctl">
-    <div class="pgrp pctl">
-      <button id="prev" class="wl" title="Previous question" ${q<=1||st.ended?'disabled':''}>${PI.prev}<span>Prev</span></button>
-      <button class="ok" id="open" title="${st.question_opened_at&&!st.revealed?'Restart timer':'Open question'}" ${canOpen?'':'disabled'}>${st.question_opened_at&&!st.revealed?PI.restart:PI.open}</button>
-      <button class="warn" id="lock" title="Lock answers" ${status==='open'?'':'disabled'}>${PI.lock}</button>
-      <button class="orange" id="reveal" title="Reveal answer" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>${PI.eye}</button>
-      ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button id="next" class="wl" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}><span>Next</span>${PI.next}</button>`}
-    </div>
-  </div>
+    </div><div class="prow ctl"><div class="pctl">
+      <button id="prev" class="nav" aria-label="Previous question" title="Previous question" ${dis(q<=1||st.ended||busy)}>${PI.prev}</button>
+      <button id="${pri.id}" class="pri ${pri.id==='endsess'?'finish':''}" ${dis(pri.disabled||busy)} ${pri.reason?`title="${pri.reason}"`:''}>${pri.label}</button>
+      <button id="next" class="nav" aria-label="Next question" title="Next question" ${dis(q>=N||st.ended||busy)}>${PI.next}</button>
+      ${secs.map(a=>`<button id="${a.id}" class="quiet" ${dis(busy)}>${a.label}</button>`).join('')}
+    </div></div>
+  ${summary}
   <div class="prow mid"><div style="width:100%">${st.ended?'<div class="fin">🎉 Final leaderboard</div>':''}${players.length?candTable(true):'<span class="muted">No candidates yet</span>'}<div class="cnt">${st.ended?'Session ended · ties broken by quicker total time':`${done}/${players.length} answered`}</div></div></div>
   <div class="prow bot"><div class="pgrp sess">
-      <button class="purple" id="newround" title="New round (same quiz, fresh players and scores)">${PI.round}<span>New round</span></button>
-      <button class="danger" id="endsess2" title="End session" ${st.ended?'disabled':''}>${PI.stop}<span>End session</span></button>
+      <button class="quiet" id="newround" ${dis(busy)}>${PI.round}New round…</button>
+      <button class="quiet dang" id="endsess2" ${dis(st.ended||busy)}>${PI.stop}End session…</button>
   </div></div>
   </div>`;
-  return bar;
 }
 function renderPip(){
   if(!pipWin||pipWin.closed||!st) return;
-  const sig=JSON.stringify([st,players,answers,avatars,quizzes.map(x=>[x.id,x.answer_key])]);
+  const sig=JSON.stringify([st,players,answers,avatars,correct,busy,quizzes.map(x=>[x.id,x.answer_key])]);
   if(sig===pipSig) return; pipSig=sig;
   const d=pipWin.document; d.body.innerHTML=presenterBar();
   const on=(id,fn)=>{const el=d.getElementById(id); if(el) el.onclick=fn;};
-  const go=(a,v)=>()=>act(a,v).then(load).catch(()=>{});
-  on('prev',go('prev')); on('open',go('open')); on('lock',go('lock')); on('reveal',go('reveal')); on('next',go('next'));
-  on('endsess',()=>{ if(pipWin.confirm('End this session? Candidates will see their final score and rank.')) act('end_session').then(load); });
-  on('endsess2',()=>{ if(pipWin.confirm('End this session?')) act('end_session').then(load); });
-  on('newround',()=>{ if(pipWin.confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
-  d.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ if(pipWin.confirm('Remove "'+x.dataset.rm+'" from this session?')) act('remove_player',{name:x.dataset.rm}).then(load); });
-  on('gotobtn',()=>act('goto',{question:+d.getElementById('goto').value}).then(load));
+  // same single-flight guard as the main page
+  const run=(a,v)=>{ if(busy) return; busy=true; render(true); act(a,v).then(load).catch(()=>{}).finally(()=>{ busy=false; render(true); }); };
+  ['prev','open','lock','reveal','next'].forEach(id=>on(id,()=>run(id)));
+  const end=()=>{ if(pipWin.confirm(`End "${st.quiz_title}" now?\n\nAnswers close and every participant sees their final score and rank. The session cannot be reopened; use New round to run this quiz again.`)) run('end_session'); };
+  on('endsess',end); on('endsess2',end);
+  on('newround',()=>{ if(pipWin.confirm(`Start a new round of "${st.quiz_title}"?\n\nThis starts a fresh session from question 1. Participants are sent back to the join screen and must rejoin; all scores restart at 0. This round's results stay in the database.`)) run('new_round'); });
+  d.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ const n=x.dataset.rm; if(pipWin.confirm(`Remove ${n} from this session?\n\nTheir answers and score are taken out of this session's results. If they answer another question from the same phone they will reappear with a fresh score.`)) run('remove_player',{name:n}); });
   tickPip(); fitPip();
 }
 // Remote: keep names whole — size the name column to the longest name, then hide Answer, Time, Q pts (in that order) if the window is too narrow

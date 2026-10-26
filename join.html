@@ -12,7 +12,7 @@
   #qr{background:#fff;padding:2vh;border-radius:2vh;line-height:0}
   .url{font-size:3.2vw;font-weight:700;letter-spacing:.01em;word-break:break-all}
   .steps{color:#8d9aa8;font-size:2vw}
-  .count{position:fixed;bottom:3vh;right:3vw;color:#8d9aa8;font-size:2vw}
+  .count{position:fixed;bottom:3vh;right:3vw;color:#8d9aa8;font-size:2vw;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -34,7 +34,7 @@ async function load(){
   const {data:st} = await sb.from('quiz_state').select('quiz_title,session_name,session_id,ended').eq('id',1).single();
   if(!st) return;
   document.getElementById('title').textContent = st.quiz_title || 'Join the quiz';
-  document.getElementById('sub').textContent = st.session_name || '';
+  document.getElementById('sub').textContent = st.ended ? 'This session has ended — wait for the host to start a new one' : (st.session_name || '');
   const {count} = await sb.from('players').select('*',{count:'exact',head:true}).eq('session_id',st.session_id);
   document.getElementById('count').textContent = count ? `${count} joined` : '';
 }

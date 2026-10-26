@@ -10,11 +10,13 @@
   .sub{color:#8d9aa8;font-size:2.2vw}
   .lbh{display:flex;align-items:baseline;gap:2vw;margin:4vh 0 2vh;font-size:3vw;font-weight:700}
   .lbh .sub{font-weight:400;font-size:1.8vw}
-  .bar{display:flex;align-items:center;gap:2vw;margin:2.2vh 0}
+  .bar{display:flex;align-items:center;gap:2vw;margin:2.2vh 0;font-variant-numeric:tabular-nums}
+  .r{width:4vw;text-align:right;font-size:2.4vw;color:#8d9aa8;font-weight:600}
   .n{width:28vw;font-size:3.2vw;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .t{flex:1;background:#1a2129;border-radius:1.5vw;height:7vh;overflow:hidden}
   .f{height:100%;background:#4f8cff;border-radius:1.5vw;transition:width .6s;min-width:.5vw}
-  .bar:first-child .f{background:#f1c40f}
+  @media(prefers-reduced-motion:reduce){.f{transition:none}}
+  .bar:first-child .f{background:#f1c40f} .bar:first-child .s{color:#f1c40f}
   .s small{font-size:1.6vw;color:#8d9aa8;font-weight:500}
   .m{font-size:3.5vw;width:5vw;text-align:center}
   .s{width:14vw;text-align:right;font-size:3.6vw;font-weight:800}
@@ -44,8 +46,8 @@ async function load(){
   document.getElementById('title').textContent=st.quiz_title;
   document.getElementById('date').textContent=st.session_name;
   document.getElementById('lbtitle').textContent=st.ended?'🎉 Final results':'Leaderboard';
-  document.getElementById('sub').textContent=st.ended?'':revealedN+' of '+st.total_questions+' revealed';
-  document.getElementById('list').innerHTML=scores.map((x,i)=>`<div class="bar">${st.ended&&i<3?'<div class="m">'+['🥇','🥈','🥉'][i]+'</div>':''}<div class="n">${avs[x.n]||''} ${esc(x.n)}</div><div class="t"><div class="f" style="width:${(x.s/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.s}</div></div>`).join('');
+  document.getElementById('sub').textContent=st.ended?'ties broken by quicker total time':revealedN+' of '+st.total_questions+' revealed';
+  document.getElementById('list').innerHTML=scores.map((x,i)=>`<div class="bar">${st.ended&&i<3&&x.s>0?'<div class="m">'+['🥇','🥈','🥉'][i]+'</div>':'<div class="r">'+(i+1)+'</div>'}<div class="n">${avs[x.n]||''} ${esc(x.n)}</div><div class="t"><div class="f" style="width:${(x.s/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.s}</div></div>`).join('');
 }
 sb.channel('board')
   .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},load)
