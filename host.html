@@ -309,7 +309,7 @@ function candTable(withRemove){
     return `<div class="tr"><span class="rk">${i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span><span class="ans ${cls}">${ans}</span>`+
       `<span class="n">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</span><span class="n tot">${x.p}</span>`+
       (withRemove?`<button class="rmx" data-rm="${esc(x.g)}" title="Remove from session" aria-label="Remove ${esc(x.g)}">✕</button>`:'')+`</div>`; }).join('');
-  return `<div class="ctab${withRemove?'':' norm'}"><div class="tr th"><span class="rk">#</span><span>Candidate</span><span class="c">Ans</span><span class="n">Time</span><span class="n">Q pts</span><span class="n">Total</span>${withRemove?'<span></span>':''}</div>${rows}</div>`;
+  return `<div class="ctab${withRemove?'':' norm'}"><div class="tr th"><span class="rk">#</span><span class="nm">Candidate</span><span class="c">Ans</span><span class="n">Time</span><span class="n">Q pts</span><span class="n">Total</span>${withRemove?'<span></span>':''}</div>${rows}</div>`;
 }
 
 // ---------- render ----------
@@ -569,7 +569,7 @@ const PIP_CSS = `
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
   .pbar{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"top top" "ctl bot" "mid mid";gap:8px;padding:8px 10px 10px;box-sizing:border-box;height:100vh}
   .prow.top{grid-area:top} .prow.ctl{grid-area:ctl} .prow.bot{grid-area:bot;align-self:start}
-  .prow.mid{grid-area:mid;min-height:0;overflow-y:auto;align-content:flex-start}
+  .prow.mid{grid-area:mid;min-height:0;overflow:auto;align-content:flex-start}
   .pgrp.sess button,.pgrp button.wl{width:auto;gap:6px;font-size:12px;padding:0 10px}
   button svg{width:16px;height:16px}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -605,7 +605,9 @@ const PIP_CSS = `
   .ans.right{background:#2ecc71;border-color:#2ecc71;color:#06220f}
   .ans.wrong{background:#e74c3c;border-color:#e74c3c;color:#fff}
   .rmx{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:#e74c3c;color:#fff;font-size:12px;border-radius:6px}
-  .tr{grid-template-columns:18px minmax(0,1fr) 30px 44px 40px 44px;gap:6px}
+  .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 30px 44px 40px 44px;gap:6px}
+  .ctab.h1 .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 30px 40px 44px} .ctab.h1 .tr > :nth-child(4){display:none}
+  .ctab.h2 .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 30px 44px} .ctab.h2 .tr > :nth-child(4),.ctab.h2 .tr > :nth-child(5){display:none}
   .cnt{color:#8d9aa8;font-size:12px;text-align:right;margin-top:4px}
   .status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#2b3642;color:#8d9aa8;white-space:nowrap}
   .status.open{background:#1d2f4d;color:#9cc0ff} .status.revealed{background:#163d2b;color:#2ecc71} .status.locked,.status.timeup{background:#3a3415;color:#f1c40f} .status.ended{background:#4a1f1b;color:#ff8a7f}
@@ -644,7 +646,7 @@ async function openPresenter(){
   try{
     let sz={width:420,height:600}; try{ sz=JSON.parse(localStorage.getItem('quiz_pip_size'))||sz; }catch(e){}
     pipWin = await documentPictureInPicture.requestWindow({width:sz.width,height:sz.height});
-    pipWin.addEventListener('resize',()=>{ try{ localStorage.setItem('quiz_pip_size',JSON.stringify({width:pipWin.innerWidth,height:pipWin.innerHeight})); }catch(e){} });
+    pipWin.addEventListener('resize',()=>{ fitPip(); try{ localStorage.setItem('quiz_pip_size',JSON.stringify({width:pipWin.innerWidth,height:pipWin.innerHeight})); }catch(e){} });
   }catch(e){ toast('Could not open the remote: '+e.message, true); return; }
   const st=pipWin.document.createElement('style'); st.textContent=PIP_CSS; pipWin.document.head.appendChild(st);
   pipWin.document.title='QuizApp remote';
@@ -693,7 +695,15 @@ function renderPip(){
   on('endsess2',()=>{ if(pipWin.confirm('End this session?')) act('end_session').then(load); });
   on('newround',()=>{ if(pipWin.confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+d.getElementById('goto').value}).then(load));
-  tickPip();
+  tickPip(); fitPip();
+}
+// Remote: keep names whole — size the name column to the longest name, then hide Time, then Q pts, if the window is too narrow
+function fitPip(){
+  if(!pipWin||pipWin.closed) return; const t=pipWin.document.querySelector('.ctab'); if(!t) return;
+  t.classList.remove('h1','h2'); t.style.removeProperty('--nmw');
+  let w=0; t.querySelectorAll('.nm').forEach(n=>w=Math.max(w,n.scrollWidth));
+  t.style.setProperty('--nmw',Math.ceil(w)+'px');
+  for(const c of ['h1','h2']){ if(t.scrollWidth<=t.clientWidth) break; t.classList.add(c); }
 }
 function tickPip(){
   if(!pipWin||pipWin.closed||!st) return; const el=pipWin.document.getElementById('ptimer'); if(!el) return;
