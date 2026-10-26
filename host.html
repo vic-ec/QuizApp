@@ -441,7 +441,7 @@ function play(){
   const completeCard = complete ? `<div class="complete">
       <div class="h">🎉 Quiz complete</div>
       <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} players</div>
-      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span></div>`:'').join('')}</div>
+      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span><span class="muted" style="display:block;font-size:11px">${(scores[i].t/1000).toFixed(1)} s total</span></div>`:'').join('')}</div>
       ${st.ended?'<p class="muted">Candidates are seeing their final score and rank.</p>':'<p class="muted">Press <b>Finish</b> to show candidates their final score and rank.</p>'}
     </div>` : '';
 

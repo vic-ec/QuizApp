@@ -52,6 +52,7 @@
   .final .pts{font-size:56px;font-weight:800;color:var(--warn)}
   /* leaderboard table — same look as the host's candidates table */
   .lb{display:flex;flex-direction:column;margin:12px 0;text-align:left}
+  .lb.final .tr{grid-template-columns:26px minmax(0,1fr) 52px 68px 56px}
   .lb .tr{display:grid;grid-template-columns:26px minmax(0,1fr) 52px 48px 56px;gap:8px;align-items:center;min-height:34px;padding:3px 6px;font-size:14px;border-radius:6px}
   .lb .tr + .tr{border-top:1px solid var(--line)}
   .lb .tr.th{min-height:0;padding-bottom:4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
@@ -141,8 +142,12 @@ async function load(){
   render();
 }
 
-function lbTable(rows){
-  return `<div class="lb"><div class="tr th"><span class="rk">#</span><span>Candidate</span><span class="n">Time</span><span class="n">Q pts</span><span class="n">Total</span></div>${rows.map((x,i)=>`<div class="tr${x.n===name?' me':''}"><span class="rk">${x.p>0&&i<3?'<span class="md">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm"><span class="av">${x.a||''}</span>${esc(x.n)}</span><span class="n">${x.q?(x.q.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${x.q?(x.q.points?'+'+x.q.points:'0'):''}</span><span class="n tot">${x.p}</span></div>`).join('')}</div>`;
+function lbTable(rows, final){
+  // after a reveal: this question's time and points; final results: number correct and total time (the tie-breaker)
+  const head = final ? `<span class="n">Correct</span><span class="n">Total time</span>` : `<span class="n">Time</span><span class="n">Q pts</span>`;
+  const cells = x => final ? `<span class="n">${x.c}</span><span class="n">${(x.t/1000).toFixed(1)} s</span>`
+    : `<span class="n">${x.q?(x.q.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${x.q?(x.q.points?'+'+x.q.points:'0'):''}</span>`;
+  return `<div class="lb${final?' final':''}"><div class="tr th"><span class="rk">#</span><span>Candidate</span>${head}<span class="n">Total</span></div>${rows.map((x,i)=>`<div class="tr${x.n===name?' me':''}"><span class="rk">${x.p>0&&i<3?'<span class="md">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm"><span class="av">${x.a||''}</span>${esc(x.n)}</span>${cells(x)}<span class="n tot">${x.p}</span></div>`).join('')}</div>`;
 }
 const totalPts = () => Object.values(mine).reduce((t,r)=>t+(r.points||0),0);
 const totalCorrect = () => Object.values(mine).filter(r=>r.is_correct===true).length;
@@ -189,7 +194,7 @@ function render(){
         <div class="small">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
         <div class="pts">${totalPts()} pts</div>
         <div style="font-size:18px">${medal} ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''} · ${totalCorrect()} of ${st.total_questions} correct</div>
-        ${lbTable(board.slice(0,10))}
+        ${lbTable(board.slice(0,10), true)}
         <button class="btn" id="exit">Exit quiz</button>
       </div>`;
     document.getElementById('exit').onclick = exit;
