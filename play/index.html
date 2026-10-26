@@ -228,7 +228,7 @@ function render(){
         <div style="font-size:26px;font-weight:800;margin-bottom:4px">Quiz complete!</div>
         <div class="small">${esc(st.quiz_title)} · ${esc(st.session_name)}</div>
         <div class="pts">${totalPts()} pts</div>
-        <div style="font-size:17px">${medal} ${rank?`${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''} · ${totalCorrect()} of ${st.total_questions} correct</div>
+        <div style="font-size:17px;text-align:center">${rank?`${medal?medal+' ':''}${rank}${['st','nd','rd'][rank-1]||'th'} of ${board.length}`:''}</div>
         <h3 style="margin:14px 0 0;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Final leaderboard</h3>
         ${lbTable(board.slice(0,10), true)}
         <button class="btn" id="exit">Exit quiz</button>
