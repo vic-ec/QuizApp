@@ -210,7 +210,7 @@ function render(){
   if(st.revealed){
     if(!my) banner = `<div class="banner bad">No answer submitted. Correct answer: ${correct||'?'}</div>`;
     else if(my.is_correct) banner = `<div class="banner ok">Correct! +${my.points} pts</div>`;
-    else banner = `<div class="banner bad">Not quite — correct answer: ${correct||'?'}</div>`;
+    else banner = `<div class="banner bad">You chose ${my.choice}. Correct = ${correct||'?'}</div>`;
     banner += q>=st.total_questions ? `<div class="banner wait">That was the last question — final results coming up…</div>` : `<div class="banner wait">Waiting for the next question…</div>`;
   } else if(my){
     banner = `<div class="banner wait">Submitted <b>${my.choice}</b>${my.elapsed_ms!=null?` in ${(my.elapsed_ms/1000).toFixed(1)} s`:''}. Waiting for the reveal…</div>`;
@@ -251,7 +251,7 @@ function render(){
 
 function leaderboardModal(q, my){
   const rank = board.findIndex(x=>x.n===name)+1;
-  const res = !my ? `<div class="res bad">No answer · correct: ${correct||'?'}</div>` : my.is_correct ? `<div class="res ok">Correct! +${my.points} pts</div>` : `<div class="res bad">Not quite · correct: ${correct||'?'}</div>`;
+  const res = !my ? `<div class="res bad">No answer · correct: ${correct||'?'}</div>` : my.is_correct ? `<div class="res ok">Correct! +${my.points} pts</div>` : `<div class="res bad">You chose ${my.choice}. Correct = ${correct||'?'}</div>`;
   const last = q>=st.total_questions;
   return `<div class="modal"><div class="box">
     ${res}
