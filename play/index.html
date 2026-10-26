@@ -142,6 +142,18 @@ async function load(){
   render();
 }
 
+function rulesList(){
+  const scoring = st.scoring==='flat'
+    ? '<li><b>100 points</b> per correct answer; wrong or no answer = 0</li>'
+    : '<li>Correct answers score by speed: fastest <b>100</b>, then <b>95</b>, <b>90</b>… (minimum 10). Wrong or no answer = 0</li>';
+  return `<ul style="text-align:left;margin:14px auto 0;padding-left:22px;line-height:1.6;max-width:340px">
+          <li><b>${st.total_questions}</b> question${st.total_questions===1?'':'s'}</li>
+          <li><b>${st.timer_seconds?st.timer_seconds+' seconds':'No time limit'}</b> per question</li>
+          <li><b>4</b> answer options (A–D), one correct</li>
+          ${scoring}
+          <li><b>Tied on points?</b> The candidate with the quicker total time on correct answers ranks higher</li>
+        </ul>`;
+}
 function lbTable(rows, final){
   // after a reveal: this question's time and points; final results: number correct and total time (the tie-breaker)
   const head = final ? `<span class="n">Correct</span><span class="n">Total time</span>` : `<span class="n">Time</span><span class="n">Q pts</span>`;
@@ -210,20 +222,17 @@ function render(){
         <div style="font-size:20px;font-weight:700;margin:6px 0 2px">${esc(name)}</div>
         <div class="small">you're in</div>
         <h2 style="margin-top:16px">${esc(st.quiz_title)}</h2>
-        <ul style="text-align:left;margin:14px auto 0;padding-left:22px;line-height:1.7;max-width:320px">
-          <li><b>${st.total_questions}</b> question${st.total_questions===1?'':'s'}</li>
-          <li><b>${st.timer_seconds?st.timer_seconds+' seconds':'No time limit'}</b> per question</li>
-          <li><b>4</b> answer options (A–D), one correct</li>
-          <li>${st.scoring==='flat'?'100 points per correct answer':'Faster correct answers score more — <b>submit as quickly as you can</b>'}</li>
-        </ul>
+        ${rulesList()}
         <div class="banner wait" style="margin-top:16px">Waiting for the host to start…</div>
         <div style="font-size:22px;font-weight:800;margin-top:14px">Good luck! 🍀</div>
         <div class="small" style="margin-top:10px"><a href="#" id="exitlink" style="color:var(--muted)">Exit quiz</a></div>
       </div></div>`;
     document.getElementById('exitlink').onclick=(e)=>{e.preventDefault(); exit();};
+    try{localStorage.setItem('quiz_intro_'+st.session_id,'1');}catch(e){}
     return;
   }
   const open = !st.locked && !st.revealed && st.question_opened_at && !expired();
+  const introKey = 'quiz_intro_'+st.session_id, showIntro = !localStorage.getItem(introKey);   // joined after the quiz started: show the rules once
   let banner='';
   if(st.revealed){
     if(!my) banner = `<div class="banner bad">No answer submitted. Correct answer: ${correct||'?'}</div>`;
@@ -258,7 +267,9 @@ function render(){
     ${banner}
     <div class="err">${esc(errMsg)}</div>
     <div class="small"><a href="#" id="exitlink" style="color:var(--muted)">Exit quiz</a></div>
-    ${st.revealed && lbDismissed!==q ? leaderboardModal(q, my) : ''}`;
+    ${st.revealed && lbDismissed!==q ? leaderboardModal(q, my) : ''}
+    ${showIntro ? `<div class="modal" id="intro"><div class="box"><h2 style="margin:0 0 4px;font-size:22px">${esc(st.quiz_title)}</h2><div class="small">How it works</div>${rulesList()}<button class="btn" id="introok" style="margin-top:16px">Got it</button></div></div>` : ''}`;
+  const io=document.getElementById('introok'); if(io) io.onclick=()=>{ try{localStorage.setItem(introKey,'1');}catch(e){} render(); };
   const cl=document.getElementById('lbclose'); if(cl) cl.onclick=()=>{ lbDismissed=q; render(); };
 
   app.querySelectorAll('button.opt').forEach(b=>b.onclick=()=>{ if(b.disabled) return; selected=b.dataset.o; errMsg=''; render(); });
