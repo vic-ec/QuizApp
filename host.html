@@ -170,10 +170,11 @@
   .qcard .complete{border-bottom:1px solid var(--line);padding-bottom:var(--gap)}
   .complete .podium div{max-width:30%}
   .ctab{display:flex;flex-direction:column}
-  .tr{display:grid;grid-template-columns:22px minmax(0,1fr) 56px 52px 48px 56px 28px;gap:8px;align-items:center;min-height:calc(var(--h) + 6px);padding:3px 0;font-size:14px}
+  .tr{display:grid;grid-template-columns:26px minmax(0,1fr) 56px 52px 48px 56px 28px;gap:8px;align-items:center;min-height:calc(var(--h) + 6px);padding:3px 0;font-size:14px}
   .tr + .tr{border-top:1px solid var(--line)}
   .tr.th{min-height:0;padding:0 0 4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
   .tr .rk{color:var(--muted);text-align:right;font-size:12px}
+  .rk .md{font-size:16px;line-height:1}
   .tr .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
   .tr .c{text-align:center}
   .tr .n{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -307,7 +308,7 @@ function candTable(withRemove){
   const rows = scoresFor().map((x,i)=>{ const a=cur[x.g];
     let ans='…', cls='';
     if(a){ if(st.revealed){ ans=a.choice; cls=a.is_correct?'right':'wrong'; } else { ans=st.locked?a.choice:'✓'; cls='done'; } }
-    return `<div class="tr"><span class="rk">${i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span><span class="ans ${cls}">${ans}</span>`+
+    return `<div class="tr"><span class="rk">${x.p>0&&i<3?'<span class="md">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span><span class="ans ${cls}">${ans}</span>`+
       `<span class="n">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</span><span class="n tot">${x.p}</span>`+
       (withRemove?`<button class="rmx" data-rm="${esc(x.g)}" title="Remove from session" aria-label="Remove ${esc(x.g)}">✕</button>`:'')+`</div>`; }).join('');
   return `<div class="ctab${withRemove?'':' norm'}"><div class="tr th"><span class="rk">#</span><span class="nm">Candidate</span><span class="c">Answer</span><span class="n">Time</span><span class="n">Q pts</span><span class="n">Total</span>${withRemove?'<span></span>':''}</div>${rows}</div>`;
@@ -594,10 +595,11 @@ const PIP_CSS = `
   .purple{background:#8e5cf6;color:#fff} .danger{background:#e74c3c;color:#fff} .primary{background:#4f8cff;color:#fff}
   .sm{height:28px;padding:0 10px;font-size:12px}
   .ctab{display:flex;flex-direction:column}
-  .tr{display:grid;grid-template-columns:22px minmax(0,1fr) 56px 52px 48px 56px 28px;gap:8px;align-items:center;min-height:calc(28px + 6px);padding:3px 0;font-size:13px}
+  .tr{display:grid;grid-template-columns:26px minmax(0,1fr) 56px 52px 48px 56px 28px;gap:8px;align-items:center;min-height:calc(28px + 6px);padding:3px 0;font-size:13px}
   .tr + .tr{border-top:1px solid #2b3642}
   .tr.th{min-height:0;padding:0 0 4px;font-size:11px;font-weight:700;color:#8d9aa8;text-transform:uppercase;letter-spacing:.04em}
   .tr .rk{color:#8d9aa8;text-align:right;font-size:12px}
+  .rk .md{font-size:15px;line-height:1}
   .tr .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
   .tr .c{text-align:center}
   .tr .n{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -608,10 +610,10 @@ const PIP_CSS = `
   .ans.wrong{background:#e74c3c;border-color:#e74c3c;color:#fff}
   .rmx{width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-size:11px;border-radius:8px}
   .rmx:hover{color:#ff8a7f;border-color:#e74c3c}
-  .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px 24px;gap:6px}
-  .ctab.h1 .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 40px 44px 24px} .ctab.h1 .tr > :nth-child(4){display:none}
-  .ctab.h2 .tr{grid-template-columns:18px minmax(var(--nmw,0px),1fr) 48px 44px 24px}
-  .ctab.h3 .tr{grid-template-columns:14px minmax(var(--nmw,0px),1fr) 30px 34px 24px;gap:4px} .ctab.h3 .tr > :nth-child(4),.ctab.h3 .tr > :nth-child(5){display:none} .ctab.h3 .tr.th .c{font-size:0} .ctab.h3 .tr.th .c::after{content:'Ans';font-size:11px} .ctab.h2 .tr > :nth-child(4),.ctab.h2 .tr > :nth-child(5){display:none}
+  .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px 24px;gap:6px}
+  .ctab.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 40px 44px 24px} .ctab.h1 .tr > :nth-child(4){display:none}
+  .ctab.h2 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 44px 24px}
+  .ctab.h3 .tr{grid-template-columns:20px minmax(var(--nmw,0px),1fr) 30px 34px 24px;gap:4px} .ctab.h3 .tr > :nth-child(4),.ctab.h3 .tr > :nth-child(5){display:none} .ctab.h3 .tr.th .c{font-size:0} .ctab.h3 .tr.th .c::after{content:'Ans';font-size:11px} .ctab.h2 .tr > :nth-child(4),.ctab.h2 .tr > :nth-child(5){display:none}
   .cnt{color:#8d9aa8;font-size:12px;text-align:right;margin-top:4px}
   .status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#2b3642;color:#8d9aa8;white-space:nowrap}
   .status.open{background:#1d2f4d;color:#9cc0ff} .status.revealed{background:#163d2b;color:#2ecc71} .status.locked,.status.timeup{background:#3a3415;color:#f1c40f} .status.ended{background:#4a1f1b;color:#ff8a7f}
