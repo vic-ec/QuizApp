@@ -131,8 +131,9 @@ async function load(){
         board = (g.data||[]).map(r=>r.name).map(n=>({n, a:avs[n],
           p:(all.data||[]).filter(x=>x.player===n).reduce((t,x)=>t+(x.points||0),0),
           c:(all.data||[]).filter(x=>x.player===n&&x.is_correct===true).length,
+          t:(all.data||[]).filter(x=>x.player===n&&x.is_correct===true).reduce((t,x)=>t+(x.elapsed_ms||0),0),
           q:(all.data||[]).find(x=>x.player===n&&x.question===s.current_question)}))
-          .sort((x,y)=>y.p-x.p||y.c-x.c||x.n.localeCompare(y.n));
+          .sort((x,y)=>y.p-x.p||x.t-y.t||x.n.localeCompare(y.n));   // ties: lower total time on correct answers wins
       }
     }
     net.style.display='none';

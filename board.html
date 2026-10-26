@@ -35,11 +35,11 @@ async function load(){
   if(!st) return;
   const [g,a] = await Promise.all([
     sb.from('players').select('name,avatar').eq('session_id',st.session_id),
-    sb.from('answers').select('player,is_correct,points').eq('session_id',st.session_id)
+    sb.from('answers').select('player,is_correct,points,elapsed_ms').eq('session_id',st.session_id)
   ]);
   const groups=(g.data||[]).map(r=>r.name), answers=a.data||[]; const avs={}; (g.data||[]).forEach(r=>avs[r.name]=r.avatar||'');
   const revealedN=(st.current_question-1)+(st.revealed?1:0);
-  const scores=groups.map(n=>{const m=answers.filter(x=>x.player===n);return {n,s:m.reduce((t,x)=>t+(x.points||0),0),c:m.filter(x=>x.is_correct===true).length}}).sort((x,y)=>y.s-x.s||y.c-x.c||x.n.localeCompare(y.n));
+  const scores=groups.map(n=>{const m=answers.filter(x=>x.player===n);const ok=m.filter(x=>x.is_correct===true);return {n,s:m.reduce((t,x)=>t+(x.points||0),0),c:ok.length,t:ok.reduce((t,x)=>t+(x.elapsed_ms||0),0)}}).sort((x,y)=>y.s-x.s||x.t-y.t||x.n.localeCompare(y.n));
   const maxP=Math.max(1,...scores.map(x=>x.s));
   document.getElementById('title').textContent=st.quiz_title;
   document.getElementById('date').textContent=st.session_name;

@@ -298,8 +298,9 @@ function tick(){
 }
 function scoresFor(){
   const shown = a => a.question!==st.current_question || st.revealed;   // don't count the live question before reveal
-  return players.map(g=>{ const m=answers.filter(a=>a.player===g && shown(a)); return {g, p:m.reduce((t,a)=>t+(a.points||0),0), c:m.filter(a=>a.is_correct===true).length}; })
-    .sort((x,y)=>y.p-x.p||y.c-x.c||x.g.localeCompare(y.g));
+  return players.map(g=>{ const m=answers.filter(a=>a.player===g && shown(a)); const ok=m.filter(a=>a.is_correct===true);
+      return {g, p:m.reduce((t,a)=>t+(a.points||0),0), c:ok.length, t:ok.reduce((t,a)=>t+(a.elapsed_ms||0),0)}; })
+    .sort((x,y)=>y.p-x.p||x.t-y.t||x.g.localeCompare(y.g));   // ties: lower total time on correct answers wins
 }
 const keyCount = (q) => Object.values(q.answer_key||{}).filter(v=>['A','B','C','D'].includes(v)).length;
 const liveActive = () => st && !st.ended && st.session_id;
@@ -377,7 +378,7 @@ function editor(){
       <div class="wide muted" style="margin-top:-6px">Shows your slides inside the live session page so you can run everything from one window. <b>Canva:</b> Share → More → Embed → copy (or just paste the design's view link). <b>PowerPoint:</b> OneDrive → File → Share → Embed. <b>Google Slides:</b> File → Share → Publish to web → Embed. The deck must be shared as viewable by link. You advance slides inside the pane; the app's buttons control the quiz only.</div>
       <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
       <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
-      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 90, 80… (min 50)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
+      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 95, 90… (min 10)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
     </div></div>
     <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="remove sm" id="resetkey">Reset answer key</button></div>
       <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
