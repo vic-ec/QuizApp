@@ -176,10 +176,11 @@
   .qcard{container-type:inline-size;display:flex;flex-direction:column;gap:var(--gap)}
   .qcard .complete{border-bottom:1px solid var(--line);padding-bottom:var(--gap)}
   .qgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--gap)}
-  .qgrid > .sec + .sec{border-top:1px solid var(--line);padding-top:var(--gap)}
+  .qright{display:flex;flex-direction:column;gap:var(--gap);min-width:0}
+  .qgrid > * + *,.qright > .sec + .sec{border-top:1px solid var(--line);padding-top:var(--gap)}
   @container (min-width:720px){
-    .qgrid{grid-template-columns:minmax(0,1fr) minmax(220px,300px) minmax(0,1fr)}
-    .qgrid > .sec + .sec{border-top:0;padding-top:0;border-left:1px solid var(--line);padding-left:var(--gap)}
+    .qgrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+    .qgrid > * + *{border-top:0;padding-top:0;border-left:1px solid var(--line);padding-left:var(--gap)}
   }
   .players,.lb{display:flex;flex-direction:column;gap:8px}
   .g{display:flex;align-items:center;gap:8px;min-height:36px;border:2px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:600;font-size:14px;min-width:0}
@@ -199,11 +200,11 @@
   .bar:first-child .f{background:var(--warn)}
   .bar .s{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
   .bar .s small{color:var(--muted);font-weight:500}
-  .dist{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-  .d{border-radius:12px;padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;border:3px solid transparent;color:#fff;font-weight:800;font-size:28px;line-height:1.1;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .d small{font-size:13px;font-weight:600;opacity:.9}
-  .d.A{background:var(--A)} .d.B{background:var(--B)} .d.C{background:var(--C);color:#2a2400;text-shadow:none} .d.D{background:var(--D);color:#06220f;text-shadow:none}
-  .d.correct{border-color:#fff;box-shadow:0 0 0 3px var(--ok)} .d.dim{opacity:.25}
+  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap)}
+  .d{border-radius:8px;height:38px;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid transparent;color:#fff;font-weight:700;font-size:13px}
+  .d b{font-size:18px}
+  .d.A{background:var(--A)} .d.B{background:var(--B)} .d.C{background:var(--C);color:#2a2400} .d.D{background:var(--D);color:#06220f}
+  .d.correct{border-color:#fff;box-shadow:0 0 0 2px var(--ok)} .d.dim{opacity:.3}
   .complete .podium div{max-width:30%}
   @container (max-width:420px){ .bar .s small{display:none} .bar .n{flex-basis:110px} }
   @container (min-width:720px) and (max-width:1100px){ .bar .s small{display:none} .bar .n{flex-basis:110px} }
@@ -504,9 +505,9 @@ function play(){
         return `<div class="${cls}"><span class="nm">${avatars[g]||''} ${esc(g)}</span><span class="c">${main}</span><span class="t">${sub}</span><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span></div>`;}).join('')}</div>`:''}</div>`;
   const leaderboardSec = `<div class="sec"><h2>Leaderboard <span class="muted">${revealedN} of ${st.total_questions} revealed</span></h2>
       ${scores.length?`<div class="lb">${scores.map((x,i)=>`<div class="bar"><span class="rk">${i+1}</span><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')}</div>`:'<p class="muted" style="margin:0">—</p>'}</div>`;
-  const spreadSec = `<div class="sec"><h2>Answers <span class="muted">Q${q}</span></h2>
-      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}">${o}<small>${dist[o]} ${dist[o]===1?'answer':'answers'}</small></div>`).join('')}</div></div>`;
-  const quizPanel = `<div class="card qcard">${completeCard}<div class="qgrid">${candidatesSec}${spreadSec}${leaderboardSec}</div></div>`;
+  const spreadSec = `<div class="sec"><h2>Answer spread <span class="muted">Q${q}</span></h2>
+      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}">${o}<b>${dist[o]}</b></div>`).join('')}</div></div>`;
+  const quizPanel = `<div class="card qcard">${completeCard}<div class="qgrid">${candidatesSec}<div class="qright">${spreadSec}${leaderboardSec}</div></div></div>`;
   if(showSlides){
     return `<div class="live slides">
       <div class="a-main">${controlPanel}${slidePane}</div>
@@ -584,7 +585,7 @@ const PIP_CSS = `
   .pbar{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"top top" "ctl bot" "mid mid";gap:8px;padding:8px 10px 10px;box-sizing:border-box;height:100vh}
   .prow.top{grid-area:top} .prow.ctl{grid-area:ctl} .prow.bot{grid-area:bot;align-self:start}
   .prow.mid{grid-area:mid;min-height:0;overflow-y:auto;align-content:flex-start}
-  .pgrp.sess button{width:auto;gap:6px;font-size:12px;padding:0 10px}
+  .pgrp.sess button,.pgrp button.wl{width:auto;gap:6px;font-size:12px;padding:0 10px}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .prow .sp{flex:1}
   .pgrp{display:flex;gap:6px;padding:6px;border:1px solid #2b3642;border-radius:10px;background:#141a21}
@@ -596,6 +597,7 @@ const PIP_CSS = `
   .toggle.on .sw{background:#4f8cff} .toggle.on .sw::after{left:15px;background:#fff}
   .pq{font-weight:800;font-size:22px;white-space:nowrap} .pq small{font-size:12px;color:#8d9aa8}
   .ptimer{font-weight:800;font-size:24px;min-width:44px;text-align:center;color:#4f8cff;font-variant-numeric:tabular-nums}
+  .ptimer{margin-left:auto}
   .ptimer.low{color:#e74c3c} .ptimer.up{color:#f1c40f;font-size:12px}
   .pctl{display:flex;gap:6px}
   button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:0 12px;height:36px;cursor:pointer;background:#2b3642;color:#e8edf2;white-space:nowrap}
@@ -617,14 +619,12 @@ const PIP_CSS = `
   .scr{display:flex;align-items:center;gap:8px;padding:4px 0} .scr .t{flex:1;font-weight:600}
   .iconbtn{background:transparent;border:1px solid #2b3642;padding:4px 8px;height:auto;color:#8d9aa8} .iconbtn:hover{color:#fff}
   .closex{margin-left:auto}
-  .pwr{background:#0f1419;color:#8d9aa8;width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid #2b3642;margin-left:auto}
-  .pwr:hover{color:#ff8a7f;border-color:#e74c3c}
   .prow.top .sp{display:none}
   .pgrp{flex-wrap:wrap}
   .plist{display:none}
   @media (max-width:560px){
     .pbar{gap:10px}
-    .prow.top{justify-content:space-between}
+    .prow.top{justify-content:flex-start}
     .pq{font-size:26px} .ptimer{font-size:30px;min-width:56px}
     .pgrp{width:100%;gap:6px;padding:6px;flex-wrap:wrap}
     .pgrp button{min-width:0;height:40px}
@@ -644,7 +644,7 @@ const PIP_CSS = `
   }
   @media (max-height:230px){
     .pbar{gap:6px;padding:6px 8px}
-    .pq{font-size:18px} .ptimer{font-size:18px} .pwr{width:30px;height:30px}
+    .pq{font-size:18px} .ptimer{font-size:18px}
     .pgrp{padding:4px} .pgrp button,.pgrp.sess button{height:28px}
   }`;
 
@@ -678,14 +678,13 @@ function presenterBar(){
     <div class="pq">Q${q}<small>/${st.total_questions}</small></div>
     <span class="status ${status}">${label}</span>
     <div class="ptimer" id="ptimer"></div>
-    <button class="pwr" id="pclosetoggle" title="Close remote">${PI.power}</button>
     </div><div class="prow ctl">
     <div class="pgrp pctl">
-      <button id="prev" title="Previous question" ${q<=1||st.ended?'disabled':''}>${PI.prev}</button>
+      <button id="prev" class="wl" title="Previous question" ${q<=1||st.ended?'disabled':''}>${PI.prev}<span>Prev</span></button>
       <button class="ok" id="open" title="${st.question_opened_at&&!st.revealed?'Restart timer':'Open question'}" ${canOpen?'':'disabled'}>${st.question_opened_at&&!st.revealed?PI.restart:PI.open}</button>
       <button class="warn" id="lock" title="Lock answers" ${status==='open'?'':'disabled'}>${PI.lock}</button>
       <button class="orange" id="reveal" title="Reveal answer" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>${PI.eye}</button>
-      ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button id="next" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}>${PI.next}</button>`}
+      ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button id="next" class="wl" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}>${PI.next}<span>Next</span></button>`}
     </div>
   </div>
   <div class="prow mid"><div class="plb">${chips||'<span class="muted">No candidates yet</span>'}<span class="muted">${done}/${players.length} answered</span></div>
@@ -709,7 +708,6 @@ function renderPip(){
   on('endsess2',()=>{ if(pipWin.confirm('End this session?')) act('end_session').then(load); });
   on('newround',()=>{ if(pipWin.confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+d.getElementById('goto').value}).then(load));
-  on('pclosetoggle',()=>{ pipWin.close(); });
   tickPip();
 }
 function tickPip(){
