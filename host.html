@@ -438,7 +438,7 @@ function play(){
         <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
         ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next<span class="ico">${PI.next}</span></button>`}
       </div>
-      <div class="row" style="margin:10px 0 0;justify-content:flex-end;gap:14px">${toggle}<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top control bar"><span>Presenter bar</span><span class="sw"></span></label></div>
+      <div class="row" style="margin:10px 0 0;justify-content:flex-end;gap:14px">${toggle}<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Remote</span><span class="sw"></span></label></div>
     </div>`;
   const buttons = `<button id="prev" ${q<=1||st.ended?'disabled':''}><span class="ico">${PI.prev}</span>Previous</button>
         ${st.question_opened_at&&!st.revealed
@@ -455,7 +455,7 @@ function play(){
         <div class="timer" id="timer"></div>
         <div class="cq">Q${q}<small> / ${st.total_questions}</small><span class="muted"> · ${done}/${players.length} answered</span></div>
       </div>
-      <div class="crow"><div class="controls" style="flex:1">${buttons}</div>${toggle}<button class="sm" id="sessbtn">Session &amp; screens</button><label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top control bar"><span>Presenter bar</span><span class="sw"></span></label></div>
+      <div class="crow"><div class="controls" style="flex:1">${buttons}</div>${toggle}<button class="sm" id="sessbtn">Session &amp; screens</button><label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Remote</span><span class="sw"></span></label></div>
     </div>`;
   const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
       <div class="slidebar"><span class="muted">Click inside the slides, then use ← → to move. The quiz buttons do not change slides.</span>
@@ -561,7 +561,8 @@ const PI = {
   eye:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   flag:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
   round:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
-  stop:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6"/></svg>'
+  stop:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6"/></svg>',
+  power:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>'
 };
 let pipWin=null, pipSig='', pipSess=false;
 const PIP_CSS = `
@@ -599,6 +600,9 @@ const PIP_CSS = `
   .scr{display:flex;align-items:center;gap:8px;padding:4px 0} .scr .t{flex:1;font-weight:600}
   .iconbtn{background:transparent;border:1px solid #2b3642;padding:4px 8px;height:auto;color:#8d9aa8} .iconbtn:hover{color:#fff}
   .closex{margin-left:auto}
+  .pwr{background:#0f1419;color:#8d9aa8;width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid #2b3642;margin-left:auto}
+  .pwr:hover{color:#ff8a7f;border-color:#e74c3c}
+  .prow.top .sp{display:none}
   .pgrp{flex-wrap:wrap}
   .plist{display:none}
   @media (max-width:560px){
@@ -611,7 +615,6 @@ const PIP_CSS = `
     .pctl #open,.pctl #lock,.pctl #reveal{flex:1 1 calc(33.333% - 4px)}
     .pgrp.sess{width:100%}
     .pgrp.sess button{flex:1 1 calc(50% - 3px)}
-    .prow.ctl .toggle{width:100%;justify-content:flex-end}
     .prow.ctl{flex-wrap:wrap}
     .plb{display:none}
     .plist{display:flex;flex-direction:column;gap:5px;width:100%}
@@ -624,14 +627,14 @@ const PIP_CSS = `
 
 async function openPresenter(){
   if(pipWin && !pipWin.closed){ pipWin.focus(); return; }
-  if(!('documentPictureInPicture' in window)){ toast('The floating bar needs Microsoft Edge or Chrome (version 116 or newer).', true); return; }
+  if(!('documentPictureInPicture' in window)){ toast('The remote needs Microsoft Edge or Chrome (version 116 or newer).', true); return; }
   try{
     let sz={width:420,height:600}; try{ sz=JSON.parse(localStorage.getItem('quiz_pip_size'))||sz; }catch(e){}
     pipWin = await documentPictureInPicture.requestWindow({width:sz.width,height:sz.height});
     pipWin.addEventListener('resize',()=>{ try{ localStorage.setItem('quiz_pip_size',JSON.stringify({width:pipWin.innerWidth,height:pipWin.innerHeight})); }catch(e){} });
-  }catch(e){ toast('Could not open the floating bar: '+e.message, true); return; }
+  }catch(e){ toast('Could not open the remote: '+e.message, true); return; }
   const st=pipWin.document.createElement('style'); st.textContent=PIP_CSS; pipWin.document.head.appendChild(st);
-  pipWin.document.title='QuizApp presenter bar';
+  pipWin.document.title='QuizApp remote';
   pipWin.addEventListener('pagehide',()=>{ pipWin=null; pipSig=''; try{render(true);}catch(e){} });
   pipSig=''; renderPip(); render(true);
 }
@@ -652,6 +655,7 @@ function presenterBar(){
     <div class="pq">Q${q}<small>/${st.total_questions}</small></div>
     <span class="status ${status}">${label}</span>
     <div class="ptimer" id="ptimer"></div>
+    <button class="pwr" id="pclosetoggle" title="Close remote">${PI.power}</button>
     </div><div class="prow ctl">
     <div class="pgrp pctl">
       <button id="prev" title="Previous question" ${q<=1||st.ended?'disabled':''}>${PI.prev}</button>
@@ -665,7 +669,6 @@ function presenterBar(){
       <button class="danger" id="endsess2" title="End session" ${st.ended?'disabled':''}>${PI.stop}</button>
     </div>
     <span class="sp"></span>
-    <label class="toggle on" id="pclosetoggle" title="Close the presenter bar"><span>Presenter bar</span><span class="sw"></span></label>
   </div>
   <div class="prow"><div class="plb">${chips||'<span class="muted">No candidates yet</span>'}<span class="muted">${done}/${players.length} answered</span></div>
   <div class="plist">${rows||'<span class="muted">No candidates yet</span>'}<span class="cnt">${done}/${players.length} answered</span></div></div>
