@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quiz — Host</title>
 <style>
-  :root{--h:28px;--pad:10px;--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;
+  :root{--h:28px;--pad:10px;--kb:36px;--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;
         --accent:#4f8cff;--ok:#2ecc71;--bad:#e74c3c;--warn:#f1c40f;
         --A:#e74c3c;--B:#3498db;--C:#f1c40f;--D:#2ecc71;}
   *{box-sizing:border-box}
@@ -26,14 +26,15 @@
   .topbar .out:hover{color:var(--text)}
   .topbar .out .ico{display:none}
   @media(max-width:480px){.tabs{min-width:0;overflow-x:auto}}
+  @media(max-width:700px){:root{--h:40px;--kb:44px}}
   button.remove{background:#5a2a26;color:#ffb4ab}
   button.purple{background:#8e5cf6;color:#fff}
   .qz.new{background:#141a21;border:1px dashed var(--accent);color:#9cc0ff}
   .qz.new:hover{background:#1d2f4d;color:#fff}
   .links{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--pad)}
-  .lk{background:#0f1419;border:1px solid var(--line);border-radius:12px;padding:var(--pad);display:flex;flex-direction:column;gap:8px}
+  .lk{background:#0f1419;border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
   .lk b{font-size:15px}
-  .pinrow{display:flex;align-items:center;gap:10px}
+  .pinrow{display:flex;align-items:center;gap:8px}
   .pinrow code{font-size:16px;letter-spacing:.2em;background:#0f1419;border:1px solid var(--line);border-radius:8px;padding:0 12px;height:var(--h);line-height:calc(var(--h) - 2px);min-width:120px;text-align:center}
   .iconbtn{background:transparent;border:1px solid var(--line);border-radius:8px;padding:0;width:var(--h);height:var(--h);display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
   .iconbtn svg{width:16px;height:16px}
@@ -67,7 +68,7 @@
   button.sm{padding:0 10px;font-size:13px}
   button:disabled{opacity:.35;cursor:default}
   input,select{font:inherit;font-size:16px;padding:0 8px;height:var(--h);border-radius:8px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
-  label.f{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;font-size:13px;color:var(--muted);min-width:0}
+  label.f{display:flex;flex-direction:column;justify-content:flex-start;gap:6px;font-size:13px;color:var(--muted);min-width:0}
   label.f input,label.f select{width:100%}
   label.f input,label.f select{font-size:16px;color:var(--text)}
   .muted{color:var(--muted);font-size:13px}
@@ -96,13 +97,25 @@
   .modalbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;max-width:380px;width:100%;text-align:center}
   .modalbox p{margin:0 0 16px;font-size:16px}
   /* editor */
-  .form{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--pad)}
-  @media(max-width:700px){.form{grid-template-columns:1fr}}
+  .form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:700px){.form{grid-template-columns:1fr} .form.four{grid-template-columns:1fr 1fr!important}}
+  .hint2{font-size:12px;color:var(--muted)}
+  .ed-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap} .ed-head .sp{flex:1}
+  .ed-actions{display:flex;align-items:center;gap:8px} .ed-state{font-size:12px;white-space:nowrap}
+  .ed-bar{display:none}
+  details.help{margin-top:8px} details.help summary{cursor:pointer;color:#9cc0ff;font-size:13px;font-weight:600} details.help .muted{margin-top:8px;line-height:1.5}
+  @media(max-width:700px){
+    .ed-head .ed-actions{display:none}
+    .ed{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+    .ed-bar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;background:#121920;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+    .ed-bar .ed-actions{display:flex} .ed-bar .ed-state{flex:1} .ed-bar button{height:44px;padding:0 16px}
+  }
   .form .wide{grid-column:1/-1}
-  .key{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:8px}
-  .key .k{display:flex;align-items:center;gap:5px;font-size:13px}
-  .key .k span{width:26px;color:var(--muted);text-align:right}
-  .key .k button{padding:0;width:32px;font-size:13px;background:#0f1419;border:1px solid var(--line);color:var(--muted)}
+  .key{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px 16px;margin-top:8px}
+  .key .k{display:flex;align-items:center;gap:6px;font-size:13px}
+  .key .k span{width:26px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  .key .k.unset span{color:var(--warn)}
+  .key .k button{padding:0;width:var(--kb);height:var(--kb);font-size:14px;background:#0f1419;border:1px solid var(--line);color:var(--muted)}
   .key .k button.on{color:#fff;border-color:transparent}
   .key .k button.on.A{background:var(--A)} .key .k button.on.B{background:var(--B)}
   .key .k button.on.C{background:var(--C);color:#2a2400} .key .k button.on.D{background:var(--D);color:#06220f}
@@ -282,7 +295,7 @@ const app = document.getElementById('app'), net = document.getElementById('net')
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
 let quizzes=[], editing=null, confirmReset=false, helpOpen=false, linkShown='', menuOpen=null, busy=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
-let view = 'home';                          // home | edit | play | settings
+let view = 'home', editing0 = '';           // editing0 = saved snapshot, for the unsaved-changes guard                          // home | edit | play | settings
 const baseUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const candidateUrl = baseUrl + 'play/';
 const joinUrl = baseUrl + 'join.html';
@@ -325,7 +338,7 @@ function route(){
   const h = location.hash.replace('#','');
   if(h==='play'){ if(liveActive()||(st&&st.session_id)) view='play'; else { view='home'; toast('No live session — press Play on a quiz'); } }
   else if(h==='settings') view='settings';
-  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : activeQuizzes().find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{},embed_url:''} : (q?JSON.parse(JSON.stringify(q)):null); view = editing?'edit':'home'; }
+  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : activeQuizzes().find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{},embed_url:''} : (q?JSON.parse(JSON.stringify(q)):null); editing0 = JSON.stringify(editing); view = editing?'edit':'home'; }
   else view='home';
   lastSig=''; render(true);
 }
@@ -448,21 +461,29 @@ function home(){
 
 function editor(){
   const q = editing, n = Math.max(1, Math.min(100, +q.total_questions||1));
-  return `<div class="page">
-    <div class="row" style="justify-content:space-between;margin-bottom:14px"><h1>${q.id?'Edit quiz':'New quiz'}</h1>
-      <div class="row ed-actions"><button id="save" class="ok">Save quiz</button><button id="saveplay" class="primary">Save &amp; play</button><button class="grey" data-go="home">Cancel</button></div></div>
-    <div class="card"><div class="form">
-      <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz"></label>
-      <label class="f wide">Presentation embed link (optional)<input id="e_embed" value="${esc(q.embed_url||'')}" placeholder="Paste a Canva / PowerPoint / Google Slides share or embed link"></label>
-      <div class="wide muted" style="margin-top:-6px">Shows your slides inside the live session page so you can run everything from one window. <b>Canva:</b> Share → More → Embed → copy (or just paste the design's view link). <b>PowerPoint:</b> OneDrive → File → Share → Embed. <b>Google Slides:</b> File → Share → Publish to web → Embed. The deck must be shared as viewable by link. You advance slides inside the pane; the app's buttons control the quiz only.</div>
-      <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
-      <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
-      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — ${speedText()}</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — ${rule().flat} per correct</option></select></label>
+  const set = keyCount({answer_key:q.answer_key,total_questions:n});
+  const dirty = JSON.stringify(q)!==editing0;
+  const actions = `<div class="ed-actions">
+      <span class="muted ed-state">${dirty?'Unsaved changes':q.id?'All changes saved':''}</span>
+      <button id="save" class="primary">Save quiz</button>
+      <button id="saveplay">Save &amp; play</button></div>`;
+  return `<div class="page ed">
+    <div class="ed-head"><h1>${q.id?'Edit quiz':'New quiz'}</h1><button class="ghost sm" id="cancel">Cancel</button><span class="sp"></span>${actions}</div>
+    <div class="card"><h2>Quiz</h2><div class="form">
+      <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz" autocomplete="off"></label>
+      <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}" inputmode="numeric"></label>
+      <label class="f">Timer per question<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}" inputmode="numeric"><span class="hint2">seconds · 0 = no timer</span></label>
+      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — ${speedText()}</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — ${rule().flat} per correct</option></select><span class="hint2">Change the numbers in Settings → Scoring rule</span></label>
     </div></div>
-    <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="ghost sm" id="resetkey">Reset answer key</button></div>
-      <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
-      <div class="key">${Array.from({length:n},(_,i)=>i+1).map(i=>`<div class="k"><span>${i}</span>${['A','B','C','D'].map(o=>`<button class="${q.answer_key[i]===o?'on '+o:''}" data-kq="${i}" data-ko="${o}">${o}</button>`).join('')}</div>`).join('')}</div>
+    <div class="card"><h2>Slides <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">· optional</span></h2>
+      <label class="f">Presentation embed link<input id="e_embed" value="${esc(q.embed_url||'')}" placeholder="Paste a Canva / PowerPoint / Google Slides share or embed link" autocomplete="off"></label>
+      <details class="help"><summary>How to get the link</summary><div class="muted">Shows your slides inside the live session page so you can run everything from one window. <b>Canva:</b> Share → More → Embed → copy (or just paste the design's view link). <b>PowerPoint:</b> OneDrive → File → Share → Embed. <b>Google Slides:</b> File → Share → Publish to web → Embed. The deck must be shared as viewable by link. You advance slides inside the pane; the app's buttons control the quiz only.</div></details>
     </div>
+    <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="pill ${set>=n?'done':'nokey'}" style="margin-left:6px">${set} of ${n} set</span></h2><button class="ghost sm" id="resetkey" ${set?'':'disabled'}>Clear all</button></div>
+      <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
+      <div class="key">${Array.from({length:n},(_,i)=>i+1).map(i=>`<div class="k ${q.answer_key[i]?'':'unset'}" role="group" aria-label="Question ${i}"><span>${i}</span>${['A','B','C','D'].map(o=>`<button class="${q.answer_key[i]===o?'on '+o:''}" data-kq="${i}" data-ko="${o}" aria-pressed="${q.answer_key[i]===o}" aria-label="Question ${i}: ${o}">${o}</button>`).join('')}</div>`).join('')}</div>
+    </div>
+    <div class="ed-bar">${actions}</div>
     ${confirmReset?`<div class="modalbg" id="resetmodal"><div class="modalbox" role="dialog" aria-modal="true" aria-label="Clear answer key"><p>Clear the whole answer key for this quiz?</p><p class="muted" style="margin:-8px 0 16px">All ${n} answers are removed from the editor. Nothing is saved until you press Save quiz.</p><div class="row" style="justify-content:center"><button class="danger" id="resetyes">Yes, clear</button><button class="grey" id="resetno">No</button></div></div></div>`:''}
     </div>`;
 }
@@ -492,24 +513,24 @@ function settings(){
     {t:'Join screen', d:'Full-screen QR code and link for a second display.', u:joinUrl, win:'quizjoin'},
     {t:'Leaderboard', d:'Full-screen live scores for the projector.', u:baseUrl+'board.html', win:'quizboard'},
   ];
-  return `<div class="page"><h1 style="margin-bottom:14px">Settings</h1>
+  return `<div class="page"><h1 style="margin-bottom:12px">Settings</h1>
     <div class="card"><h2>Host PIN</h2>
-      <div class="pinrow"><code id="pinval">${pinShown?esc(pin):'•'.repeat(pin.length)}</code>
-        <button class="iconbtn" id="togglepin" title="${pinShown?'Hide PIN':'Show PIN'}">${pinShown?EYE:EYEOFF}</button></div>
-      <div class="row" style="margin-top:12px"><input id="newpin" placeholder="New PIN (min 4 characters)" style="flex:1;max-width:320px"><button id="setpin">Change PIN</button></div>
-      <p class="muted">Anyone with the PIN can control the quiz. Change it before each session if candidates may have seen it.</p></div>
+      <div class="pinrow"><code id="pinval" aria-label="Current PIN">${pinShown?esc(pin):'•'.repeat(pin.length)}</code>
+        <button class="iconbtn" id="togglepin" aria-pressed="${pinShown}" aria-label="${pinShown?'Hide PIN':'Show PIN'}" title="${pinShown?'Hide PIN':'Show PIN'}">${pinShown?EYE:EYEOFF}</button></div>
+      <form class="row" style="margin-top:12px" id="pinform"><label class="sr" for="newpin">New PIN</label><input id="newpin" placeholder="New PIN (min 4 characters)" autocomplete="off" style="flex:1;max-width:320px"><button class="primary" id="setpin" type="submit">Change PIN</button></form>
+      <p class="muted" style="margin-bottom:0">Anyone with the PIN can control the quiz. Change it before each session if candidates may have seen it.</p></div>
     <div class="card"><h2>Scoring rule</h2>
       <p class="muted" style="margin-top:0">Applies to every quiz. Speed: the fastest correct answer gets the top score, each later correct answer gets <i>step</i> fewer, never below the minimum. Shown to candidates when they join.</p>
-      <div class="form" style="grid-template-columns:repeat(4,1fr)">
+      <div class="form four" style="grid-template-columns:repeat(4,1fr)">
         <label class="f">Speed: top score<input id="sc_top" type="number" min="1" max="1000" value="${rule().top}"></label>
         <label class="f">Speed: step down<input id="sc_step" type="number" min="0" max="1000" value="${rule().step}"></label>
         <label class="f">Speed: minimum<input id="sc_min" type="number" min="0" max="1000" value="${rule().min}"></label>
         <label class="f">Flat: per correct<input id="sc_flat" type="number" min="1" max="1000" value="${rule().flat}"></label>
       </div>
-      <div class="row" style="margin-top:10px"><button class="ok" id="savescoring">Save scoring rule</button><span class="muted">Speed scores: ${speedText()} · Flat: ${rule().flat} each · Ties: quicker total time on correct answers ranks higher</span></div></div>
+      <div class="row" style="margin-top:12px"><button class="primary" id="savescoring">Save scoring rule</button><span class="muted">Speed scores: ${speedText()} · Flat: ${rule().flat} each · Ties: quicker total time on correct answers ranks higher</span></div></div>
     <div class="card"><h2>Screens &amp; links</h2>
       <div class="links">${links.map((l,i)=>`<div class="lk"><b>${l.t}</b><span class="muted">${l.d}</span>
-        <div class="row"><button class="primary sm" data-open="${l.u}" data-win="${l.win||'_blank'}" title="Open in new window">Open</button><button class="sm" data-copy="${l.u}">Copy link</button><button class="sm" data-showlink="${l.u}">Show link</button></div></div>`).join('')}</div></div>
+        <div class="row"><button class="primary sm" data-open="${l.u}" data-win="${l.win||'_blank'}" title="Open in new window">Open</button><button class="ghost sm" data-copy="${l.u}">Copy link</button><button class="ghost sm" data-showlink="${l.u}">Show link</button></div></div>`).join('')}</div></div>
   </div>`;
 }
 
@@ -646,14 +667,16 @@ function bind(){
   app.querySelectorAll('[data-delete]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.delete); if(!confirm(`Permanently delete "${q.title}" and its answer key? This cannot be undone.`)) return; const {error}=await sb.rpc('quiz_delete_forever',{p_pin:pin,p_id:+b.dataset.delete}); if(error) return toast(error.message,true); await loadQuizzes(); toast('Deleted'); render(true); });
   // editor
   const readForm=()=>{ editing.title=document.getElementById('e_title').value; editing.embed_url=normalizeEmbed(document.getElementById('e_embed').value); editing.total_questions=+document.getElementById('e_total').value||1; editing.timer_seconds=+document.getElementById('e_timer').value||0; editing.scoring=document.getElementById('e_scoring').value; };
-  ['e_title','e_embed','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el) el.onchange=readForm;});
+  ['e_title','e_embed','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el){ el.onchange=readForm; el.oninput=()=>{ readForm(); app.querySelectorAll('.ed-state').forEach(x=>x.textContent='Unsaved changes'); }; }});
+  on('cancel',()=>{ readForm(); if(JSON.stringify(editing)!==editing0 && !confirm('Discard unsaved changes to this quiz?')) return; go('home'); });
+  window.onbeforeunload = (view==='edit') ? ()=>{ try{readForm();}catch(e){} return JSON.stringify(editing)!==editing0 ? true : undefined; } : null;
   const et=document.getElementById('e_total'); if(et) et.onchange=()=>{ readForm(); render(true); };
   app.querySelectorAll('[data-kq]').forEach(b=>b.onclick=()=>{ readForm(); const i=b.dataset.kq,o=b.dataset.ko; if(editing.answer_key[i]===o) delete editing.answer_key[i]; else editing.answer_key[i]=o; render(true); });
   on('resetkey',()=>{ readForm(); confirmReset=true; render(true); });
   on('resetno',()=>{ confirmReset=false; render(true); });
   const rm=document.getElementById('resetmodal'); if(rm){ rm.onclick=(e)=>{ if(e.target===rm){ confirmReset=false; render(true); } }; document.getElementById('resetno').focus(); }
-  on('resetyes',()=>{ editing.answer_key={}; confirmReset=false; render(true); toast('Answer key cleared — remember to save'); });
-  const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); return null; } const q=await act('save_quiz',editing); editing.id=q.id; const {error:ee}=await sb.rpc('quiz_set_embed',{p_pin:pin,p_id:q.id,p_url:editing.embed_url||''}); if(ee){ toast(ee.message,true); } await loadQuizzes(); toast('Saved'); return q; };
+  on('resetyes',()=>{ editing.answer_key={}; confirmReset=false; render(true); toast('Answer key cleared — not saved yet'); });
+  const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); document.getElementById('e_title').focus(); return null; } const q=await act('save_quiz',editing); editing.id=q.id; const {error:ee}=await sb.rpc('quiz_set_embed',{p_pin:pin,p_id:q.id,p_url:editing.embed_url||''}); if(ee){ toast(ee.message,true); } await loadQuizzes(); editing0=JSON.stringify(editing); toast('Saved'); return q; };
   on('save',async()=>{ const q=await save(); if(q) render(true); });
   on('saveplay',async()=>{ const q=await save(); if(!q) return; if(liveActive() && !confirm(`A session of "${st.quiz_title}" is still running. Start this quiz instead?`)) return; await act('play',{id:q.id}); await load(); go('play'); });
   // settings
@@ -661,7 +684,7 @@ function bind(){
   app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{ window.open(b.dataset.open, b.dataset.win, b.dataset.win==='_blank'?'':'width=1000,height=720'); if(menuOpen){ menuOpen=null; render(true); } });
   app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); toast('Link copied'); }catch(e){ const ta=document.createElement('textarea'); ta.value=b.dataset.copy; document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); ta.remove(); toast(ok?'Link copied':'Could not copy — use Show link instead', !ok); } menuOpen=null; render(true); });
   on('savescoring',async()=>{ const v=id=>+document.getElementById(id).value; await act('set_scoring',{speed_top:v('sc_top'),speed_step:v('sc_step'),speed_min:v('sc_min'),flat_points:v('sc_flat')}); await load(); toast('Scoring rule saved'); });
-  on('setpin',async()=>{const p=document.getElementById('newpin').value.trim(); await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); toast('PIN changed'); document.getElementById('newpin').value='';});
+  const pf=document.getElementById('pinform'); if(pf) pf.onsubmit=async(e)=>{ e.preventDefault(); const p=document.getElementById('newpin').value.trim(); if(p.length<4){ toast('PIN must be at least 4 characters',true); return; } await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); toast('PIN changed'); document.getElementById('newpin').value=''; };
   // play
   // one in-flight host action at a time (buttons disable while busy)
   const run=(a,v)=>{ if(busy) return; busy=true; menuOpen=null; render(true); act(a,v).then(load).catch(()=>{}).finally(()=>{ busy=false; render(true); }); };
