@@ -579,7 +579,11 @@ const PI = {
 let pipWin=null, pipSig='', pipSess=false;
 const PIP_CSS = `
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
-  .pbar{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;box-sizing:border-box;min-height:100vh}
+  .pbar{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;box-sizing:border-box;height:100vh}
+  .pbar > .prow{flex:none}
+  .pbar > .prow.mid{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:flex-start}
+  .prow.bot .pgrp.sess{width:100%;box-sizing:border-box}
+  .pgrp.sess button{flex:1 1 0;width:auto;gap:6px;font-size:12px}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .prow .sp{flex:1}
   .pgrp{display:flex;gap:6px;padding:6px;border:1px solid #2b3642;border-radius:10px;background:#141a21}
@@ -635,6 +639,11 @@ const PIP_CSS = `
     .plist .r b{color:#f1c40f;font-weight:800} .plist .r i{font-style:normal;font-size:12px;color:#8d9aa8;width:16px;text-align:center}
     .plist .r.done{border-color:#4f8cff} .plist .r.right{border-color:#2ecc71} .plist .r.right i{color:#2ecc71} .plist .r.wrong{border-color:#e74c3c} .plist .r.wrong i{color:#ff8a7f}
     .plist .cnt{color:#8d9aa8;font-size:12px;text-align:right}
+  }
+  @media (max-height:230px){
+    .pbar{gap:6px;padding:6px 8px}
+    .pq{font-size:18px} .ptimer{font-size:18px} .pwr{width:30px;height:30px}
+    .pgrp{padding:4px} .pgrp button,.pgrp.sess button{height:28px}
   }`;
 
 async function openPresenter(){
@@ -676,14 +685,13 @@ function presenterBar(){
       <button class="orange" id="reveal" title="Reveal answer" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>${PI.eye}</button>
       ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button id="next" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}>${PI.next}</button>`}
     </div>
-    <div class="pgrp sess">
-      <button class="purple" id="newround" title="New round (same quiz, fresh players and scores)">${PI.round}</button>
-      <button class="danger" id="endsess2" title="End session" ${st.ended?'disabled':''}>${PI.stop}</button>
-    </div>
-    <span class="sp"></span>
   </div>
-  <div class="prow"><div class="plb">${chips||'<span class="muted">No candidates yet</span>'}<span class="muted">${done}/${players.length} answered</span></div>
+  <div class="prow mid"><div class="plb">${chips||'<span class="muted">No candidates yet</span>'}<span class="muted">${done}/${players.length} answered</span></div>
   <div class="plist">${rows||'<span class="muted">No candidates yet</span>'}<span class="cnt">${done}/${players.length} answered</span></div></div>
+  <div class="prow bot"><div class="pgrp sess">
+      <button class="purple" id="newround" title="New round (same quiz, fresh players and scores)">${PI.round}<span>New round</span></button>
+      <button class="danger" id="endsess2" title="End session" ${st.ended?'disabled':''}>${PI.stop}<span>End session</span></button>
+  </div></div>
   </div>`;
   return bar;
 }
