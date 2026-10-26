@@ -381,10 +381,13 @@ function candTable(withRemove){
   const rows = scoresFor().map((x,i)=>{ const a=cur[x.g];
     let ans='…', cls='';
     if(a){ if(st.revealed){ ans=a.choice; cls=a.is_correct?'right':'wrong'; } else { ans=st.locked?a.choice:'✓'; cls='done'; } }
-    return `<div class="tr"><span class="rk">${x.p>0&&i<3?'<span class="md">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span><span class="ans ${cls}">${ans}</span>`+
-      `<span class="n">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</span><span class="n tot">${x.p}</span>`+
+    const mid = st.ended   // session over: final standings (Correct · Total time) instead of this question's answer
+      ? `<span class="n">${x.c}</span><span class="n">${(x.t/1000).toFixed(1)} s</span><span class="n"></span>`
+      : `<span class="ans ${cls}">${ans}</span><span class="n">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</span>`;
+    return `<div class="tr"><span class="rk">${x.p>0&&i<3?'<span class="md">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span>${mid}<span class="n tot">${x.p}</span>`+
       (withRemove?`<button class="rmx" data-rm="${esc(x.g)}" title="Remove from session" aria-label="Remove ${esc(x.g)}">✕</button>`:'')+`</div>`; }).join('');
-  return `<div class="ctab${withRemove?'':' norm'}"><div class="tr th"><span class="rk">#</span><span class="nm">Candidate</span><span class="c">Answer</span><span class="n">Time</span><span class="n">Q pts</span><span class="n">Total</span>${withRemove?'<span></span>':''}</div>${rows}</div>`;
+  const head = st.ended ? `<span class="n" title="Correct answers">✓</span><span class="n" title="Total time on correct answers">Time</span><span class="n"></span>` : `<span class="c">Answer</span><span class="n">Time</span><span class="n">Q pts</span>`;
+  return `<div class="ctab${withRemove?'':' norm'}${st.ended?' final':''}"><div class="tr th"><span class="rk">#</span><span class="nm">Candidate</span>${head}<span class="n">Total</span>${withRemove?'<span></span>':''}</div>${rows}</div>`;
 }
 
 // ---------- render ----------
@@ -752,6 +755,10 @@ const PIP_CSS = `
   .rmx{width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-size:11px;border-radius:8px}
   .rmx:hover{color:#ff8a7f;border-color:#e74c3c}
   .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px 24px;gap:6px}
+  .ctab.final .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 32px 56px 0 44px 24px}
+  .ctab.final.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 52px 0 44px 24px}
+  .ctab.final.h2 .tr,.ctab.final.h3 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 0 44px 24px}
+  .fin{font-weight:800;font-size:14px;padding:2px 0 6px}
   /* narrowing order: hide Answer first, then Time, then Q pts; Total always stays */
   .ctab.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 44px 40px 44px 24px} .ctab.h1 .tr > :nth-child(3){display:none}
   .ctab.h2 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 40px 44px 24px} .ctab.h2 .tr > :nth-child(3),.ctab.h2 .tr > :nth-child(4){display:none}
@@ -823,7 +830,7 @@ function presenterBar(){
       ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button id="next" class="wl" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}><span>Next</span>${PI.next}</button>`}
     </div>
   </div>
-  <div class="prow mid"><div style="width:100%">${players.length?candTable(true):'<span class="muted">No candidates yet</span>'}<div class="cnt">${done}/${players.length} answered</div></div></div>
+  <div class="prow mid"><div style="width:100%">${st.ended?'<div class="fin">🎉 Final leaderboard</div>':''}${players.length?candTable(true):'<span class="muted">No candidates yet</span>'}<div class="cnt">${st.ended?'Session ended · ties broken by quicker total time':`${done}/${players.length} answered`}</div></div></div>
   <div class="prow bot"><div class="pgrp sess">
       <button class="purple" id="newround" title="New round (same quiz, fresh players and scores)">${PI.round}<span>New round</span></button>
       <button class="danger" id="endsess2" title="End session" ${st.ended?'disabled':''}>${PI.stop}<span>End session</span></button>
