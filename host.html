@@ -24,6 +24,8 @@
   .tabs .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(46,204,113,.25)}
   .topbar .out{font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:7px 12px}
   .topbar .out:hover{color:var(--text)}
+  .topbar .out .ico{display:none}
+  @media(max-width:700px){.topbar .out .lbl{display:none}.topbar .out .ico{display:inline}}
   button.remove{background:#5a2a26;color:#ffb4ab}
   button.purple{background:#8e5cf6;color:#fff}
   .qz.new{background:linear-gradient(180deg,#2a1f4d,#1a2129);border:1px dashed #8e5cf6;color:#c9b6ff}
@@ -60,12 +62,6 @@
   button.danger{background:var(--bad);color:#fff}
   button.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
   button.xl{font-size:clamp(13px,1.5vw,22px);padding:0 clamp(10px,1.6vw,26px);height:clamp(40px,4.6vw,64px);line-height:1;white-space:nowrap}
-  .controls button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
-  .controls .ico{display:inline-flex;line-height:0}
-  .controls{display:flex;gap:clamp(6px,.8vw,10px);flex-wrap:nowrap;align-items:stretch}
-  .controls button{height:clamp(40px,4.6vw,64px);line-height:1;padding-top:0;padding-bottom:0;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
-  .controls button.xl{flex:1 1 0}
-  .controls #prev{font-size:clamp(13px,1.5vw,22px);padding:0 clamp(10px,1.6vw,26px)}
   button.orange{background:#e67e22;color:#fff}
   button.magenta{background:#e0409a;color:#fff}
   .big{font-size:clamp(28px,3.6vw,48px)}
@@ -73,7 +69,6 @@
   h1{font-size:clamp(16px,1.7vw,22px)}
   @media(max-width:1200px){.layout{grid-template-columns:1fr 260px}}
   @media(max-width:900px){.layout{grid-template-columns:1fr}}
-  .controls{overflow-x:auto}
   .card{min-width:0}
   button.sm{padding:8px 12px;font-size:13px}
   button:disabled{opacity:.35;cursor:default}
@@ -99,12 +94,32 @@
   .ed-actions button{padding:8px 14px;font-size:13px}
   .layout.slides{grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);grid-template-areas:"ctrl side" "slides side";align-items:start}
   .a-ctrl{grid-area:ctrl} .a-slides{grid-area:slides} .a-side{grid-area:side}
-  .layout.slides .controls button.xl{font-size:clamp(12px,1.05vw,17px);padding:0 clamp(6px,.8vw,14px);height:clamp(38px,3.6vw,52px)}
-  .layout.slides .controls #prev{font-size:clamp(11px,.9vw,14px);padding:0 clamp(6px,.7vw,12px);height:clamp(38px,3.6vw,52px)}
   .layout.slides .big,.layout.slides .timer{font-size:clamp(24px,2.8vw,40px)}
   .layout.slides h1{font-size:clamp(15px,1.4vw,20px)}
   @media(max-width:1100px){.layout.slides{grid-template-columns:1fr;grid-template-areas:"ctrl" "slides" "side"}}
-  .card.compact{padding:10px 12px;margin-bottom:10px}
+  .card.compact{padding:10px 12px;margin-bottom:12px}
+  .page.wide{max-width:1500px}
+  .stats2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:900px){.stats2{grid-template-columns:1fr}}
+  .pgrp{display:flex;gap:6px;padding:5px;border:1px solid var(--line);border-radius:10px;background:#141a21;flex-wrap:nowrap}
+  .cbtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 12px;font-size:14px;font-weight:700;border-radius:8px;white-space:nowrap}
+  .cbtn svg{flex:none}
+  .crow.ctl{gap:10px}
+  .sm .lbl{margin-left:6px}
+  #sessbtn{display:inline-flex;align-items:center}
+  .slidebar .sm{display:inline-flex;align-items:center;gap:6px}
+  .compact .timer{font-size:26px}
+  @media(max-width:700px){
+    .cbtn{width:40px;padding:0} .cbtn .lbl{display:none}
+    .sm .lbl,#sessbtn .lbl,.slidebar .lbl{display:none}
+    .tabs a{padding:6px 10px;font-size:13px;white-space:nowrap} .topbar{gap:8px;padding:10px 12px} .topbar .brand{font-size:16px}
+    .ctitle{max-width:100%;width:100%} .crow .sp{flex:1 1 100%;display:none}
+    .cq{width:100%;font-size:16px}
+    .crow.ctl{gap:8px} .crow.ctl .pgrp{flex:1 1 auto} .crow.ctl .toggle{font-size:12px}
+    .compact .timer{font-size:22px}
+    .big{font-size:26px}
+    .layout{padding:12px;gap:12px} .page{padding:12px}
+  }
   .crow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .crow + .crow{margin-top:8px}
   .crow .sp{flex:1}
@@ -112,9 +127,6 @@
   .cq{font-size:18px;font-weight:800;white-space:nowrap} .cq small{font-size:12px;color:var(--muted);font-weight:600} .cq .muted{font-size:12px;font-weight:500}
   .compact .timer{font-size:22px} .compact .timer.up{font-size:14px}
   .compact .pill{padding:2px 8px;font-size:11px}
-  .compact .controls{gap:6px}
-  .compact .controls button.xl{height:34px;font-size:13px;padding:0 8px}
-  .compact .controls #prev{height:34px;font-size:13px;padding:0 8px}
   .compact .toggle{font-size:12px} .compact #sessbtn{padding:7px 10px;font-size:12px;white-space:nowrap}
   .modalbox.sess{max-width:520px;text-align:left;max-height:90vh;overflow:auto}
   .modalbox.sess .card{margin-bottom:12px}
@@ -200,7 +212,7 @@ const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
-let quizzes=[], editing=null, confirmReset=false, sessOpen=false, linkShown='', slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
+let quizzes=[], editing=null, confirmReset=false, sessOpen=false, linkShown='', helpOpen=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
 let view = 'home';                          // home | edit | play | settings
 const baseUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const candidateUrl = baseUrl + 'play/';
@@ -295,7 +307,7 @@ const liveActive = () => st && !st.ended && st.session_id;
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,sessOpen,linkShown]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,sessOpen,linkShown,helpOpen]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
@@ -313,7 +325,7 @@ function topbar(){
       ${tab('play','Live session',view==='play',liveActive()?'<span class="dot"></span>':'')}
       ${tab('settings','Settings',view==='settings')}
     </nav>
-    <span class="sp"></span><a href="#" id="logout" class="out">Log out</a></div>`;
+    <span class="sp"></span><a href="#" id="logout" class="out" title="Log out"><span class="lbl">Log out</span><span class="ico">⎋</span></a></div>`;
 }
 
 function home(){
@@ -374,6 +386,9 @@ function normalizeEmbed(v){
 let pinShown=false;
 const ICON_EXT='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
 const ICON_LINK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+const ICON_MORE='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg>';
+const ICON_HELP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>';
+const ICON_FS='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 const ICON_COPY='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 const EYE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYEOFF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
@@ -421,33 +436,21 @@ function play(){
   const embed = quiz && quiz.embed_url;
   const showSlides = embed && slidesOn;
   const toggle = embed ? `<label class="toggle rev ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span>Show slides</span><span class="sw"></span></label>` : '';
-  const controlsCard = `<div class="card">
-      <div class="row" style="justify-content:space-between;align-items:flex-start">
-        <div><h1>${esc(st.quiz_title)} <span style="color:var(--muted);font-weight:500">· ${esc(st.session_name)}</span></h1>
-          <div style="margin-top:6px"><span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No answer key for Q'+q+'</span>'}
-          <span class="pill waiting">${st.scoring==='flat'?'Flat':'Speed'} · ${st.timer_seconds?st.timer_seconds+' s':'no timer'}</span></div></div>
-        <div style="display:flex;gap:24px;align-items:flex-end"><div class="timer" id="timer"></div>
-          <div style="text-align:right"><div class="big">Q${q}<span style="font-size:20px;color:var(--muted)"> / ${st.total_questions}</span></div><div class="muted">${done} of ${players.length} answered</div></div></div>
-      </div>
-      <div class="controls" style="margin-top:14px">
-        <button id="prev" ${q<=1||st.ended?'disabled':''}><span class="ico">${PI.prev}</span>Previous</button>
-        ${st.question_opened_at&&!st.revealed
-          ? `<button class="ok xl" id="open" ${canOpen?'':'disabled'}>Restart timer</button>`
-          : `<button class="ok xl" id="open" ${canOpen?'':'disabled'}>Open question</button>`}
-        <button class="warn xl" id="lock" ${status==='open'?'':'disabled'}>Lock</button>
-        <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
-        ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next<span class="ico">${PI.next}</span></button>`}
-      </div>
-      <div class="row" style="margin:10px 0 0;justify-content:flex-end;gap:14px">${toggle}<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Remote</span><span class="sw"></span></label></div>
+  const remoteToggle = `<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Remote</span><span class="sw"></span></label>`;
+  const cb=(id,cls,icon,label,title,dis)=>`<button class="cbtn ${cls}" id="${id}" title="${title}" ${dis?'disabled':''}>${icon}<span class="lbl">${label}</span></button>`;
+  const restart = st.question_opened_at && !st.revealed;
+  const controlsRow = `<div class="pgrp pctl">
+      ${cb('prev','',PI.prev,'Previous','Previous question',q<=1||st.ended)}
+      ${cb('open','ok',restart?PI.restart:PI.open,restart?'Restart':'Open',restart?'Restart timer':'Open question',!canOpen)}
+      ${cb('lock','warn',PI.lock,'Lock','Lock answers',status!=='open')}
+      ${cb('reveal','orange',PI.eye,'Reveal','Reveal answer',st.revealed||!keyCur||!st.question_opened_at||st.ended)}
+      ${lastRevealed&&!st.ended?cb('endsess','magenta',PI.flag,'Finish','Finish & show results',false):cb('next','',PI.next,'Next','Next question',q>=st.total_questions||st.ended)}
+    </div>
+    <div class="pgrp sess">
+      ${cb('newround','purple',PI.round,'New round','New round: same quiz, fresh players and scores',false)}
+      ${cb('endsess2','danger',PI.stop,'End','End session',st.ended)}
     </div>`;
-  const buttons = `<button id="prev" ${q<=1||st.ended?'disabled':''}><span class="ico">${PI.prev}</span>Previous</button>
-        ${st.question_opened_at&&!st.revealed
-          ? `<button class="ok xl" id="open" ${canOpen?'':'disabled'}>Restart timer</button>`
-          : `<button class="ok xl" id="open" ${canOpen?'':'disabled'}>Open question</button>`}
-        <button class="warn xl" id="lock" ${status==='open'?'':'disabled'}>Lock</button>
-        <button class="orange xl" id="reveal" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>Reveal</button>
-        ${lastRevealed&&!st.ended?`<button class="magenta xl" id="endsess">Finish &amp; show results</button>`:`<button class="xl" id="next" ${q>=st.total_questions||st.ended?'disabled':''}>Next<span class="ico">${PI.next}</span></button>`}`;
-  const compactCard = `<div class="card compact">
+  const headerCard = `<div class="card compact">
       <div class="crow">
         <div class="ctitle"><b>${esc(st.quiz_title)}</b><span class="muted"> · ${esc(st.session_name)}</span></div>
         <span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No key for Q'+q+'</span>'}
@@ -455,11 +458,13 @@ function play(){
         <div class="timer" id="timer"></div>
         <div class="cq">Q${q}<small> / ${st.total_questions}</small><span class="muted"> · ${done}/${players.length} answered</span></div>
       </div>
-      <div class="crow"><div class="controls" style="flex:1">${buttons}</div>${toggle}<button class="sm" id="sessbtn">Session &amp; screens</button><label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Remote</span><span class="sw"></span></label></div>
+      <div class="crow ctl">${controlsRow}<span class="sp"></span>${toggle}${remoteToggle}<button class="sm" id="sessbtn" title="Session &amp; screens">${ICON_MORE}<span class="lbl">Session &amp; screens</span></button></div>
     </div>`;
   const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
-      <div class="slidebar"><span class="muted">Click inside the slides, then use ← → to move. The quiz buttons do not change slides.</span>
-        <button class="sm" id="slidesfs">Full screen</button><button class="sm" id="slidesnew">Open in new window</button></div>` : '';
+      <div class="slidebar"><span class="sp"></span>
+        <button class="iconbtn" id="slideshelp" title="How the slides pane works">${ICON_HELP}</button>
+        <button class="sm" id="slidesfs">${ICON_FS}<span class="lbl">Full screen</span></button><button class="sm" id="slidesnew">${ICON_EXT}<span class="lbl">New window</span></button></div>
+      ${helpOpen?`<div class="modalbg" id="helpmodal"><div class="modalbox" style="text-align:left"><p><b>Slides pane</b></p><p class="muted" style="margin:0 0 10px">Click inside the slides, then use ← → (or Canva's own arrows) to move between slides. The quiz buttons control the quiz only — they do not change slides.</p><p class="muted" style="margin:0 0 14px">Full screen shows the pane on this screen; New window opens the deck in its own window, which you can drag to the projector.</p><div class="row" style="justify-content:flex-end"><button class="grey sm" id="helpclose">Close</button></div></div></div>`:''}` : '';
   const candidatesCard = `<div class="card"><h2>Candidates — question ${q}</h2>
       ${players.length?'':'<p class="muted">Nobody has joined yet. Open the join screen on a second display.</p>'}
       <div class="players">${players.map(g=>{ const a=cur[g]; let cls='g'; if(a) cls += st.revealed?(a.is_correct?' right':' wrong'):' done';
@@ -484,19 +489,16 @@ function play(){
     ${linkShown?`<div class="modalbg" id="linkmodal" style="z-index:60"><div class="modalbox"><p style="margin-bottom:8px">Link</p><input readonly value="${esc(linkShown)}" style="width:100%;text-align:center" onfocus="this.select()"><div class="row" style="justify-content:center;margin-top:12px"><button class="primary sm" data-copy="${esc(linkShown)}">Copy link</button><button class="grey sm" id="linkclose">Close</button></div></div></div>`:''}`;
   const backCard = `<div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>`;
 
+  const modal = sessOpen ? `<div class="modalbg" id="sessmodal"><div class="modalbox sess"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>Session &amp; screens</b><button class="iconbtn" id="sessclose" aria-label="Close">✕</button></div>${sessionCard}${screensCard}${backCard}</div></div>` : '';
+  const stats = `${completeCard}${candidatesCard}<div class="stats2">${leaderboardCard}${spreadCard}</div>`;
   if(showSlides){
-    const modal = sessOpen ? `<div class="modalbg" id="sessmodal"><div class="modalbox sess"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>Session &amp; screens</b><button class="iconbtn" id="sessclose" aria-label="Close">✕</button></div>${sessionCard}${screensCard}${backCard}</div></div>` : '';
     return `<div class="layout slides">
-      <div class="a-ctrl">${compactCard}</div>
+      <div class="a-ctrl">${headerCard}</div>
       <div class="a-slides">${slidePane}</div>
-      <div class="a-side">${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
+      <div class="a-side">${stats}</div>
     </div>${modal}`;
   }
-  const modal2 = sessOpen ? `<div class="modalbg" id="sessmodal"><div class="modalbox sess"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>Session &amp; screens</b><button class="iconbtn" id="sessclose" aria-label="Close">✕</button></div>${sessionCard}${screensCard}${backCard}</div></div>` : '';
-  return `<div class="layout">
-    <div>${controlsCard}${completeCard}${candidatesCard}${leaderboardCard}${spreadCard}</div>
-    <div>${sessionCard}${screensCard}${backCard}</div>
-  </div>${modal2}`;
+  return `<div class="page wide">${headerCard}${stats}</div>${modal}`;
 }
 
 // ---------- events ----------
@@ -536,6 +538,8 @@ function bind(){
   on('newround',()=>{ if(confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
   on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
   on('sessbtn',()=>{ sessOpen=true; render(true); });
+  on('slideshelp',()=>{ helpOpen=true; render(true); }); on('helpclose',()=>{ helpOpen=false; render(true); });
+  const hm=document.getElementById('helpmodal'); if(hm) hm.onclick=(e)=>{ if(e.target===hm){ helpOpen=false; render(true); } };
   app.querySelectorAll('[data-showlink]').forEach(b=>b.onclick=()=>{ linkShown=b.dataset.showlink; render(true); });
   on('linkclose',()=>{ linkShown=''; render(true); });
   const lm=document.getElementById('linkmodal'); if(lm){ lm.onclick=(e)=>{ if(e.target===lm){ linkShown=''; render(true); } }; lm.querySelector('input').select(); }
