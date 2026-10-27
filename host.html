@@ -554,10 +554,11 @@ function play(){
       <div class="mh">Presentation</div>
       <button role="menuitem" data-open="${joinUrl}" data-win="quizjoin">${ICON_EXT}Open join screen</button>
       <button role="menuitem" data-copy="${joinUrl}">${ICON_COPY}Copy join link</button>
+      <button role="menuitem" data-showlink="${joinUrl}">${ICON_LINK}Show join link</button>
+      <hr>
       <button role="menuitem" data-open="${baseUrl}board.html" data-win="quizboard">${ICON_EXT}Open leaderboard</button>
       <button role="menuitem" data-copy="${baseUrl}board.html">${ICON_COPY}Copy leaderboard link</button>
-      ${embed?`<button role="menuitem" id="m_slides">${slidesOn?'Hide':'Show'} slides pane</button>`:''}
-      ${hasPip?`<button role="menuitem" id="m_pip">${pipOn?'Close':'Open'} floating remote</button>`:''}
+      <button role="menuitem" data-showlink="${baseUrl}board.html">${ICON_LINK}Show leaderboard link</button>
       <hr><div class="mh">Session</div>
       <button role="menuitem" id="newround">${PI.round}New round…</button>
       <button role="menuitem" class="dang" id="endsess2" ${dis(st.ended)}>${PI.stop}End session…</button>
@@ -601,12 +602,11 @@ function play(){
   }
 
   // ---- C. presentation tools (desktop; the same actions sit in the session menu on mobile)
-  const tools = `<div class="sec desk"><h2>Presentation</h2><div class="tools">
-      <div class="grp"><span class="lab">Join screen</span><button data-open="${joinUrl}" data-win="quizjoin">${ICON_EXT}Open</button><button data-copy="${joinUrl}">${ICON_COPY}Copy link</button><button data-showlink="${joinUrl}">${ICON_LINK}Show link</button></div>
-      <div class="grp"><span class="lab">Leaderboard</span><button data-open="${baseUrl}board.html" data-win="quizboard">${ICON_EXT}Open</button><button data-copy="${baseUrl}board.html">${ICON_COPY}Copy link</button><button data-showlink="${baseUrl}board.html">${ICON_LINK}Show link</button></div>
+  const tools = (embed||hasPip) ? `<div class="sec"><div class="tools">
       ${embed?`<div class="grp"><label class="toggle ${slidesOn?'on':''}" id="slidestoggle"><input type="checkbox" class="sr" ${slidesOn?'checked':''}><span>Show slides pane on this page</span><span class="sw"></span></label></div>`:''}
       ${hasPip?`<div class="grp"><label class="toggle ${pipOn?'on':''}" id="piptoggle"><input type="checkbox" class="sr" ${pipOn?'checked':''}><span>Floating remote</span><span class="sw"></span></label></div>`:''}
-    </div></div>`;
+      <span class="hint" style="margin-left:auto">Join screen and leaderboard links are under ⋯ Session options</span>
+    </div></div>` : '';
 
   const controlPanel = `<div class="card cpanel">${ctx}${qblock}${summary?`<div class="sec">${summary}</div>`:''}${tools}</div>`;
 
