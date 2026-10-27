@@ -84,6 +84,7 @@
   .lb .tr.me{background:#1d2f4d;box-shadow:inset 0 0 0 2px var(--accent)}
   .chip{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 7px;border-radius:6px;font-weight:700;font-size:12px;background:#2b3642;color:var(--muted)}
   .chip.right{background:#163d2b;color:var(--ok)} .chip.wrong{background:#4a1f1b;color:#ff8a7f} .chip.none{background:transparent;border:1px dashed var(--line);font-weight:500}
+  .homelink{color:#9cc0ff;font-size:14px;font-weight:600;text-decoration:none} .homelink:hover{text-decoration:underline}
   .err{color:#ff8a7f;font-size:14px;text-align:center;min-height:18px}
   .center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
   .join{width:100%;max-width:440px;text-align:center}
@@ -207,7 +208,7 @@ function render(){
         <div class="avatars">${AVATARS.map(a=>`<button class="${a===avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div>
         <button class="btn" id="join" ${closed?'disabled':''}>${closed?'Waiting for the host to start a quiz…':'Join quiz'}</button>
         <p class="small" style="margin:12px 0 0">Keep this page open. If you lose connection, just reload — you'll land back on the current question.</p>
-        <p class="small" style="margin:14px 0 0"><a href="../" style="color:var(--muted);text-decoration:none">← Back to QuizApp home</a></p>
+        <p class="small" style="margin:14px 0 0"><a href="../" class="homelink">← Back to QuizApp home</a></p>
       </div></div>`;
     const inp = document.getElementById('g'); inp.focus();
     app.querySelectorAll('.avatars button').forEach(b=>b.onclick=()=>{ avatar=b.dataset.a; try{localStorage.setItem('quiz_avatar',avatar);}catch(e){} app.querySelectorAll('.avatars button').forEach(x=>x.classList.toggle('sel',x.dataset.a===avatar)); });
