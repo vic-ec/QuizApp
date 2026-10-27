@@ -33,8 +33,8 @@ new QRCode(document.getElementById('qr'),{text:url,width:Math.min(window.innerHe
 async function load(){
   const {data:st} = await sb.from('quiz_state').select('quiz_title,session_name,session_id,ended').eq('id',1).single();
   if(!st) return;
-  document.getElementById('title').textContent = st.quiz_title || 'Join the quiz';
-  document.getElementById('sub').textContent = st.ended ? 'This session has ended — wait for the host to start a new one' : (st.session_name || '');
+  document.getElementById('title').textContent = st.ended ? 'Join the quiz' : (st.quiz_title || 'Join the quiz');
+  document.getElementById('sub').textContent = st.ended ? 'Waiting for the host to start…' : (st.session_name || '');
   const {count} = await sb.from('players').select('*',{count:'exact',head:true}).eq('session_id',st.session_id);
   document.getElementById('count').textContent = count ? `${count} joined` : '';
 }
