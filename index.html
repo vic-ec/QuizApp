@@ -46,10 +46,10 @@
   .phone .submit{margin-top:10px;height:36px;border-radius:10px;background:var(--accent);display:grid;place-items:center;font-weight:700;font-size:13px}
   .board{width:250px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column}
   .board h3{margin:0 0 10px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
-  .board .r{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;flex:1}
+  .board .r{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:0;min-height:0;border-top:1px solid var(--line);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;flex:1 1 0;color:var(--text)}
   .board .r:first-of-type{border-top:0}
-  .board .rk{color:var(--muted);text-align:center;font-size:12px;line-height:1;height:16px;display:grid;place-items:center}
-  .board .pts{font-weight:700} .board .r.lead .pts{color:var(--warn)}
+  .board .rk{color:var(--muted);text-align:center;font-size:12px;line-height:1;height:16px;overflow:hidden;display:grid;place-items:center}
+  .board .pts{font-weight:700} .board .r.top .pts{color:var(--warn)}
   .board .r .av{margin-right:4px}
   /* how it works */
   .how{padding-top:24px;padding-bottom:64px}
@@ -106,7 +106,7 @@
     </div>
     <div class="board" aria-hidden="true">
       <h3>Leaderboard</h3>
-      <div class="r lead"><span class="rk">🥇</span><span><span class="av">🐼</span>Bob</span><span class="pts">285</span></div>
+      <div class="r top"><span class="rk">🥇</span><span><span class="av">🐼</span>Bob</span><span class="pts">285</span></div>
       <div class="r"><span class="rk">🥈</span><span><span class="av">🦊</span>Alice</span><span class="pts">190</span></div>
       <div class="r"><span class="rk">🥉</span><span><span class="av">🐸</span>Chidi</span><span class="pts">180</span></div>
       <div class="r"><span class="rk">4</span><span><span class="av">🐨</span>Dana</span><span class="pts">95</span></div>
