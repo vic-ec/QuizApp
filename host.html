@@ -603,9 +603,8 @@ function play(){
 
   // ---- C. presentation tools (desktop; the same actions sit in the session menu on mobile)
   const tools = (embed||hasPip) ? `<div class="sec"><div class="tools">
-      ${embed?`<div class="grp"><label class="toggle ${slidesOn?'on':''}" id="slidestoggle"><input type="checkbox" class="sr" ${slidesOn?'checked':''}><span>Show slides pane on this page</span><span class="sw"></span></label></div>`:''}
+      ${embed?`<div class="grp"><label class="toggle ${slidesOn?'on':''}" id="slidestoggle"><input type="checkbox" class="sr" ${slidesOn?'checked':''}><span>Show slides pane</span><span class="sw"></span></label></div>`:''}
       ${hasPip?`<div class="grp"><label class="toggle ${pipOn?'on':''}" id="piptoggle"><input type="checkbox" class="sr" ${pipOn?'checked':''}><span>Floating remote</span><span class="sw"></span></label></div>`:''}
-      <span class="hint" style="margin-left:auto">Join screen and leaderboard links are under ⋯ Session options</span>
     </div></div>` : '';
 
   const controlPanel = `<div class="card cpanel">${ctx}${qblock}${summary?`<div class="sec">${summary}</div>`:''}${tools}</div>`;
