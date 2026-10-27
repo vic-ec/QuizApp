@@ -148,7 +148,7 @@ async function load(){
       if(s.ended || s.revealed){
         const [g,all] = await Promise.all([
           sb.from('players').select('name,avatar').eq('session_id',s.session_id),
-          sb.from('answers').select('player,question,points,is_correct,elapsed_ms').eq('session_id',s.session_id)
+          sb.from('answers').select('player,question,choice,points,is_correct,elapsed_ms').eq('session_id',s.session_id)
         ]);
         const avs = {}; (g.data||[]).forEach(r=>avs[r.name]=r.avatar||'');
         board = (g.data||[]).map(r=>r.name).map(n=>({n, a:avs[n],
