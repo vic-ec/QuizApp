@@ -98,6 +98,9 @@
   .modal .res{font-size:22px;font-weight:800;margin-bottom:2px}
   .modal .res.ok{color:var(--ok)} .modal .res.bad{color:#ff8a7f}
   .modal h3{margin:12px 0 4px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .cdbox{padding:28px 18px}
+  .cdt{font-size:26px;font-weight:800;margin-bottom:6px}
+  .cdn{font-size:96px;font-weight:800;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;margin:8px 0 4px}
   .modal .close{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;height:44px;padding:0 18px;font:inherit}
 </style>
 </head>
@@ -193,6 +196,7 @@ function remaining(){
   return Math.max(0, st.timer_seconds - (serverNow() - new Date(st.question_opened_at).getTime())/1000);
 }
 const expired = () => { const r=remaining(); return r!==null && r<=0; };
+const startsIn = () => (st && st.question_opened_at) ? Math.max(0, (new Date(st.question_opened_at).getTime() - serverNow())/1000) : 0;
 
 function render(){
   if(!name){
@@ -258,11 +262,12 @@ function render(){
     try{localStorage.setItem('quiz_intro_'+st.session_id,'1');}catch(e){}
     return;
   }
-  const open = !st.locked && !st.revealed && st.question_opened_at && !expired();
+  const counting = startsIn()>0 && !st.locked && !st.revealed;
+  const open = !st.locked && !st.revealed && st.question_opened_at && !expired() && !counting;
   const introKey = 'quiz_intro_'+st.session_id, showIntro = rulesOpen || !localStorage.getItem(introKey);   // joined after the quiz started: show the rules once
   // state badge, from the same flags the host uses
-  const state = st.revealed?'revealed':!st.question_opened_at?'waiting':my?'answered':st.locked?'locked':expired()?'timeup':'open';
-  const stateLabel = {waiting:'Not opened yet',open:'Answer now',answered:'Answered',timeup:'Time up',locked:'Answers locked',revealed:'Answer revealed'}[state];
+  const state = st.revealed?'revealed':!st.question_opened_at?'waiting':counting?'countdown':my?'answered':st.locked?'locked':expired()?'timeup':'open';
+  const stateLabel = {waiting:'Not opened yet',countdown:'Starting…',open:'Answer now',answered:'Answered',timeup:'Time up',locked:'Answers locked',revealed:'Answer revealed'}[state];
   let banner='', action='';
   if(st.revealed){
     if(!my) banner = `<div class="banner bad">No answer submitted · correct answer: ${correct||'?'}</div>`;
@@ -275,6 +280,8 @@ function render(){
     action = `<button class="submit quiet" disabled>Waiting for the reveal…</button>`;
   } else if(!st.question_opened_at){
     action = `<button class="submit quiet" disabled>Waiting for the host to open the question…</button>`;
+  } else if(counting){
+    action = `<button class="submit quiet" disabled>Get ready…</button>`;
   } else if(st.locked || expired()){
     banner = `<div class="banner lock">${expired()&&!st.locked?"Time's up":'Answers locked'} — you did not answer</div>`;
     action = `<button class="submit quiet" disabled>Waiting for the reveal…</button>`;
@@ -302,6 +309,7 @@ function render(){
     <div aria-live="polite">${banner}<div class="err">${esc(errMsg)}</div></div>
     <div class="actbar"><div class="in">${action}</div></div>
     ${st.revealed && lbDismissed!==q ? leaderboardModal(q, my) : ''}
+    ${counting && !showIntro ? `<div class="modal" role="dialog" aria-modal="true" aria-label="The quiz is about to start"><div class="box cdbox"><div class="cdt">Good luck 🍀</div><div class="small" style="font-size:16px">The quiz starts in…</div><div class="cdn" id="cdn" aria-live="polite">${Math.ceil(startsIn())}</div><div class="small">seconds</div></div></div>` : ''}
     ${showIntro ? `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="introh"><div class="box"><h2 id="introh" style="margin:0 0 4px;font-size:22px">${esc(st.quiz_title)}</h2><div class="small">How it works</div>${rulesList()}<button class="btn" id="introok" style="margin-top:16px">Got it</button></div></div>` : ''}`;
   const io=document.getElementById('introok'); if(io){ io.focus(); io.onclick=()=>{ rulesOpen=false; try{localStorage.setItem(introKey,'1');}catch(e){} render(); }; }
   const cl=document.getElementById('lbclose'); if(cl){ cl.focus(); cl.onclick=()=>{ lbDismissed=q; render(); }; }
@@ -329,8 +337,12 @@ function leaderboardModal(q, my){
     <button class="close" id="lbclose">Hide</button>
   </div></div>`;
 }
+let wasCounting=false;
 function tick(){
   const el=document.getElementById('timer'); if(!el||!st) return;
+  const si=startsIn();
+  if(si>0 && !st.locked && !st.revealed){ el.textContent=''; const n=document.getElementById('cdn'); if(n) n.textContent=Math.ceil(si); wasCounting=true; return; }
+  if(wasCounting){ wasCounting=false; render(); return; }
   const r=remaining();
   if(r===null){ el.textContent = st.timer_seconds?'':'no timer'; el.className='timer off'; return; }
   if(st.revealed || st.locked){ el.textContent=''; return; }

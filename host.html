@@ -170,6 +170,7 @@
   .qctl .pri{height:44px;padding:0 20px;font-size:15px;font-weight:700;background:var(--accent);color:#fff;border-radius:10px;min-width:180px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
   .qctl .pri.finish{background:var(--ok);color:#06220f}
   .qctl .pri:disabled{opacity:.45}
+  .qctl .pri.cd:disabled{opacity:1;background:#1d2f4d;color:#9cc0ff;font-variant-numeric:tabular-nums}
   .qctl .sec-btn{height:44px;padding:0 14px;border-radius:10px;background:#2b3642;display:inline-flex;align-items:center;gap:6px}
   .qsel{height:44px;min-width:84px;padding:0 32px 0 12px;border-radius:10px;background:#0f1419 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238d9aa8' stroke-width='3' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;-webkit-appearance:none;font-size:14px;font-weight:600;color:var(--text);border:1px solid var(--line)}
   .qctl .more{height:44px;width:44px;padding:0;border-radius:10px;background:#2b3642;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
@@ -372,13 +373,18 @@ async function load(){
   }catch(e){ net.style.display='block'; }
   render();
 }
+const startsIn = () => (st && st.question_opened_at) ? Math.max(0, (new Date(st.question_opened_at).getTime() - serverNow())/1000) : 0;
 function remaining(){
   if(!st || !st.timer_seconds || !st.question_opened_at) return null;
   return Math.max(0, st.timer_seconds - (serverNow() - new Date(st.question_opened_at).getTime())/1000);
 }
 let wasExpired=false;
+let wasCounting=false;
 function tick(){
   const el=document.getElementById('timer'); if(!el||!st) return;
+  const si=startsIn(), cd=document.getElementById('countdown');
+  if(si>0 && !st.locked && !st.revealed && !st.ended){ el.textContent=''; if(cd) cd.textContent='Starts in '+Math.ceil(si)+'…'; wasCounting=true; return; }
+  if(wasCounting){ wasCounting=false; render(true); return; }
   const r=remaining();
   if(r===null || st.revealed || st.locked || st.ended){ el.textContent=''; return; }
   el.textContent = r>0 ? Math.ceil(r) : "";
@@ -545,10 +551,10 @@ function play(){
   const L=SessionLogic, q=st.current_question, N=st.total_questions;
   const cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
   const done=players.filter(g=>cur[g]).length;
-  const r=remaining(), timeUp=r!==null&&r<=0;
-  const status=L.questionStatus(st,timeUp), stateLabel=L.STATUS_LABEL[status];
+  const si=startsIn(), r=remaining(), timeUp=si<=0&&r!==null&&r<=0;
+  const status=L.questionStatus(st,timeUp,si), stateLabel=L.STATUS_LABEL[status];
   const quiz=quizzes.find(x=>x.id===st.quiz_id); const keyCur=!!(quiz&&quiz.answer_key[q]);
-  const pri=L.primaryAction(st,keyCur,timeUp), secs=L.secondaryActions(st,keyCur,timeUp);
+  const pri=L.primaryAction(st,keyCur,timeUp,si), secs=L.secondaryActions(st,keyCur,timeUp,si);
   const scores=scoresFor(); const revealedN=(q-1)+(st.revealed?1:0);
   const complete=(st.revealed&&q>=N)||st.ended;
   const embed=quiz&&quiz.embed_url, showSlides=embed&&slidesOn;
@@ -577,7 +583,7 @@ function play(){
     </div></div>`;
 
   // ---- B. current question
-  const priBtn = `<button class="pri ${pri.id==='endsess'?'finish':''}" id="${pri.id}" ${dis(pri.disabled||busy)} ${pri.reason?`title="${pri.reason}"`:''}>${pri.label}${pri.id==='next'?PI.next:''}</button>`;
+  const priBtn = `<button class="pri ${pri.id==='endsess'?'finish':''} ${pri.countdown?'cd':''}" id="${pri.countdown?'countdown':pri.id}" ${dis(pri.disabled||busy)} ${pri.reason?`title="${pri.reason}"`:''} ${pri.start?'data-start="1"':''}>${pri.label}${pri.id==='next'?PI.next:''}</button>`;
   const moreMenu = menuOpen==='more' ? `<div class="menu left" role="menu" id="moremenu" aria-label="More question actions">
       ${secs.map(a=>`<button role="menuitem" id="${a.id}">${a.label}</button>`).join('')||'<button disabled>No other actions</button>'}</div>` : '';
   const qsel = `<label class="sr" for="qsel">Go to question</label><select class="qsel" id="qsel" ${dis(st.ended||busy)}>${Array.from({length:N},(_,i)=>i+1).map(i=>`<option value="${i}" ${i===q?'selected':''}>Q${i}</option>`).join('')}</select>`;
@@ -588,6 +594,7 @@ function play(){
       <div class="mwrap"><button class="more" id="morebtn" aria-label="More question actions" aria-haspopup="menu" aria-expanded="${menuOpen==='more'}" ${dis(!secs.length)}>${ICON_DOTS}</button>${moreMenu}</div>
     </div>`;
   const hint = st.ended ? '' : pri.reason ? `<div class="hint">${pri.reason} — add it under My quizzes → Edit. You can still move on.</div>`
+    : pri.start ? `<div class="hint">Start quiz gives everyone a ${L.START_COUNTDOWN}-second countdown, then question 1 opens and its timer runs.</div>`
     : !st.question_opened_at ? '<div class="hint">Moving to another question opens it straight away and starts the timer.</div>' : '';
   const qblock = `<div class="sec">
       <div class="qhead"><span class="qn">Question ${q} of ${N}</span><span class="state ${status}">${stateLabel}</span>
@@ -694,7 +701,8 @@ function bind(){
   // play
   // one in-flight host action at a time (buttons disable while busy)
   const run=(a,v)=>{ if(busy) return; busy=true; menuOpen=null; render(true); act(a,v).then(load).catch(()=>{}).finally(()=>{ busy=false; render(true); }); };
-  ['open','lock','reveal','next','prev'].forEach(id=>on(id,()=>run(id)));
+  ['lock','reveal','next','prev'].forEach(id=>on(id,()=>run(id)));
+  on('open',()=>{ const b=document.getElementById('open'); run('open', b&&b.dataset.start ? {delay:SessionLogic.START_COUNTDOWN} : {}); });
   const qs=document.getElementById('qsel'); if(qs) qs.onchange=()=>run('goto',{question:+qs.value});
   const end=()=>{ menuOpen=null; if(confirm(`End "${st.quiz_title}" now?\n\nAnswers close and every participant sees their final score and rank. The session cannot be reopened; use New round to run this quiz again.`)) run('end_session'); else render(true); };
   on('endsess',end); on('endsess2',end);
@@ -817,10 +825,10 @@ async function openPresenter(){
 }
 function presenterBar(){
   const L=SessionLogic, q=st.current_question, N=st.total_questions, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
-  const r=remaining(), timeUp=r!==null&&r<=0;
-  const status=L.questionStatus(st,timeUp);
+  const si=startsIn(), r=remaining(), timeUp=si<=0&&r!==null&&r<=0;
+  const status=L.questionStatus(st,timeUp,si);
   const quiz=quizzes.find(x=>x.id===st.quiz_id); const keyCur=!!(quiz&&quiz.answer_key[q]);
-  const pri=L.primaryAction(st,keyCur,timeUp), secs=L.secondaryActions(st,keyCur,timeUp);
+  const pri=L.primaryAction(st,keyCur,timeUp,si), secs=L.secondaryActions(st,keyCur,timeUp,si);
   const done=players.filter(g=>cur[g]).length, dis=(x)=>x?'disabled':'';
   let summary='';
   if(st.revealed && !st.ended){
@@ -834,7 +842,7 @@ function presenterBar(){
     <div class="ptimer" id="ptimer"></div>
     </div><div class="prow ctl"><div class="pctl">
       <button id="prev" class="nav" aria-label="Previous question" title="Previous question" ${dis(q<=1||st.ended||busy)}>${PI.prev}</button>
-      <button id="${pri.id}" class="pri ${pri.id==='endsess'?'finish':''}" ${dis(pri.disabled||busy)} ${pri.reason?`title="${pri.reason}"`:''}>${pri.label}</button>
+      <button id="${pri.countdown?'countdown':pri.id}" class="pri ${pri.id==='endsess'?'finish':''}" ${dis(pri.disabled||busy)} ${pri.reason?`title="${pri.reason}"`:''} ${pri.start?'data-start="1"':''}>${pri.label}</button>
       <button id="next" class="nav" aria-label="Next question" title="Next question" ${dis(q>=N||st.ended||busy)}>${PI.next}</button>
       ${secs.map(a=>`<button id="${a.id}" class="quiet" ${dis(busy)}>${a.label}</button>`).join('')}
     </div></div>
@@ -854,7 +862,8 @@ function renderPip(){
   const on=(id,fn)=>{const el=d.getElementById(id); if(el) el.onclick=fn;};
   // same single-flight guard as the main page
   const run=(a,v)=>{ if(busy) return; busy=true; render(true); act(a,v).then(load).catch(()=>{}).finally(()=>{ busy=false; render(true); }); };
-  ['prev','open','lock','reveal','next'].forEach(id=>on(id,()=>run(id)));
+  ['prev','lock','reveal','next'].forEach(id=>on(id,()=>run(id)));
+  on('open',()=>{ const b=d.getElementById('open'); run('open', b&&b.dataset.start ? {delay:SessionLogic.START_COUNTDOWN} : {}); });
   const end=()=>{ if(pipWin.confirm(`End "${st.quiz_title}" now?\n\nAnswers close and every participant sees their final score and rank. The session cannot be reopened; use New round to run this quiz again.`)) run('end_session'); };
   on('endsess',end); on('endsess2',end);
   on('newround',()=>{ if(pipWin.confirm(`Start a new round of "${st.quiz_title}"?\n\nThis starts a fresh session from question 1. Participants are sent back to the join screen and must rejoin; all scores restart at 0. This round's results stay in the database.`)) run('new_round'); });
@@ -870,8 +879,12 @@ function fitPip(){
   for(const c of ['h1','h2','h3']){ if(t.scrollWidth<=t.clientWidth) break; t.classList.add(c); }
   if(mid) mid.classList.toggle('hscroll', t.scrollWidth>t.clientWidth);   // sideways scroll only when even the short table can't fit
 }
+let pipCounting=false;
 function tickPip(){
   if(!pipWin||pipWin.closed||!st) return; const el=pipWin.document.getElementById('ptimer'); if(!el) return;
+  const si=startsIn(), cd=pipWin.document.getElementById('countdown');
+  if(si>0 && !st.locked && !st.revealed && !st.ended){ el.textContent=''; if(cd) cd.textContent='Starts in '+Math.ceil(si)+'…'; pipCounting=true; return; }
+  if(pipCounting){ pipCounting=false; pipSig=''; renderPip(); return; }
   const r=remaining();
   if(r===null||st.revealed||st.locked||st.ended){ el.textContent=''; return; }
   el.textContent = r>0?Math.ceil(r):'TIME UP'; el.className='ptimer'+(r<=0?' up':r<=10?' low':'');
