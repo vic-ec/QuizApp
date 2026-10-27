@@ -3,52 +3,125 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QuizApp</title>
+<title>QuizApp — live quizzes for teaching sessions</title>
+<meta name="description" content="Turn teaching into a live quiz. Participants answer on their phones, see the results and follow the leaderboard. No account, no app to install.">
 <style>
-  :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;--accent:#4f8cff;--ok:#2ecc71;--purple:#8e5cf6;
+  :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;--accent:#4f8cff;--ok:#2ecc71;--warn:#f1c40f;
         --A:#e74c3c;--B:#3498db;--C:#f1c40f;--D:#2ecc71}
   *{box-sizing:border-box}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;min-height:100vh}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;min-height:100vh;line-height:1.5}
   main{flex:1}
-  .top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);background:#121920}
-  .brand{font-weight:800;font-size:20px}
-  .top a{display:inline-flex;align-items:center;color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:10px;height:40px;padding:0 14px;margin-left:8px}
-  .top a:hover{color:var(--text)}
-  .hero{max-width:900px;margin:0 auto;padding:9vh 20px 6vh;text-align:center}
-  h1{font-size:clamp(28px,5vw,46px);margin:0 0 10px;line-height:1.1}
-  .lead{color:var(--muted);font-size:clamp(15px,2vw,19px);margin:0 auto 32px;max-width:560px}
-  .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:28px}
-  .btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:18px;padding:16px 28px;border-radius:14px;text-decoration:none;color:#fff;border:0}
-  .btn.join{background:var(--accent)} .btn.host{background:transparent;border:1px solid var(--line);color:var(--text)}
-  .btn:hover{filter:brightness(1.1)} .btn.host:hover{border-color:var(--muted)}
-  .tiles{display:flex;gap:10px;justify-content:center;margin:40px auto 0}
-  .tiles span{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff}
-  .tiles .A{background:var(--A)} .tiles .B{background:var(--B)} .tiles .C{background:var(--C);color:#2a2400} .tiles .D{background:var(--D);color:#06220f}
-  .how{max-width:900px;margin:0 auto;padding:0 20px 8vh}
-  .how h2{text-align:center;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 18px}
-  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-  .step b{display:block;font-size:16px;margin-bottom:6px}
-  .step p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  /* header */
+  .top{border-bottom:1px solid var(--line);background:#121920}
+  .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px}
+  .brand{font-weight:800;font-size:18px;letter-spacing:.01em;text-decoration:none;color:var(--text);display:inline-flex;align-items:center;gap:8px}
+  .brand .mark{display:inline-grid;grid-template-columns:1fr 1fr;gap:2px;width:18px;height:18px}
+  .brand .mark i{border-radius:3px} .mark .a{background:var(--A)} .mark .b{background:var(--B)} .mark .c{background:var(--C)} .mark .d{background:var(--D)}
+  .hostlink{display:inline-flex;align-items:center;height:36px;padding:0 14px;border:1px solid var(--line);border-radius:10px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;white-space:nowrap}
+  .hostlink:hover{color:var(--text);border-color:var(--muted)}
+  /* hero */
+  .hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center;padding-top:64px;padding-bottom:40px}
+  h1{font-size:clamp(32px,4.6vw,52px);line-height:1.08;margin:0 0 14px;letter-spacing:-.01em}
+  .lead{color:var(--muted);font-size:clamp(16px,1.6vw,19px);margin:0 0 28px;max-width:34ch}
+  .cta{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-weight:700;font-size:18px;height:56px;padding:0 28px;border-radius:14px;text-decoration:none;color:#fff;background:var(--accent);min-width:220px}
+  .btn:hover{filter:brightness(1.08)}
+  .btn svg{width:20px;height:20px}
+  .assure{color:var(--muted);font-size:14px;display:flex;gap:8px;align-items:center}
+  .assure .tick{color:var(--ok);font-weight:800}
+  .hostpath{color:var(--muted);font-size:14px;margin-top:8px}
+  .hostpath a{color:#9cc0ff;text-decoration:none;font-weight:600} .hostpath a:hover{text-decoration:underline}
+  /* product preview: a phone mid-question and the leaderboard */
+  .preview{position:relative;display:flex;justify-content:center;align-items:flex-end;gap:16px;min-height:380px}
+  .phone{width:230px;background:#0b0f14;border:1px solid var(--line);border-radius:28px;padding:14px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .phone .bar{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);margin-bottom:8px}
+  .phone .bar b{color:var(--text)}
+  .phone .qline{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;margin-bottom:10px}
+  .phone .state{font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;background:#1d2f4d;color:#9cc0ff}
+  .phone .timer{margin-left:auto;color:var(--accent);font-size:16px;font-variant-numeric:tabular-nums}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .tiles span{height:62px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:26px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .tiles .A{background:var(--A)} .tiles .B{background:var(--B);box-shadow:0 0 0 3px #fff inset} .tiles .C{background:var(--C);color:#2a2400;text-shadow:none} .tiles .D{background:var(--D);color:#06220f;text-shadow:none}
+  .phone .submit{margin-top:10px;height:36px;border-radius:10px;background:var(--accent);display:grid;place-items:center;font-weight:700;font-size:13px}
+  .board{width:250px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:28px}
+  .board h3{margin:0 0 10px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+  .board .r{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+  .board .r:first-of-type{border-top:0}
+  .board .rk{color:var(--muted);text-align:center;font-size:12px;line-height:1;height:16px;display:grid;place-items:center}
+  .board .pts{font-weight:700} .board .r.lead .pts{color:var(--warn)}
+  .board .r .av{margin-right:4px}
+  /* how it works */
+  .how{padding-top:24px;padding-bottom:64px}
+  .how h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 16px;font-weight:700}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;gap:12px}
+  .step .n{flex:none;width:28px;height:28px;border-radius:50%;background:#1d2f4d;color:#9cc0ff;display:grid;place-items:center;font-weight:800;font-size:13px}
+  .step b{display:block;font-size:15px;margin-bottom:4px}
+  .step p{margin:0;color:var(--muted);font-size:14px}
   footer{text-align:center;color:var(--muted);font-size:13px;padding:20px;border-top:1px solid var(--line)}
   footer a{color:var(--muted)}
+  @media(prefers-reduced-motion:no-preference){ .btn{transition:filter .15s} }
+  /* narrow */
+  @media(max-width:860px){
+    .hero{grid-template-columns:1fr;gap:36px;padding-top:40px;padding-bottom:28px}
+    .preview{min-height:0;align-items:flex-start}
+    .board{margin-bottom:0}
+    .steps{grid-template-columns:1fr}
+  }
+  @media(max-width:560px){
+    .wrap{padding:0 16px}
+    .hero{padding-top:32px;padding-bottom:24px}
+    .btn{width:100%}
+    .preview{gap:12px}
+    .phone{width:min(230px,52%)} .board{width:min(250px,46%);padding:12px}
+    .tiles span{height:52px;font-size:22px}
+    .board .r{font-size:12px}
+    .top .wrap{height:52px}
+  }
+  @media(max-width:380px){ .board{display:none} .phone{width:100%;max-width:260px} }
 </style>
 </head>
 <body>
-<div class="top"><span class="brand">QuizApp</span><nav><a href="play/">Join a quiz</a><a href="host.html">Host login</a></nav></div>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./" aria-label="QuizApp home"><span class="mark" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></span>QuizApp</a>
+  <a class="hostlink" href="host.html">Host login</a>
+</div></header>
 <main>
-<section class="hero">
-  <h1>Live quizzes for teaching sessions</h1>
-  <div class="cta"><a class="btn join" href="play/">▶ Join a quiz</a><a class="btn host" href="host.html">Host login</a></div>
+<section class="wrap hero">
+  <div>
+    <h1>Turn teaching into a live quiz.</h1>
+    <p class="lead">Answer on your phone, see the results and follow the leaderboard.</p>
+    <div class="cta">
+      <a class="btn" href="play/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>Join a quiz</a>
+      <div class="assure"><span class="tick" aria-hidden="true">✓</span>No participant account. No app to install.</div>
+    </div>
+    <p class="hostpath">Running the session? <a href="host.html">Host login →</a></p>
+  </div>
+  <div class="preview" aria-label="Preview: a phone mid-question and the live leaderboard" role="img">
+    <div class="phone" aria-hidden="true">
+      <div class="bar"><span>🦊 <b>Alice</b></span><span><b>190</b> pts</span></div>
+      <div class="qline">Q4 of 9 <span class="state">Answer now</span><span class="timer">18</span></div>
+      <div class="tiles"><span class="A">A</span><span class="B">B</span><span class="C">C</span><span class="D">D</span></div>
+      <div class="submit">Submit B</div>
+    </div>
+    <div class="board" aria-hidden="true">
+      <h3>Leaderboard</h3>
+      <div class="r lead"><span class="rk">🥇</span><span><span class="av">🐼</span>Bob</span><span class="pts">285</span></div>
+      <div class="r"><span class="rk">🥈</span><span><span class="av">🦊</span>Alice</span><span class="pts">190</span></div>
+      <div class="r"><span class="rk">🥉</span><span><span class="av">🐸</span>Chidi</span><span class="pts">180</span></div>
+      <div class="r"><span class="rk">4</span><span><span class="av">🐨</span>Dana</span><span class="pts">95</span></div>
+    </div>
+  </div>
 </section>
-<section class="how">
+<section class="wrap how">
   <h2>How it works</h2>
   <div class="steps">
-    <div class="step"><b>1 · Candidates join</b><p>Scan the QR code or open the join link, pick an avatar and enter a name. No account, no app to install.</p></div>
-    <div class="step"><b>2 · Host runs the quiz</b><p>The host shows each question on screen (slides, images, anything), opens it in QuizApp to start the timer, and candidates submit A–D from their phones.</p></div>
-    <div class="step"><b>3 · Reveal and rank</b><p>Reveal the answer, see who got it and how fast, and follow the leaderboard through to the final podium.</p></div>
+    <div class="step"><span class="n">1</span><div><b>Join from your phone</b><p>Scan the QR code or open the join link, type your name and pick an avatar.</p></div></div>
+    <div class="step"><span class="n">2</span><div><b>Answer A–D</b><p>The question is on the shared screen. Tap your answer before the timer runs out; faster correct answers score more.</p></div></div>
+    <div class="step"><span class="n">3</span><div><b>See the results</b><p>When the host reveals the answer you see how you did, then the leaderboard — right through to the final podium.</p></div></div>
   </div>
 </section>
 </main>
