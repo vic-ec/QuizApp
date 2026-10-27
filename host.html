@@ -196,6 +196,8 @@
   .menu.left{right:auto;left:0}
   .menu .mh{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px 4px}
   .menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+  .menu .ms{font-size:13px;font-weight:700;color:var(--text);padding:8px 10px 2px}
+  .menu .ms ~ button{padding-left:22px}
   .menu button{width:100%;text-align:left;height:38px;padding:0 10px;background:transparent;border-radius:8px;font-weight:500;display:flex;align-items:center;gap:10px}
   .menu button:hover,.menu button:focus-visible{background:#2b3642}
   .menu button.dang{color:#ff8a7f}
@@ -552,13 +554,14 @@ function play(){
   // ---- A. session context + options menu
   const sessMenu = menuOpen==='sess' ? `<div class="menu" role="menu" id="sessmenu" aria-label="Session options">
       <div class="mh">Presentation</div>
-      <button role="menuitem" data-open="${joinUrl}" data-win="quizjoin">${ICON_EXT}Open join screen</button>
-      <button role="menuitem" data-copy="${joinUrl}">${ICON_COPY}Copy join link</button>
-      <button role="menuitem" data-showlink="${joinUrl}">${ICON_LINK}Show join link</button>
-      <hr>
-      <button role="menuitem" data-open="${baseUrl}board.html" data-win="quizboard">${ICON_EXT}Open leaderboard</button>
-      <button role="menuitem" data-copy="${baseUrl}board.html">${ICON_COPY}Copy leaderboard link</button>
-      <button role="menuitem" data-showlink="${baseUrl}board.html">${ICON_LINK}Show leaderboard link</button>
+      <div class="ms">Join screen</div>
+      <button role="menuitem" data-open="${joinUrl}" data-win="quizjoin" aria-label="Open join screen window">${ICON_EXT}Open window</button>
+      <button role="menuitem" data-copy="${joinUrl}" aria-label="Copy join screen link">${ICON_COPY}Copy link</button>
+      <button role="menuitem" data-showlink="${joinUrl}" aria-label="Show join screen link">${ICON_LINK}Show link</button>
+      <div class="ms">Leaderboard</div>
+      <button role="menuitem" data-open="${baseUrl}board.html" data-win="quizboard" aria-label="Open leaderboard window">${ICON_EXT}Open window</button>
+      <button role="menuitem" data-copy="${baseUrl}board.html" aria-label="Copy leaderboard link">${ICON_COPY}Copy link</button>
+      <button role="menuitem" data-showlink="${baseUrl}board.html" aria-label="Show leaderboard link">${ICON_LINK}Show link</button>
       <hr><div class="mh">Session</div>
       <button role="menuitem" id="newround">${PI.round}New round…</button>
       <button role="menuitem" class="dang" id="endsess2" ${dis(st.ended)}>${PI.stop}End session…</button>
