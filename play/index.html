@@ -115,7 +115,8 @@ const AVATARS = ['🐶','🐱','🐼','🦁','🐯','🐨','🐰','🦊','🐻',
 let name = localStorage.getItem('quiz_name') || '';
 let avatar = localStorage.getItem('quiz_avatar') || '';
 let lbDismissed = null;        // question number whose leaderboard popup was closed
-let st = null, mine = {}, correct = null, knownSession = null, titleCache = localStorage.getItem('quiz_title') || 'Quiz';
+let st = null, mine = {}, correct = null, knownSession = null, titleCache = localStorage.getItem('quiz_title') || '';
+const joinTitle = () => (st && !st.ended && titleCache) ? titleCache : 'Join the quiz';
 let selected = null, busy = false, errMsg = '', menuOpen = false, rulesOpen = false;
 let clockOffset = 0;           // serverNow ≈ Date.now() - clockOffset
 let board = [];                // leaderboard (after each reveal and at the end)
@@ -133,7 +134,7 @@ async function load(){
     const {data:s, error} = await sb.from('quiz_state').select('*').eq('id',1).single();
     if(error) throw error;
     if(st && st.current_question!==s.current_question) { selected=null; errMsg=''; }
-    st = s; titleCache = s.quiz_title || 'Quiz'; try{localStorage.setItem('quiz_title', titleCache);}catch(e){}
+    st = s; titleCache = s.ended ? '' : (s.quiz_title || ''); try{ if(titleCache) localStorage.setItem('quiz_title', titleCache); else localStorage.removeItem('quiz_title'); }catch(e){}
     if(name){
       const storedSession = localStorage.getItem('quiz_session');
       if((knownSession && knownSession !== s.session_id) || (!knownSession && storedSession && storedSession !== s.session_id)){
@@ -197,16 +198,17 @@ function render(){
   if(!name){
     document.body.classList.add('centered');
     const closed = !st || st.ended;
-    if(document.getElementById('g')){ const h=document.getElementById('jt'); if(h) h.textContent=titleCache;
-      const jb=document.getElementById('join'); if(jb){ jb.disabled=closed; jb.textContent=closed?'Waiting for the host to start a quiz…':'Join quiz'; } return; }
+    if(document.getElementById('g')){ const h=document.getElementById('jt'); if(h) h.textContent=joinTitle(); const w=document.getElementById('jw'); if(w) w.style.display=closed?'':'none';
+      const jb=document.getElementById('join'); if(jb){ jb.disabled=closed; jb.textContent='Join quiz'; } return; }
     app.innerHTML = `
       <div class="center"><div class="card join">
-        <h2 id="jt" style="margin-bottom:16px">${esc(titleCache)}</h2>
+        <h2 id="jt" style="margin-bottom:4px">${esc(joinTitle())}</h2>
+        <p class="small" id="jw" style="margin:0 0 16px;${closed?'':'display:none'}">Waiting for the host to start…</p>
         <div class="small" style="text-align:left;margin:0 0 6px">Type your name</div>
         <input id="g" placeholder="Your name" maxlength="40" autocomplete="off" value="${esc(name)}">
         <div class="small" style="text-align:left;margin:14px 0 0">Pick your avatar</div>
         <div class="avatars">${AVATARS.map(a=>`<button class="${a===avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div>
-        <button class="btn" id="join" ${closed?'disabled':''}>${closed?'Waiting for the host to start a quiz…':'Join quiz'}</button>
+        <button class="btn" id="join" ${closed?'disabled':''}>${'Join quiz'}</button>
         <p class="small" style="margin:12px 0 0">Keep this page open. If you lose connection, just reload — you'll land back on the current question.</p>
         <p class="small" style="margin:14px 0 0"><a href="../" class="homelink">← Back to QuizApp home</a></p>
       </div></div>`;
