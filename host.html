@@ -5,38 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quiz — Host</title>
 <style>
-  :root{--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;
+  :root{--h:28px;--pad:10px;--kb:36px;--bg:#0f1419;--card:#1a2129;--line:#2b3642;--text:#e8edf2;--muted:#8d9aa8;
         --accent:#4f8cff;--ok:#2ecc71;--bad:#e74c3c;--warn:#f1c40f;
         --A:#e74c3c;--B:#3498db;--C:#f1c40f;--D:#2ecc71;}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
   a{color:#9cc0ff}
+  .homelink{display:inline-block;margin-top:4px;color:#9cc0ff;font-size:14px;font-weight:600;text-decoration:none} .homelink:hover{text-decoration:underline}
   .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
   .gatecard{width:100%;max-width:400px;text-align:center;padding:24px}
-  .topbar{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--line);background:#121920}
-  .topbar .brand{font-weight:800;font-size:18px;letter-spacing:.02em}
+  .gatecard input{height:48px;font-size:18px;padding:0 12px}
+  .gatecard #login{height:48px;font-size:17px;border-radius:10px}
+  .gatecard #pinerr{margin:10px 0 6px;font-size:14px}
+  .topbar{display:flex;align-items:center;gap:var(--pad);padding:var(--pad);border-bottom:1px solid var(--line);background:#121920}
+  .topbar .brand{font-weight:800;font-size:16px;letter-spacing:.02em}
   .topbar .crumb{color:var(--muted)}
   .topbar .sp{flex:1}
-  .tabs{display:flex;gap:4px;background:#0f1419;border:1px solid var(--line);border-radius:12px;padding:4px}
-  .tabs a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:9px;display:flex;align-items:center;gap:8px}
+  .tabs{display:flex;gap:2px;background:#0f1419;border:1px solid var(--line);border-radius:8px;padding:2px;height:var(--h)}
+  .tabs a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:600;padding:0 10px;border-radius:6px;display:flex;align-items:center;gap:6px;white-space:nowrap}
   .tabs a:hover{color:var(--text)}
   .tabs a.on{background:#2b3642;color:var(--text)}
-  .tabs .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(46,204,113,.25)}
-  .topbar .out{font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .tabs .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 2px rgba(46,204,113,.25)}
+  .topbar .out{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:0 10px;height:var(--h);display:inline-flex;align-items:center}
   .topbar .out:hover{color:var(--text)}
   .topbar .out .ico{display:none}
-  @media(max-width:700px){.topbar .out .lbl{display:none}.topbar .out .ico{display:inline}}
+  @media(max-width:480px){.tabs{min-width:0;overflow-x:auto}}
+  @media(max-width:700px){:root{--h:40px;--kb:44px}}
   button.remove{background:#5a2a26;color:#ffb4ab}
   button.purple{background:#8e5cf6;color:#fff}
-  .qz.new{background:linear-gradient(180deg,#2a1f4d,#1a2129);border:1px dashed #8e5cf6;color:#c9b6ff}
-  .qz.new:hover{background:#2f2358;color:#fff}
-  .links{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-  .lk{background:#0f1419;border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+  .qz.new{background:#141a21;border:1px dashed var(--accent);color:#9cc0ff}
+  .qz.new:hover{background:#1d2f4d;color:#fff}
+  .links{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--pad)}
+  .lk{background:#0f1419;border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
   .lk b{font-size:15px}
-  .lk .u{font-size:12px;color:var(--muted);word-break:break-all}
-  .pinrow{display:flex;align-items:center;gap:10px}
-  .pinrow code{font-size:22px;letter-spacing:.2em;background:#0f1419;border:1px solid var(--line);border-radius:8px;padding:8px 14px;min-width:120px;text-align:center}
-  .iconbtn{background:transparent;border:1px solid var(--line);border-radius:8px;padding:8px;line-height:0;color:var(--muted)}
+  .pinrow{display:flex;align-items:center;gap:8px}
+  .pinrow code{font-size:16px;letter-spacing:.2em;background:#0f1419;border:1px solid var(--line);border-radius:8px;padding:0 12px;height:var(--h);line-height:calc(var(--h) - 2px);min-width:120px;text-align:center}
+  .iconbtn{background:transparent;border:1px solid var(--line);border-radius:8px;padding:0;width:var(--h);height:var(--h);display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+  .iconbtn svg{width:16px;height:16px}
   .iconbtn:hover{color:var(--text);border-color:var(--accent)}
   .scr{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
   .scr:first-of-type{border-top:0;padding-top:0}
@@ -45,35 +50,29 @@
   [data-tip]:hover::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 8px);width:max-content;background:#0f1419;border:1px solid var(--line);color:var(--text);font-size:12px;font-weight:400;line-height:1.4;padding:8px 10px;border-radius:8px;z-index:30;text-align:left;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.4)}
   .lk{justify-content:space-between}
   .lk .row{margin-top:auto}
-  .page{max-width:1100px;margin:0 auto;padding:20px}
-  .layout{display:grid;grid-template-columns:1fr 300px;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
-  @media(max-width:900px){.layout{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  .page{max-width:1100px;margin:0 auto;padding:var(--pad)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:var(--pad);margin-bottom:var(--pad)}
   h1{margin:0;font-size:22px}
   h2{margin:0 0 10px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   .big{font-size:48px;font-weight:800;line-height:1}
   .timer{font-size:48px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1}
   .timer.low{color:var(--bad)} .timer.up{color:var(--warn);font-size:22px}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:12px 16px;cursor:pointer;background:#2b3642;color:var(--text)}
+  .row{display:flex;gap:var(--pad);flex-wrap:wrap;align-items:center}
+  button{font:inherit;font-size:13px;font-weight:600;border:0;border-radius:8px;padding:0 12px;height:var(--h);cursor:pointer;background:#2b3642;color:var(--text);white-space:nowrap}
   button.primary{background:var(--accent);color:#fff}
   button.ok{background:var(--ok);color:#06220f}
   button.warn{background:var(--warn);color:#2a2400}
   button.danger{background:var(--bad);color:#fff}
   button.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
-  button.xl{font-size:clamp(13px,1.5vw,22px);padding:0 clamp(10px,1.6vw,26px);height:clamp(40px,4.6vw,64px);line-height:1;white-space:nowrap}
+  button.ghost:hover{color:var(--text);border-color:var(--muted)}
   button.orange{background:#e67e22;color:#fff}
   button.magenta{background:#e0409a;color:#fff}
-  .big{font-size:clamp(28px,3.6vw,48px)}
-  .timer{font-size:clamp(28px,3.6vw,48px)}
-  h1{font-size:clamp(16px,1.7vw,22px)}
-  @media(max-width:1200px){.layout{grid-template-columns:1fr 260px}}
-  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  h1{font-size:18px}
   .card{min-width:0}
-  button.sm{padding:8px 12px;font-size:13px}
+  button.sm{padding:0 10px;font-size:13px}
   button:disabled{opacity:.35;cursor:default}
-  input,select{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
-  label.f{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;font-size:13px;color:var(--muted);min-width:0}
+  input,select{font:inherit;font-size:16px;padding:0 8px;height:var(--h);border-radius:8px;border:1px solid var(--line);background:#0f1419;color:var(--text)}
+  label.f{display:flex;flex-direction:column;justify-content:flex-start;gap:6px;font-size:13px;color:var(--muted);min-width:0}
   label.f input,label.f select{width:100%}
   label.f input,label.f select{font-size:16px;color:var(--text)}
   .muted{color:var(--muted);font-size:13px}
@@ -83,98 +82,48 @@
   .pill.ended{background:#4a1f1b;color:#ff8a7f} .pill.timeup{background:#3a3415;color:var(--warn)}
   .pill.nokey{background:#4a1f1b;color:#ff8a7f} .pill.done{background:#163d2b;color:var(--ok)}
   /* home */
-  .quizzes{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-  .qz{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .quizzes{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--pad)}
+  .qz{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:var(--pad);display:flex;flex-direction:column;gap:var(--pad)}
   .qz.new{align-items:center;justify-content:center;min-height:160px;cursor:pointer}
   .qz h3{margin:0;font-size:18px}
   .qz .meta{font-size:13px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
   .qz .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto}
-  .qz .actions button{padding:8px 0;font-size:13px}
+  .qz .actions button{padding:0}
   button.grey{background:#5b6775;color:#fff}
-  .ed-actions button{padding:8px 14px;font-size:13px}
-  .layout.slides{grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);grid-template-areas:"ctrl side" "slides side";align-items:start}
-  .a-ctrl{grid-area:ctrl} .a-slides{grid-area:slides} .a-side{grid-area:side}
-  .layout.slides .big,.layout.slides .timer{font-size:clamp(24px,2.8vw,40px)}
-  .layout.slides h1{font-size:clamp(15px,1.4vw,20px)}
-  @media(max-width:1100px){.layout.slides{grid-template-columns:1fr;grid-template-areas:"ctrl" "slides" "side"}}
-  .card.compact{padding:10px 12px;margin-bottom:12px}
   .page.wide{max-width:1500px}
-  .stats2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:900px){.stats2{grid-template-columns:1fr}}
-  .pgrp{display:flex;gap:6px;padding:5px;border:1px solid var(--line);border-radius:10px;background:#141a21;flex-wrap:nowrap}
-  .cbtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 12px;font-size:14px;font-weight:700;border-radius:8px;white-space:nowrap}
-  .cbtn svg{flex:none}
-  .crow.ctl{gap:10px}
-  .sm .lbl{margin-left:6px}
-  #sessbtn{display:inline-flex;align-items:center}
-  .slidebar .sm{display:inline-flex;align-items:center;gap:6px}
-  .compact .timer{font-size:26px}
-  @media(max-width:700px){
-    .cbtn{width:40px;padding:0} .cbtn .lbl{display:none}
-    .sm .lbl,#sessbtn .lbl,.slidebar .lbl{display:none}
-    .tabs a{padding:6px 10px;font-size:13px;white-space:nowrap} .topbar{gap:8px;padding:10px 12px} .topbar .brand{font-size:16px}
-    .ctitle{max-width:100%;width:100%} .crow .sp{flex:1 1 100%;display:none}
-    .cq{width:100%;font-size:16px}
-    .crow.ctl{gap:8px} .crow.ctl .pgrp{flex:1 1 auto} .crow.ctl .toggle{font-size:12px}
-    .compact .timer{font-size:22px}
-    .big{font-size:26px}
-    .layout{padding:12px;gap:12px} .page{padding:12px}
-  }
-  .crow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .crow + .crow{margin-top:8px}
-  .crow .sp{flex:1}
-  .ctitle{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%}
-  .cq{font-size:18px;font-weight:800;white-space:nowrap} .cq small{font-size:12px;color:var(--muted);font-weight:600} .cq .muted{font-size:12px;font-weight:500}
-  .compact .timer{font-size:22px} .compact .timer.up{font-size:14px}
-  .compact .pill{padding:2px 8px;font-size:11px}
-  .compact .toggle{font-size:12px} .compact #sessbtn{padding:7px 10px;font-size:12px;white-space:nowrap}
-  .modalbox.sess{max-width:520px;text-align:left;max-height:90vh;overflow:auto}
-  .modalbox.sess .card{margin-bottom:12px}
-  @media(max-width:1100px){.layout.slides{grid-template-columns:1fr}}
-  .slidewrap{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
-  .slidewrap iframe{width:100%;height:100%;border:0;display:block}
-  .slidebar{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-  .slidebar .muted{flex:1}
+  @media(max-width:700px){ .slidebar .lbl{display:none} }
   .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--muted);user-select:none}
   .toggle .sw{width:34px;height:20px;border-radius:999px;background:#2b3642;position:relative;transition:.15s}
   .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#8d9aa8;transition:.15s}
   .toggle.on .sw{background:var(--accent)} .toggle.on .sw::after{left:17px;background:#fff}
   .toggle.rev{flex-direction:row}
-  .modalbg{position:fixed;inset:0;background:rgba(5,8,12,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .modalbg{position:fixed;inset:0;background:rgba(5,8,12,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:var(--pad)}
   .modalbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;max-width:380px;width:100%;text-align:center}
   .modalbox p{margin:0 0 16px;font-size:16px}
   /* editor */
-  .form{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  @media(max-width:700px){.form{grid-template-columns:1fr}}
+  .form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:700px){.form{grid-template-columns:1fr} .form.four{grid-template-columns:1fr 1fr!important}}
+  .hint2{font-size:12px;color:var(--muted)}
+  .ed-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap} .ed-head .sp{flex:1}
+  .ed-actions{display:flex;align-items:center;gap:8px} .ed-state{font-size:12px;white-space:nowrap}
+  .ed-bar{display:none}
+  details.help{margin-top:8px} details.help summary{cursor:pointer;color:#9cc0ff;font-size:13px;font-weight:600} details.help .muted{margin-top:8px;line-height:1.5}
+  @media(max-width:700px){
+    .ed-head .ed-actions{display:none}
+    .ed{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+    .ed-bar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;background:#121920;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+    .ed-bar .ed-actions{display:flex} .ed-bar .ed-state{flex:1} .ed-bar button{height:44px;padding:0 16px}
+  }
   .form .wide{grid-column:1/-1}
-  .key{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:8px}
-  .key .k{display:flex;align-items:center;gap:5px;font-size:13px}
-  .key .k span{width:26px;color:var(--muted);text-align:right}
-  .key .k button{padding:8px 0;width:32px;font-size:13px;background:#0f1419;border:1px solid var(--line);color:var(--muted)}
+  .key{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px 16px;margin-top:8px}
+  .key .k{display:flex;align-items:center;gap:6px;font-size:13px}
+  .key .k span{width:26px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  .key .k.unset span{color:var(--warn)}
+  .key .k button{padding:0;width:var(--kb);height:var(--kb);font-size:14px;background:#0f1419;border:1px solid var(--line);color:var(--muted)}
   .key .k button.on{color:#fff;border-color:transparent}
   .key .k button.on.A{background:var(--A)} .key .k button.on.B{background:var(--B)}
   .key .k button.on.C{background:var(--C);color:#2a2400} .key .k button.on.D{background:var(--D);color:#06220f}
   /* play */
-  .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:8px}
-  .g{border:2px solid var(--line);border-radius:10px;padding:8px 8px 6px;text-align:center;font-weight:600;font-size:13px;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .g.done{border-color:var(--accent);background:#1d2f4d}
-  .g.right{border-color:var(--ok);background:#163d2b}
-  .g.wrong{border-color:var(--bad);background:#4a1f1b}
-  .g .c{font-size:17px;display:block;margin-top:2px;line-height:1.2}
-  .g .t{font-size:11px;color:var(--muted);font-weight:500;display:block}
-  .g .x{position:absolute;top:4px;right:8px;color:var(--muted);cursor:pointer;font-weight:400;font-size:12px}
-  .bar{display:flex;align-items:center;gap:10px;margin:8px 0}
-  .bar .n{width:140px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bar .t{flex:1;background:#0f1419;border-radius:8px;height:30px;overflow:hidden}
-  .bar .f{height:100%;background:var(--accent);border-radius:8px;transition:width .4s;min-width:2px}
-  .bar:first-of-type .f{background:var(--warn)}
-  .bar .s{width:110px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
-  .bar .s small{color:var(--muted);font-weight:500}
-  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .d{border-radius:10px;padding:12px;text-align:center;border:3px solid transparent;color:#fff;font-weight:700}
-  .d.A{background:var(--A)} .d.B{background:var(--B)} .d.C{background:var(--C);color:#2a2400} .d.D{background:var(--D);color:#06220f}
-  .d.correct{border-color:#fff} .d.dim{opacity:.3}
-  .d b{font-size:26px;display:block}
   .qrmini{display:flex;gap:12px;align-items:center;cursor:pointer}
   .qrmini #qr{background:#fff;padding:4px;border-radius:6px;width:fit-content;line-height:0}
   .qrmini:hover .hint{color:var(--text)}
@@ -186,8 +135,146 @@
   .podium b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .net{position:fixed;left:0;right:0;bottom:0;background:#4a1f1b;color:#ff8a7f;text-align:center;padding:8px;display:none}
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#163d2b;color:var(--ok);padding:10px 16px;border-radius:10px;font-weight:600;display:none}
-  .banner{border-radius:12px;padding:12px 14px;background:#1d2f4d;color:#9cc0ff;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .banner{border-radius:12px;padding:var(--pad);background:#1d2f4d;color:#9cc0ff;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .banner .sp{flex:1}
+  /* ===== live session (host dashboard) =====
+     spacing scale 4/8/12/16/24; one accent (blue); green = live/success; red = destructive */
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .live{--gap:12px;display:flex;flex-direction:column;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+  .live .card{padding:16px;margin:0;min-width:0}
+  .live.slides{display:grid;grid-template-columns:minmax(0,1fr) 340px;align-items:start;max-width:none}
+  .a-main{display:flex;flex-direction:column;gap:16px;min-width:0} .a-side{min-width:0}
+  @media(max-width:900px){.live.slides{grid-template-columns:1fr}}
+  .live h2{margin:0;font-size:12px}
+  .sec{display:flex;flex-direction:column;gap:12px;min-width:0}
+  .cpanel{display:flex;flex-direction:column;gap:16px}
+  .cpanel .sec + .sec{border-top:1px solid var(--line);padding-top:16px}
+  /* A. session context */
+  .ctx{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .ctx .ttl{font-size:18px;font-weight:700;min-width:0;flex:1 1 120px;line-height:1.25}
+  .ctxr{display:flex;align-items:center;gap:12px;flex:none;margin-left:auto}
+  .ctx .ttl small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+  .livedot{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600}
+  .livedot::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(46,204,113,.2)}
+  .livedot.off{color:var(--muted)} .livedot.off::before{background:var(--muted);box-shadow:none}
+  /* B. current question */
+  .qhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .qhead .qn{font-size:22px;font-weight:800;line-height:1}
+  .qhead .state{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#2b3642;color:var(--muted);white-space:nowrap}
+  .state.open{background:#1d2f4d;color:#9cc0ff} .state.revealed{background:#163d2b;color:var(--ok)}
+  .state.locked,.state.timeup{background:#3a3415;color:var(--warn)} .state.ended{background:#4a1f1b;color:#ff8a7f}
+  .qhead .cnt{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+  .qhead .timer{font-size:22px;margin-left:auto;font-variant-numeric:tabular-nums}
+  .live .timer:empty{display:none}
+  .qctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .qctl .pri{height:44px;padding:0 20px;font-size:15px;font-weight:700;background:var(--accent);color:#fff;border-radius:10px;min-width:180px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .qctl .pri.finish{background:var(--ok);color:#06220f}
+  .qctl .pri:disabled{opacity:.45}
+  .qctl .sec-btn{height:44px;padding:0 14px;border-radius:10px;background:#2b3642;display:inline-flex;align-items:center;gap:6px}
+  .qsel{height:44px;min-width:84px;padding:0 32px 0 12px;border-radius:10px;background:#0f1419 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238d9aa8' stroke-width='3' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;-webkit-appearance:none;font-size:14px;font-weight:600;color:var(--text);border:1px solid var(--line)}
+  .qctl .more{height:44px;width:44px;padding:0;border-radius:10px;background:#2b3642;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+  .hint{font-size:12px;color:var(--muted)}
+  .busy .pri::after{content:"";width:14px;height:14px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* results summary */
+  .summary{display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-radius:10px;background:#141a21;border:1px solid var(--line)}
+  .summary .k{font-size:12px;color:var(--muted)} .summary .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+  .summary .v.ok{color:var(--ok)}
+  .summary .dist{display:flex;gap:6px;flex-wrap:wrap}
+  .summary .dist span{padding:2px 8px;border-radius:6px;background:#0f1419;font-variant-numeric:tabular-nums;font-size:13px}
+  .summary .dist span.hit{background:#163d2b;color:var(--ok);font-weight:700}
+  /* C. presentation tools */
+  .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tools .grp{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:4px;border-radius:10px;background:#141a21}
+  .tools .grp .lab{font-size:12px;color:var(--muted);padding:0 4px 0 8px}
+  .tools button{height:36px;padding:0 12px;background:#2b3642;display:inline-flex;align-items:center;gap:6px}
+  .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--muted);user-select:none;height:36px;padding:0 8px}
+  .toggle .sw{width:34px;height:20px;border-radius:999px;background:#2b3642;position:relative;transition:.15s;flex:none}
+  .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#8d9aa8;transition:.15s}
+  .toggle.on .sw{background:var(--accent)} .toggle.on .sw::after{left:17px;background:#fff}
+  .toggle.on{color:var(--text)}
+  @media(prefers-reduced-motion:reduce){.toggle .sw,.toggle .sw::after{transition:none} .busy .pri::after{animation:none}}
+  /* menus */
+  .mwrap{position:relative}
+  .menu{position:absolute;right:0;top:calc(100% + 6px);min-width:220px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px;z-index:40;box-shadow:0 12px 32px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:2px}
+  .menu.left{right:auto;left:0}
+  .menu .mh{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px 4px}
+  .menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+  .menu .ms{font-size:13px;font-weight:700;color:var(--text);padding:8px 10px 2px}
+  .menu .ms ~ button{padding-left:22px}
+  .menu button{width:100%;text-align:left;height:38px;padding:0 10px;background:transparent;border-radius:8px;font-weight:500;display:flex;align-items:center;gap:10px}
+  .menu button:hover,.menu button:focus-visible{background:#2b3642}
+  .menu button.dang{color:#ff8a7f}
+  .menu button:disabled{opacity:.45}
+  .menubtn{height:36px;width:36px;padding:0;background:#2b3642;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;border-radius:10px}
+  .menubtn[aria-expanded="true"]{background:#3a4654;color:var(--text)}
+  /* participants table */
+  .ptwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative}
+  .ptable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+  .ptable th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:0 8px 8px;white-space:nowrap}
+  .ptable td{padding:6px 8px;border-top:1px solid var(--line);height:44px;vertical-align:middle}
+  .ptable .num,.ptable th.num{text-align:right}
+  .ptable .rk{width:36px;color:var(--muted);text-align:right}
+  .ptable .rk .md{font-size:16px;line-height:1}
+  .ptable .nm{font-weight:600;max-width:0;min-width:120px;white-space:nowrap}
+  .ptable .nm .av{display:inline-block;width:24px;text-align:center;margin-right:6px;font-size:15px}
+  .ptable .nm .t{display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+  .ptable .tot{font-weight:700} .ptable tr.lead .tot{color:var(--warn)}
+  .ptable .menucell{width:44px;text-align:right}
+  .chip{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 8px;border-radius:6px;font-weight:700;font-size:13px;background:#2b3642;color:var(--muted);white-space:nowrap}
+  .chip.done{background:#1d2f4d;color:#9cc0ff} .chip.right{background:#163d2b;color:var(--ok)} .chip.wrong{background:#4a1f1b;color:#ff8a7f}
+  .chip.none{background:transparent;border:1px dashed var(--line);font-weight:500}
+  .sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .rowmenu{height:36px;width:36px;padding:0;background:transparent;color:var(--muted);border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
+  .rowmenu:hover,.rowmenu[aria-expanded="true"]{background:#2b3642;color:var(--text)}
+  .empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
+  .slidewrap{background:#000;border:1px solid var(--line);border-radius:12px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 120px)}
+  .slidewrap iframe{width:100%;height:100%;border:0;display:block}
+  .slidebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+  .slidebar .sm{display:inline-flex;align-items:center;gap:6px;height:36px}
+  .complete .podium div{max-width:30%}
+  /* side column when the slides pane is shown */
+  .a-side .ptable .qp,.a-side .ptable th.qp,.a-side .ptable td.tm:not(.fin),.a-side .ptable th.tm:not(.fin){display:none}
+  .a-side .ptable .nm{min-width:70px} .a-side .ptable th{font-size:10px;padding:0 6px 6px} .a-side .ptable td{padding:4px 6px}
+  /* narrow / mobile */
+  .mob{display:none}
+  @media(max-width:700px){
+    .live{padding:12px 16px calc(96px + env(safe-area-inset-bottom,0px));gap:12px}
+    .live .card{padding:12px}
+    .desk{display:none} .mob{display:block}
+    .ctx .ttl{font-size:17px}
+    .qhead .qn{font-size:18px}
+    .qctl{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#121920;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));flex-wrap:nowrap}
+    .qctl .pri{flex:1 1 auto;min-width:0;height:48px}
+    .qctl .sec-btn{height:48px;width:48px;padding:0;justify-content:center} .qctl .sec-btn .lbl{display:none}
+    .qsel{height:48px;flex:0 0 auto}
+    .qctl .more{height:48px;width:48px}
+    .qctl .menu{bottom:calc(100% + 6px);top:auto}
+    .hint{display:none}
+    .summary{gap:8px 16px}
+    /* two-line participant rows instead of a table */
+    .ptable,.ptable tbody,.ptable tr,.ptable td{display:block}
+    .ptable thead{display:none}
+    .ptable tr{display:grid;grid-template-columns:28px minmax(0,1fr) auto 44px;grid-template-areas:"rk nm tot mn" "rk sub sub mn";align-items:center;column-gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+    .ptable td{border:0;height:auto;padding:0;min-height:0}
+    .ptable .rk{grid-area:rk;text-align:center;width:auto}
+    .ptable .nm{grid-area:nm;max-width:none;min-width:0;font-size:15px}
+    .ptable .tot{grid-area:tot;font-size:15px}
+    .ptable .menucell{grid-area:mn;width:auto}
+    .ptable .sub{grid-area:sub;display:flex;gap:10px;align-items:center;color:var(--muted);font-size:13px;margin-top:4px}
+    .ptable .sub:empty{display:none}
+    .ptable .tm,.ptable .qp,.ptable .an{display:none}
+  }
+  @media(min-width:701px){ .ptable .sub{display:none} }
+  @media(max-width:360px){ .qctl{gap:6px;padding-left:10px;padding-right:10px} .qctl .pri{padding:0 10px;font-size:14px;min-width:0} }
+  /* mobile top bar */
+  .mnav{display:none}
+  @media(max-width:700px){
+    .topbar .tabs,.topbar .out{display:none}
+    .mnav{display:block;margin-left:auto}
+    .topbar .brand{display:block;font-size:16px}
+    .topbar .where{font-size:13px;color:var(--muted);margin-left:4px}
+  }
 </style>
 </head>
 <body>
@@ -195,10 +282,10 @@
   <div class="brand" style="font-size:22px;font-weight:800">QuizApp</div>
   <h1 style="font-size:20px;margin:14px 0 4px">Host login</h1>
   <p class="muted" style="margin:0 0 14px">Enter the host PIN.</p>
-  <input id="pin" type="password" placeholder="PIN" style="width:100%;font-size:20px;text-align:center;letter-spacing:.2em">
-  <button class="primary" id="login" style="width:100%;margin-top:10px;font-size:16px">Enter</button>
+  <input id="pin" type="password" placeholder="PIN" style="width:100%;text-align:center;letter-spacing:.2em">
+  <button class="primary" id="login" style="width:100%;margin-top:10px">Enter</button>
   <p id="pinerr" style="color:#ff8a7f;min-height:18px"></p>
-  <a href="./" class="muted" style="font-size:13px;text-decoration:none">← Back to QuizApp home</a>
+  <a href="./" class="homelink">← Back to QuizApp home</a>
 </div></div>
 <div id="app" style="display:none"></div>
 <div class="net" id="net">Connection lost — retrying…</div>
@@ -207,13 +294,14 @@
 <script src="vendor-supabase.js"></script>
 <script src="vendor-qrcode.js"></script>
 <script src="config.js"></script>
+<script src="session-logic.js"></script>
 <script>
 const sb = supabase.createClient(QUIZ_CONFIG.url, QUIZ_CONFIG.key);
 const app = document.getElementById('app'), net = document.getElementById('net');
 let pin = sessionStorage.getItem('quiz_pin') || '';
 let st=null, players=[], avatars={}, answers=[], correct=null, clockOffset=0;
-let quizzes=[], editing=null, confirmReset=false, sessOpen=false, linkShown='', helpOpen=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
-let view = 'home';                          // home | edit | play | settings
+let quizzes=[], editing=null, confirmReset=false, helpOpen=false, linkShown='', menuOpen=null, busy=false, slidesOn = localStorage.getItem('quiz_slides')!=='0';              // editing = working copy of a quiz in the editor
+let view = 'home', editing0 = '';           // editing0 = saved snapshot, for the unsaved-changes guard                          // home | edit | play | settings
 const baseUrl = location.origin + location.pathname.replace(/host(\.html)?$/,'');
 const candidateUrl = baseUrl + 'play/';
 const joinUrl = baseUrl + 'join.html';
@@ -256,7 +344,7 @@ function route(){
   const h = location.hash.replace('#','');
   if(h==='play'){ if(liveActive()||(st&&st.session_id)) view='play'; else { view='home'; toast('No live session — press Play on a quiz'); } }
   else if(h==='settings') view='settings';
-  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : activeQuizzes().find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{},embed_url:''} : (q?JSON.parse(JSON.stringify(q)):null); view = editing?'edit':'home'; }
+  else if(h.startsWith('edit-')){ const id=h.slice(5); const q = id==='new' ? null : activeQuizzes().find(x=>String(x.id)===id); editing = id==='new' ? {id:null,title:'',total_questions:10,timer_seconds:30,scoring:'speed',answer_key:{},embed_url:''} : (q?JSON.parse(JSON.stringify(q)):null); editing0 = JSON.stringify(editing); view = editing?'edit':'home'; }
   else view='home';
   lastSig=''; render(true);
 }
@@ -293,52 +381,76 @@ function tick(){
   const el=document.getElementById('timer'); if(!el||!st) return;
   const r=remaining();
   if(r===null || st.revealed || st.locked || st.ended){ el.textContent=''; return; }
-  el.textContent = r>0 ? Math.ceil(r) : "TIME UP";
+  el.textContent = r>0 ? Math.ceil(r) : "";
   el.className = 'timer' + (r<=0?' up':r<=10?' low':'');
   if((r<=0)!==wasExpired){ wasExpired=(r<=0); render(true); }
 }
 function scoresFor(){
-  return players.map(g=>{ const m=answers.filter(a=>a.player===g); return {g, p:m.reduce((t,a)=>t+(a.points||0),0), c:m.filter(a=>a.is_correct===true).length}; })
-    .sort((x,y)=>y.p-x.p||y.c-x.c||x.g.localeCompare(y.g));
+  const shown = a => a.question!==st.current_question || st.revealed;   // don't count the live question before reveal
+  return players.map(g=>{ const m=answers.filter(a=>a.player===g && shown(a)); const ok=m.filter(a=>a.is_correct===true);
+      return {g, p:m.reduce((t,a)=>t+(a.points||0),0), c:ok.length, t:ok.reduce((t,a)=>t+(a.elapsed_ms||0),0)}; })
+    .sort((x,y)=>y.p-x.p||x.t-y.t||x.g.localeCompare(y.g));   // ties: lower total time on correct answers wins
 }
 const keyCount = (q) => Object.values(q.answer_key||{}).filter(v=>['A','B','C','D'].includes(v)).length;
 const liveActive = () => st && !st.ended && st.session_id;
+// Scoring rule lives in quiz_state (host-editable in Settings); describe it in words
+const rule = () => ({top:(st&&st.speed_top)||100, step:(st&&st.speed_step)??5, min:(st&&st.speed_min)??10, flat:(st&&st.flat_points)||100});
+function speedText(){ const r=rule(); return r.step?`${r.top}, ${r.top-r.step}, ${r.top-2*r.step}… (min ${r.min})`:`${r.top} each`; }
+function candTable(withRemove){
+  const q=st.current_question, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
+  const rows = scoresFor().map((x,i)=>{ const a=cur[x.g];
+    let ans='—', cls=st.revealed?'none':'';
+    if(a){ if(st.revealed){ ans=(a.is_correct?'✓ ':'✕ ')+a.choice; cls=a.is_correct?'right':'wrong'; } else { ans=st.locked?a.choice:'✓'; cls='done'; } }
+    const mid = st.ended   // session over: final standings (Correct · Total time) instead of this question's answer
+      ? `<span class="n">${x.c}</span><span class="n">${(x.t/1000).toFixed(1)} s</span><span class="n"></span>`
+      : `<span class="ans ${cls}" title="${cls==='right'?'correct':cls==='wrong'?'incorrect':cls==='done'?'answered':st.revealed?'no answer':'waiting'}">${ans}</span><span class="n">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</span><span class="n">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</span>`;
+    return `<div class="tr${i===0&&x.p>0?' lead':''}"><span class="rk">${x.p>0&&i<3?'<span class="md" aria-label="rank '+(i+1)+'">'+['🥇','🥈','🥉'][i]+'</span>':i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span>${mid}<span class="n tot">${x.p}</span>`+
+      (withRemove?`<button class="rmx" data-rm="${esc(x.g)}" title="Remove participant" aria-label="Remove ${esc(x.g)} from session">✕</button>`:'')+`</div>`; }).join('');
+  const head = st.ended ? `<span class="n" title="Correct answers">✓</span><span class="n" title="Total time on correct answers">Time</span><span class="n"></span>` : `<span class="c">Answer</span><span class="n">Time</span><span class="n">Q pts</span>`;
+  return `<div class="ctab${withRemove?'':' norm'}${st.ended?' final':''}"><div class="tr th"><span class="rk">#</span><span class="nm">Candidate</span>${head}<span class="n">Total</span>${withRemove?'<span></span>':''}</div>${rows}</div>`;
+}
 
 // ---------- render ----------
 let lastSig='';
 function render(force){
-  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,sessOpen,linkShown,helpOpen]);
+  const sig = JSON.stringify([view,st,players,answers,correct,quizzes,editing,binOpen,pinShown,confirmReset,slidesOn,helpOpen,linkShown,menuOpen,busy]);
   if(!force && sig===lastSig) return;
   lastSig = sig;
   const keep = {}; app.querySelectorAll('input,select').forEach(el=>{ if(document.activeElement===el) keep[el.id]=el.value; });
   const oldFrame=document.getElementById('slides');
-  app.innerHTML = topbar() + (view==='home'?home():view==='edit'?editor():view==='settings'?settings():play());
+  app.innerHTML = topbar() + (view==='home'?home():view==='edit'?editor():view==='settings'?settings():play()) + linkModal();
   const newFrame=document.getElementById('slides'); if(oldFrame&&newFrame&&oldFrame.src===newFrame.src) newFrame.replaceWith(oldFrame);
   Object.entries(keep).forEach(([id,v])=>{const el=document.getElementById(id); if(el){el.value=v; el.focus();}});
   bind();
 }
+function linkModal(){
+  return linkShown ? `<div class="modalbg" id="linkmodal" style="z-index:60"><div class="modalbox" role="dialog" aria-modal="true" aria-label="Link"><p style="margin-bottom:8px">Link</p><input readonly value="${esc(linkShown)}" style="width:100%;text-align:center" onfocus="this.select()"><div class="row" style="justify-content:center;margin-top:12px"><button class="primary sm" data-copy="${esc(linkShown)}">Copy link</button><button class="grey sm" id="linkclose">Close</button></div></div></div>` : '';
+}
 function topbar(){
   const tab=(h,label,on,extra='')=>`<a href="#${h}" class="${on?'on':''}">${extra}${label}</a>`;
-  return `<div class="topbar"><span class="brand">QuizApp</span>
+  return `<div class="topbar"><span class="brand">QuizApp</span><span class="where mob">${view==='home'?'My quizzes':view==='play'?'Live session':view==='settings'?'Settings':'Edit quiz'}</span>
     <nav class="tabs">
       ${tab('home','My quizzes',view==='home')}
       ${tab('play','Live session',view==='play',liveActive()?'<span class="dot"></span>':'')}
       ${tab('settings','Settings',view==='settings')}
     </nav>
-    <span class="sp"></span><a href="#" id="logout" class="out" title="Log out"><span class="lbl">Log out</span><span class="ico">⎋</span></a></div>`;
+    <span class="sp"></span><a href="#" id="logout" class="out" title="Log out"><span class="lbl">Log out</span><span class="ico">⎋</span></a>
+    <div class="mnav mwrap"><button class="menubtn" id="navbtn" aria-label="Menu" aria-haspopup="menu" aria-expanded="${menuOpen==='nav'}">${ICON_MENU}</button>
+      ${menuOpen==='nav'?`<div class="menu" role="menu" id="navmenu">
+        <button role="menuitem" data-go="home">My quizzes</button><button role="menuitem" data-go="play">Live session</button><button role="menuitem" data-go="settings">Settings</button><hr><button role="menuitem" id="logout2">Log out</button></div>`:''}</div></div>`;
 }
 
 function home(){
   const live = st && !st.ended ? `<div class="banner"><b>Live session in progress:</b> ${esc(st.quiz_title)} · ${esc(st.session_name)} · Q${st.current_question}/${st.total_questions} · ${players.length} joined<span class="sp"></span><button class="primary sm" data-go="play">Resume ▸</button><button class="danger sm" id="endlive">End session</button></div>` : '';
   return `<div class="page">${live}
-    <h1 style="margin:${live?'16px':'0'} 0 14px">My quizzes</h1>
+    <h1 style="margin:${live?'16px':'0'} 0 12px">My quizzes</h1>
     <div class="quizzes">
-      <div class="qz new" data-go="edit-new"><div style="font-size:34px">＋</div><div>Create new quiz</div></div>
+      <button class="qz new" data-go="edit-new" style="font:inherit"><div style="font-size:34px;line-height:1">＋</div><div style="font-weight:600">Create new quiz</div></button>
       ${activeQuizzes().map(q=>`<div class="qz">
         <h3>${esc(q.title)}</h3>
         <div class="meta"><span>${q.total_questions} questions</span><span>${q.timer_seconds?q.timer_seconds+' s timer':'no timer'}</span><span>${q.scoring==='flat'?'flat':'speed'} scoring</span></div>
         <div>${keyCount(q)>=q.total_questions?'<span class="pill done">Answer key complete</span>':'<span class="pill nokey">Key: '+keyCount(q)+' of '+q.total_questions+'</span>'}</div>
-        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button class="grey" data-go="edit-${q.id}">Edit</button><button class="remove" data-archive="${q.id}" title="Move to bin">Remove</button></div>
+        <div class="actions"><button class="primary" data-play="${q.id}">▶ Play</button><button class="grey" data-go="edit-${q.id}">Edit</button><button class="ghost" data-archive="${q.id}" title="Move to bin">Remove</button></div>
       </div>`).join('')}
     </div>
     ${binnedQuizzes().length?`<div style="margin-top:28px">
@@ -355,22 +467,30 @@ function home(){
 
 function editor(){
   const q = editing, n = Math.max(1, Math.min(100, +q.total_questions||1));
-  return `<div class="page">
-    <div class="row" style="justify-content:space-between;margin-bottom:14px"><h1>${q.id?'Edit quiz':'New quiz'}</h1>
-      <div class="row ed-actions"><button id="save" class="ok">Save quiz</button><button id="saveplay" class="primary">Save &amp; play</button><button class="grey" data-go="home">Cancel</button></div></div>
-    <div class="card"><div class="form">
-      <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz"></label>
-      <label class="f wide">Presentation embed link (optional)<input id="e_embed" value="${esc(q.embed_url||'')}" placeholder="Paste a Canva / PowerPoint / Google Slides share or embed link"></label>
-      <div class="wide muted" style="margin-top:-6px">Shows your slides inside the live session page so you can run everything from one window. <b>Canva:</b> Share → More → Embed → copy (or just paste the design's view link). <b>PowerPoint:</b> OneDrive → File → Share → Embed. <b>Google Slides:</b> File → Share → Publish to web → Embed. The deck must be shared as viewable by link. You advance slides inside the pane; the app's buttons control the quiz only.</div>
-      <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}"></label>
-      <label class="f">Timer per question (seconds, 0 = none)<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}"></label>
-      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — 100, 90, 80… (min 50)</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — 100 per correct</option></select></label>
+  const set = keyCount({answer_key:q.answer_key,total_questions:n});
+  const dirty = JSON.stringify(q)!==editing0;
+  const actions = `<div class="ed-actions">
+      <span class="muted ed-state">${dirty?'Unsaved changes':q.id?'All changes saved':''}</span>
+      <button id="save" class="primary">Save quiz</button>
+      <button id="saveplay">Save &amp; play</button></div>`;
+  return `<div class="page ed">
+    <div class="ed-head"><h1>${q.id?'Edit quiz':'New quiz'}</h1><button class="ghost sm" id="cancel">Cancel</button><span class="sp"></span>${actions}</div>
+    <div class="card"><h2>Quiz</h2><div class="form">
+      <label class="f wide">Quiz name<input id="e_title" value="${esc(q.title)}" placeholder="e.g. ECG Quiz" autocomplete="off"></label>
+      <label class="f">Number of questions<input id="e_total" type="number" min="1" max="100" value="${n}" inputmode="numeric"></label>
+      <label class="f">Timer per question<input id="e_timer" type="number" min="0" max="600" value="${q.timer_seconds}" inputmode="numeric"><span class="hint2">seconds · 0 = no timer</span></label>
+      <label class="f">Scoring<select id="e_scoring"><option value="speed" ${q.scoring==='speed'?'selected':''}>Speed — ${speedText()}</option><option value="flat" ${q.scoring==='flat'?'selected':''}>Flat — ${rule().flat} per correct</option></select><span class="hint2">Change the numbers in Settings → Scoring rule</span></label>
     </div></div>
-    <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="muted" style="text-transform:none">(${keyCount({answer_key:q.answer_key,total_questions:n})} of ${n} set)</span></h2><button class="remove sm" id="resetkey">Reset answer key</button></div>
-      <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
-      <div class="key">${Array.from({length:n},(_,i)=>i+1).map(i=>`<div class="k"><span>${i}</span>${['A','B','C','D'].map(o=>`<button class="${q.answer_key[i]===o?'on '+o:''}" data-kq="${i}" data-ko="${o}">${o}</button>`).join('')}</div>`).join('')}</div>
+    <div class="card"><h2>Slides <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">· optional</span></h2>
+      <label class="f">Presentation embed link<input id="e_embed" value="${esc(q.embed_url||'')}" placeholder="Paste a Canva / PowerPoint / Google Slides share or embed link" autocomplete="off"></label>
+      <details class="help"><summary>How to get the link</summary><div class="muted">Shows your slides inside the live session page so you can run everything from one window. <b>Canva:</b> Share → More → Embed → copy (or just paste the design's view link). <b>PowerPoint:</b> OneDrive → File → Share → Embed. <b>Google Slides:</b> File → Share → Publish to web → Embed. The deck must be shared as viewable by link. You advance slides inside the pane; the app's buttons control the quiz only.</div></details>
     </div>
-    ${confirmReset?`<div class="modalbg" id="resetmodal"><div class="modalbox"><p>Are you sure you want to clear all answers?</p><div class="row" style="justify-content:center"><button class="danger" id="resetyes">Yes, clear</button><button class="grey" id="resetno">No</button></div></div></div>`:''}
+    <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Answer key <span class="pill ${set>=n?'done':'nokey'}" style="margin-left:6px">${set} of ${n} set</span></h2><button class="ghost sm" id="resetkey" ${set?'':'disabled'}>Clear all</button></div>
+      <p class="muted">Tap the correct option for each question. The question images and options stay in your slide deck; the app only needs the letters.</p>
+      <div class="key">${Array.from({length:n},(_,i)=>i+1).map(i=>`<div class="k ${q.answer_key[i]?'':'unset'}" role="group" aria-label="Question ${i}"><span>${i}</span>${['A','B','C','D'].map(o=>`<button class="${q.answer_key[i]===o?'on '+o:''}" data-kq="${i}" data-ko="${o}" aria-pressed="${q.answer_key[i]===o}" aria-label="Question ${i}: ${o}">${o}</button>`).join('')}</div>`).join('')}</div>
+    </div>
+    <div class="ed-bar">${actions}</div>
+    ${confirmReset?`<div class="modalbg" id="resetmodal"><div class="modalbox" role="dialog" aria-modal="true" aria-label="Clear answer key"><p>Clear the whole answer key for this quiz?</p><p class="muted" style="margin:-8px 0 16px">All ${n} answers are removed from the editor. Nothing is saved until you press Save quiz.</p><div class="row" style="justify-content:center"><button class="danger" id="resetyes">Yes, clear</button><button class="grey" id="resetno">No</button></div></div></div>`:''}
     </div>`;
 }
 
@@ -386,10 +506,11 @@ function normalizeEmbed(v){
 let pinShown=false;
 const ICON_EXT='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
 const ICON_LINK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
-const ICON_MORE='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg>';
 const ICON_HELP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>';
 const ICON_FS='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 const ICON_COPY='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const ICON_MENU='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>';
+const ICON_DOTS='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
 const EYE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYEOFF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 function settings(){
@@ -398,107 +519,144 @@ function settings(){
     {t:'Join screen', d:'Full-screen QR code and link for a second display.', u:joinUrl, win:'quizjoin'},
     {t:'Leaderboard', d:'Full-screen live scores for the projector.', u:baseUrl+'board.html', win:'quizboard'},
   ];
-  return `<div class="page"><h1 style="margin-bottom:14px">Settings</h1>
+  return `<div class="page"><h1 style="margin-bottom:12px">Settings</h1>
     <div class="card"><h2>Host PIN</h2>
-      <div class="pinrow"><code id="pinval">${pinShown?esc(pin):'•'.repeat(pin.length)}</code>
-        <button class="iconbtn" id="togglepin" title="${pinShown?'Hide PIN':'Show PIN'}">${pinShown?EYE:EYEOFF}</button></div>
-      <div class="row" style="margin-top:12px"><input id="newpin" placeholder="New PIN (min 4 characters)" style="flex:1;max-width:320px"><button id="setpin">Change PIN</button></div>
-      <p class="muted">Anyone with the PIN can control the quiz. Change it before each session if candidates may have seen it.</p></div>
+      <div class="pinrow"><code id="pinval" aria-label="Current PIN">${pinShown?esc(pin):'•'.repeat(pin.length)}</code>
+        <button class="iconbtn" id="togglepin" aria-pressed="${pinShown}" aria-label="${pinShown?'Hide PIN':'Show PIN'}" title="${pinShown?'Hide PIN':'Show PIN'}">${pinShown?EYE:EYEOFF}</button></div>
+      <form class="row" style="margin-top:12px" id="pinform"><label class="sr" for="newpin">New PIN</label><input id="newpin" placeholder="New PIN (min 4 characters)" autocomplete="off" style="flex:1;max-width:320px"><button class="primary" id="setpin" type="submit">Change PIN</button></form>
+      <p class="muted" style="margin-bottom:0">Anyone with the PIN can control the quiz. Change it before each session if candidates may have seen it.</p></div>
+    <div class="card"><h2>Scoring rule</h2>
+      <p class="muted" style="margin-top:0">Applies to every quiz. Speed: the fastest correct answer gets the top score, each later correct answer gets <i>step</i> fewer, never below the minimum. Shown to candidates when they join.</p>
+      <div class="form four" style="grid-template-columns:repeat(4,1fr)">
+        <label class="f">Speed: top score<input id="sc_top" type="number" min="1" max="1000" value="${rule().top}"></label>
+        <label class="f">Speed: step down<input id="sc_step" type="number" min="0" max="1000" value="${rule().step}"></label>
+        <label class="f">Speed: minimum<input id="sc_min" type="number" min="0" max="1000" value="${rule().min}"></label>
+        <label class="f">Flat: per correct<input id="sc_flat" type="number" min="1" max="1000" value="${rule().flat}"></label>
+      </div>
+      <div class="row" style="margin-top:12px"><button class="primary" id="savescoring">Save scoring rule</button><span class="muted">Speed scores: ${speedText()} · Flat: ${rule().flat} each · Ties: quicker total time on correct answers ranks higher</span></div></div>
     <div class="card"><h2>Screens &amp; links</h2>
-      <div class="links">${links.map((l,i)=>`<div class="lk"><b>${l.t}</b><span class="muted">${l.d}</span><span class="u">${l.u}</span>
-        <div class="row"><button class="primary sm" data-open="${l.u}" data-win="${l.win||'_blank'}">Open in new window</button><button class="sm" data-copy="${l.u}">Copy link</button></div></div>`).join('')}</div></div>
+      <div class="links">${links.map((l,i)=>`<div class="lk"><b>${l.t}</b><span class="muted">${l.d}</span>
+        <div class="row"><button class="primary sm" data-open="${l.u}" data-win="${l.win||'_blank'}" title="Open in new window">Open</button><button class="ghost sm" data-copy="${l.u}">Copy link</button><button class="ghost sm" data-showlink="${l.u}">Show link</button></div></div>`).join('')}</div></div>
   </div>`;
 }
 
 function play(){
   if(!st) return '<div class="page muted">Loading…</div>';
-  const q = st.current_question;
-  const cur = {}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
-  const done = players.filter(g=>cur[g]).length;
-  const r = remaining(), timeUp = r!==null && r<=0;
-  const status = st.ended?'ended':st.revealed?'revealed':st.locked?(st.question_opened_at?'locked':'waiting'):timeUp?'timeup':'open';
-  const statusLabel = {ended:'SESSION ENDED',revealed:'REVEALED',locked:'LOCKED',waiting:'WAITING TO OPEN',timeup:"TIME UP",open:'OPEN'}[status];
-  const quiz = quizzes.find(x=>x.id===st.quiz_id); const keyCur = quiz && quiz.answer_key[q];
-  const revealedN = (q-1)+(st.revealed?1:0);
-  const scores = scoresFor(); const maxP = Math.max(1,...scores.map(s=>s.p));
-  const dist = {A:0,B:0,C:0,D:0}; Object.values(cur).forEach(a=>dist[a.choice]++);
-  const canOpen = !st.ended && (!st.question_opened_at || st.locked || timeUp) && !st.revealed;
-  const lastRevealed = st.revealed && q>=st.total_questions;
-  const complete = lastRevealed || st.ended;
+  const L=SessionLogic, q=st.current_question, N=st.total_questions;
+  const cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
+  const done=players.filter(g=>cur[g]).length;
+  const r=remaining(), timeUp=r!==null&&r<=0;
+  const status=L.questionStatus(st,timeUp), stateLabel=L.STATUS_LABEL[status];
+  const quiz=quizzes.find(x=>x.id===st.quiz_id); const keyCur=!!(quiz&&quiz.answer_key[q]);
+  const pri=L.primaryAction(st,keyCur,timeUp), secs=L.secondaryActions(st,keyCur,timeUp);
+  const scores=scoresFor(); const revealedN=(q-1)+(st.revealed?1:0);
+  const complete=(st.revealed&&q>=N)||st.ended;
+  const embed=quiz&&quiz.embed_url, showSlides=embed&&slidesOn;
+  const hasPip='documentPictureInPicture' in window, pipOn=pipWin&&!pipWin.closed;
+  const dis=(x)=>x?'disabled':'';
 
-  const completeCard = complete ? `<div class="card complete">
-      <div class="h">🎉 Quiz complete</div>
-      <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} players</div>
-      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span></div>`:'').join('')}</div>
-      ${st.ended?'<p class="muted">Candidates are seeing their final score and rank.</p>':'<p class="muted">Press <b>End session</b> to show candidates their final score and rank.</p>'}
+  // ---- A. session context + options menu
+  const sessMenu = menuOpen==='sess' ? `<div class="menu" role="menu" id="sessmenu" aria-label="Session options">
+      <div class="mh">Presentation</div>
+      <div class="ms">Join screen</div>
+      <button role="menuitem" data-open="${joinUrl}" data-win="quizjoin" aria-label="Open join screen window">${ICON_EXT}Open window</button>
+      <button role="menuitem" data-copy="${joinUrl}" aria-label="Copy join screen link">${ICON_COPY}Copy link</button>
+      <button role="menuitem" data-showlink="${joinUrl}" aria-label="Show join screen link">${ICON_LINK}Show link</button>
+      <div class="ms">Leaderboard</div>
+      <button role="menuitem" data-open="${baseUrl}board.html" data-win="quizboard" aria-label="Open leaderboard window">${ICON_EXT}Open window</button>
+      <button role="menuitem" data-copy="${baseUrl}board.html" aria-label="Copy leaderboard link">${ICON_COPY}Copy link</button>
+      <button role="menuitem" data-showlink="${baseUrl}board.html" aria-label="Show leaderboard link">${ICON_LINK}Show link</button>
+      <hr><div class="mh">Session</div>
+      <button role="menuitem" id="newround">${PI.round}New round…</button>
+      <button role="menuitem" class="dang" id="endsess2" ${dis(st.ended)}>${PI.stop}End session…</button>
     </div>` : '';
+  const ctx = `<div class="sec"><div class="ctx">
+      <div class="ttl">${esc(st.quiz_title)}<small>${esc(st.session_name)} · ${players.length} joined</small></div>
+      <div class="ctxr"><span class="livedot ${st.ended?'off':''}">${st.ended?'Ended':'Live'}</span>
+      <div class="mwrap"><button class="menubtn" id="sessbtn" aria-label="Session options" aria-haspopup="menu" aria-expanded="${menuOpen==='sess'}">${ICON_DOTS}</button>${sessMenu}</div></div>
+    </div></div>`;
 
-  const embed = quiz && quiz.embed_url;
-  const showSlides = embed && slidesOn;
-  const toggle = embed ? `<label class="toggle rev ${slidesOn?'on':''}" id="slidestoggle" title="Show or hide the slides pane"><span>Show slides</span><span class="sw"></span></label>` : '';
-  const remoteToggle = `<label class="toggle rev ${pipWin&&!pipWin.closed?'on':''}" id="piptoggle" title="Floating always-on-top remote control"><span>Remote</span><span class="sw"></span></label>`;
-  const cb=(id,cls,icon,label,title,dis)=>`<button class="cbtn ${cls}" id="${id}" title="${title}" ${dis?'disabled':''}>${icon}<span class="lbl">${label}</span></button>`;
-  const restart = st.question_opened_at && !st.revealed;
-  const controlsRow = `<div class="pgrp pctl">
-      ${cb('prev','',PI.prev,'Previous','Previous question',q<=1||st.ended)}
-      ${cb('open','ok',restart?PI.restart:PI.open,restart?'Restart':'Open',restart?'Restart timer':'Open question',!canOpen)}
-      ${cb('lock','warn',PI.lock,'Lock','Lock answers',status!=='open')}
-      ${cb('reveal','orange',PI.eye,'Reveal','Reveal answer',st.revealed||!keyCur||!st.question_opened_at||st.ended)}
-      ${lastRevealed&&!st.ended?cb('endsess','magenta',PI.flag,'Finish','Finish & show results',false):cb('next','',PI.next,'Next','Next question',q>=st.total_questions||st.ended)}
-    </div>
-    <div class="pgrp sess">
-      ${cb('newround','purple',PI.round,'New round','New round: same quiz, fresh players and scores',false)}
-      ${cb('endsess2','danger',PI.stop,'End','End session',st.ended)}
+  // ---- B. current question
+  const priBtn = `<button class="pri ${pri.id==='endsess'?'finish':''}" id="${pri.id}" ${dis(pri.disabled||busy)} ${pri.reason?`title="${pri.reason}"`:''}>${pri.label}${pri.id==='next'?PI.next:''}</button>`;
+  const moreMenu = menuOpen==='more' ? `<div class="menu left" role="menu" id="moremenu" aria-label="More question actions">
+      ${secs.map(a=>`<button role="menuitem" id="${a.id}">${a.label}</button>`).join('')||'<button disabled>No other actions</button>'}</div>` : '';
+  const qsel = `<label class="sr" for="qsel">Go to question</label><select class="qsel" id="qsel" ${dis(st.ended||busy)}>${Array.from({length:N},(_,i)=>i+1).map(i=>`<option value="${i}" ${i===q?'selected':''}>Q${i}</option>`).join('')}</select>`;
+  const controls = `<div class="qctl ${busy?'busy':''}">
+      <button class="sec-btn" id="prev" ${dis(q<=1||st.ended||busy)} aria-label="Previous question">${PI.prev}<span class="lbl">Previous</span></button>
+      ${qsel}
+      ${priBtn}
+      <div class="mwrap"><button class="more" id="morebtn" aria-label="More question actions" aria-haspopup="menu" aria-expanded="${menuOpen==='more'}" ${dis(!secs.length)}>${ICON_DOTS}</button>${moreMenu}</div>
     </div>`;
-  const headerCard = `<div class="card compact">
-      <div class="crow">
-        <div class="ctitle"><b>${esc(st.quiz_title)}</b><span class="muted"> · ${esc(st.session_name)}</span></div>
-        <span class="pill ${status}">${statusLabel}</span>${keyCur?'':'<span class="pill nokey">No key for Q'+q+'</span>'}
-        <span class="sp"></span>
-        <div class="timer" id="timer"></div>
-        <div class="cq">Q${q}<small> / ${st.total_questions}</small><span class="muted"> · ${done}/${players.length} answered</span></div>
-      </div>
-      <div class="crow ctl">${controlsRow}<span class="sp"></span>${toggle}${remoteToggle}<button class="sm" id="sessbtn" title="Session &amp; screens">${ICON_MORE}<span class="lbl">Session &amp; screens</span></button></div>
+  const hint = st.ended ? '' : pri.reason ? `<div class="hint">${pri.reason} — add it under My quizzes → Edit. You can still move on.</div>`
+    : !st.question_opened_at ? '<div class="hint">Moving to another question opens it straight away and starts the timer.</div>' : '';
+  const qblock = `<div class="sec">
+      <div class="qhead"><span class="qn">Question ${q} of ${N}</span><span class="state ${status}">${stateLabel}</span>
+        <span class="cnt">${done} of ${players.length} answered</span><div class="timer" id="timer"></div></div>
+      ${controls}${hint}
     </div>`;
-  const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
-      <div class="slidebar"><span class="sp"></span>
-        <button class="iconbtn" id="slideshelp" title="How the slides pane works">${ICON_HELP}</button>
-        <button class="sm" id="slidesfs">${ICON_FS}<span class="lbl">Full screen</span></button><button class="sm" id="slidesnew">${ICON_EXT}<span class="lbl">New window</span></button></div>
-      ${helpOpen?`<div class="modalbg" id="helpmodal"><div class="modalbox" style="text-align:left"><p><b>Slides pane</b></p><p class="muted" style="margin:0 0 10px">Click inside the slides, then use ← → (or Canva's own arrows) to move between slides. The quiz buttons control the quiz only — they do not change slides.</p><p class="muted" style="margin:0 0 14px">Full screen shows the pane on this screen; New window opens the deck in its own window, which you can drag to the projector.</p><div class="row" style="justify-content:flex-end"><button class="grey sm" id="helpclose">Close</button></div></div></div>`:''}` : '';
-  const candidatesCard = `<div class="card"><h2>Candidates — question ${q}</h2>
-      ${players.length?'':'<p class="muted">Nobody has joined yet. Open the join screen on a second display.</p>'}
-      <div class="players">${players.map(g=>{ const a=cur[g]; let cls='g'; if(a) cls += st.revealed?(a.is_correct?' right':' wrong'):' done';
-        const main = a?(st.revealed||st.locked?a.choice:'✓'):'…'; const sub = a?(st.revealed?`+${a.points} pts · ${(a.elapsed_ms/1000).toFixed(1)} s`:`${(a.elapsed_ms/1000).toFixed(1)} s`):'';
-        return `<div class="${cls}"><span class="x" data-rm="${esc(g)}" title="Remove from session">✕</span>${avatars[g]||''} ${esc(g)}<span class="c">${main}</span><span class="t">${sub}</span></div>`;}).join('')}</div></div>`;
-  const leaderboardCard = `<div class="card"><h2>Leaderboard <span class="muted" style="text-transform:none">(${revealedN} of ${st.total_questions} revealed)</span></h2>
-      ${scores.map(x=>`<div class="bar"><div class="n">${avatars[x.g]||''} ${esc(x.g)}</div><div class="t"><div class="f" style="width:${(x.p/maxP*100).toFixed(0)}%"></div></div><div class="s">${x.p} <small>pts · ${x.c}✓</small></div></div>`).join('')||'<p class="muted">—</p>'}</div>`;
-  const spreadCard = `<div class="card"><h2>Answer spread — question ${q}</h2>
-      <div class="dist">${['A','B','C','D'].map(o=>`<div class="d ${o} ${st.revealed?(o===correct?'correct':'dim'):''}"><b>${dist[o]}</b>${o}</div>`).join('')}</div></div>`;
-  const sessionCard = `<div class="card"><h2>Session</h2>
-      <p class="muted" style="margin-top:0">${esc(st.session_name)} · ${players.length} joined</p>
-      <div class="row" style="display:grid;grid-template-columns:1fr 1fr"><button class="purple sm" id="newround">New round</button><button class="danger sm" id="endsess2" ${st.ended?'disabled':''}>End session</button></div>
-      <p class="muted">New round: same quiz, fresh players and scores (for the next group).</p>
-      <div class="row" style="margin-top:6px"><label class="muted">Jump to question</label><input id="goto" type="number" min="1" max="${st.total_questions}" value="${q}" style="width:70px"><button class="primary sm" id="gotobtn">Go</button></div></div>`;
-  const screensCard = `<div class="card"><h2>Screens</h2>
-      ${[{t:'Join screen',u:joinUrl,win:'quizjoin'},{t:'Leaderboard',u:baseUrl+'board.html',win:'quizboard'}]
-        .map(l=>`<div class="scr"><span class="t">${l.t}</span>
-          <button class="iconbtn" data-open="${l.u}" data-win="${l.win}" data-tip="Open in new window" aria-label="Open ${l.t} in new window">${ICON_EXT}</button>
-          <button class="iconbtn" data-copy="${l.u}" data-tip="Copy link" aria-label="Copy ${l.t} link">${ICON_COPY}</button>
-          <button class="iconbtn" data-showlink="${l.u}" data-tip="Show link" aria-label="Show ${l.t} link">${ICON_LINK}</button></div>`).join('')}
-    </div>
-    ${linkShown?`<div class="modalbg" id="linkmodal" style="z-index:60"><div class="modalbox"><p style="margin-bottom:8px">Link</p><input readonly value="${esc(linkShown)}" style="width:100%;text-align:center" onfocus="this.select()"><div class="row" style="justify-content:center;margin-top:12px"><button class="primary sm" data-copy="${esc(linkShown)}">Copy link</button><button class="grey sm" id="linkclose">Close</button></div></div></div>`:''}`;
-  const backCard = `<div class="card"><a href="#home" style="font-weight:600;text-decoration:none">← Back to My quizzes</a><div class="muted" style="margin-top:4px">The session keeps running.</div></div>`;
 
-  const modal = sessOpen ? `<div class="modalbg" id="sessmodal"><div class="modalbox sess"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>Session &amp; screens</b><button class="iconbtn" id="sessclose" aria-label="Close">✕</button></div>${sessionCard}${screensCard}${backCard}</div></div>` : '';
-  const stats = `${completeCard}${candidatesCard}<div class="stats2">${leaderboardCard}${spreadCard}</div>`;
-  if(showSlides){
-    return `<div class="layout slides">
-      <div class="a-ctrl">${headerCard}</div>
-      <div class="a-slides">${slidePane}</div>
-      <div class="a-side">${stats}</div>
-    </div>${modal}`;
+  // ---- results summary (host only; after reveal)
+  let summary='';
+  if(st.revealed){
+    const sm=L.resultsSummary(players,cur,correct);
+    const opts=['A','B','C','D']; Object.keys(sm.dist).forEach(k=>{ if(!opts.includes(k)) opts.push(k); });
+    summary = `<div class="summary" aria-live="polite">
+      <div><div class="k">Correct answer</div><div class="v ok">${correct?esc(correct):'No key'}</div></div>
+      <div><div class="k">Correct</div><div class="v">${correct?`${sm.right} of ${sm.total} · ${sm.pct}%`:'—'}</div></div>
+      <div><div class="k">Answered</div><div class="v">${sm.answered} of ${sm.total}</div></div>
+      <div><div class="k">Spread</div><div class="dist">${opts.map(o=>`<span class="${o===correct?'hit':''}">${o}: ${sm.dist[o]||0}</span>`).join('')}${sm.total-sm.answered?`<span>No answer: ${sm.total-sm.answered}</span>`:''}</div></div>
+    </div>`;
   }
-  return `<div class="page wide">${headerCard}${stats}</div>${modal}`;
+
+  // ---- C. presentation tools (desktop; the same actions sit in the session menu on mobile)
+  const tools = (embed||hasPip) ? `<div class="sec"><div class="tools">
+      ${embed?`<div class="grp"><label class="toggle ${slidesOn?'on':''}" id="slidestoggle"><input type="checkbox" class="sr" ${slidesOn?'checked':''}><span>Show slides pane</span><span class="sw"></span></label></div>`:''}
+      ${hasPip?`<div class="grp"><label class="toggle ${pipOn?'on':''}" id="piptoggle"><input type="checkbox" class="sr" ${pipOn?'checked':''}><span>Floating remote</span><span class="sw"></span></label></div>`:''}
+    </div></div>` : '';
+
+  const controlPanel = `<div class="card cpanel">${ctx}${qblock}${summary?`<div class="sec">${summary}</div>`:''}${tools}</div>`;
+
+  // ---- slides pane
+  const slidePane = showSlides ? `<div class="slidewrap"><iframe id="slides" src="${esc(embed)}" allow="fullscreen" allowfullscreen loading="lazy" title="Presentation"></iframe></div>
+      <div class="slidebar">
+        <button class="iconbtn" id="slideshelp" aria-label="How the slides pane works">${ICON_HELP}</button>
+        <button class="sm" id="slidesfs">${ICON_FS}<span class="lbl">Full screen</span></button><button class="sm" id="slidesnew">${ICON_EXT}<span class="lbl">New window</span></button></div>
+      ${helpOpen?`<div class="modalbg" id="helpmodal"><div class="modalbox" style="text-align:left" role="dialog" aria-modal="true" aria-label="Slides pane help"><p><b>Slides pane</b></p><p class="muted" style="margin:0 0 10px">Click inside the slides, then use ← → (or Canva's own arrows) to move between slides. The quiz buttons control the quiz only — they do not change slides.</p><p class="muted" style="margin:0 0 14px">Full screen shows the pane on this screen; New window opens the deck in its own window, which you can drag to the projector.</p><div class="row" style="justify-content:flex-end"><button class="grey sm" id="helpclose">Close</button></div></div></div>`:''}` : '';
+
+  // ---- participants
+  const completeCard = complete ? `<div class="complete">
+      <div class="h">🎉 Quiz complete</div>
+      <div class="muted">${esc(st.quiz_title)} · ${esc(st.session_name)} · ${players.length} participants</div>
+      <div class="podium">${[1,0,2].map(i=>scores[i]?`<div class="p${i+1}"><b>${avatars[scores[i].g]||''} ${esc(scores[i].g)}</b><span class="muted">${scores[i].p} pts</span><span class="muted" style="display:block;font-size:11px">${(scores[i].t/1000).toFixed(1)} s total</span></div>`:'').join('')}</div>
+      ${st.ended?'<p class="muted">Participants are seeing their final score and rank.</p>':'<p class="muted">Press <b>Finish &amp; show results</b> to show participants their final score and rank.</p>'}
+    </div>` : '';
+  const chip = (a)=>{
+    if(!a) return st.revealed ? '<span class="chip none">No answer</span>' : '<span class="chip">— <span class="sr">waiting</span></span>';
+    if(st.revealed) return a.is_correct ? `<span class="chip right">✓ ${a.choice}<span class="sr"> correct</span></span>` : `<span class="chip wrong">✕ ${a.choice}<span class="sr"> incorrect</span></span>`;
+    return `<span class="chip done">${st.locked?a.choice:'✓'}<span class="sr"> answered</span></span>`;
+  };
+  const rows = scores.map((x,i)=>{ const a=cur[x.g]; const medal=x.p>0&&i<3?['🥇','🥈','🥉'][i]:null; const key=esc(x.g);
+    const sub = st.ended ? `<span>${x.c} correct</span><span>·</span><span>${(x.t/1000).toFixed(1)} s total</span>`
+      : `${chip(a)}${a?`<span>${(a.elapsed_ms/1000).toFixed(1)} s</span>`:''}${a&&st.revealed?`<span>+${a.points} this question</span>`:''}`;
+    const menu = menuOpen==='row:'+x.g ? `<div class="menu" role="menu" aria-label="Actions for ${key}"><button role="menuitem" class="dang" data-rm="${key}">Remove participant…</button></div>` : '';
+    return `<tr class="${i===0&&x.p>0?'lead':''}" data-key="${key}">
+      <td class="rk">${medal?`<span class="md" aria-label="rank ${i+1}">${medal}</span>`:i+1}</td>
+      <td class="nm"><span class="av" aria-hidden="true">${avatars[x.g]||''}</span><span class="t">${key}</span></td>
+      ${st.ended ? `<td class="num an">${x.c}</td><td class="num tm fin">${(x.t/1000).toFixed(1)} s</td>`
+        : `<td class="an">${chip(a)}</td><td class="num tm">${a?(a.elapsed_ms/1000).toFixed(1)+' s':''}</td><td class="num qp">${a&&st.revealed?(a.points?'+'+a.points:'0'):''}</td>`}
+      <td class="num tot">${x.p}</td>
+      <td class="sub">${sub}</td>
+      <td class="menucell"><div class="mwrap"><button class="rowmenu" data-rowmenu="${key}" aria-label="Actions for ${key}" aria-haspopup="menu" aria-expanded="${menuOpen==='row:'+x.g}">${ICON_DOTS}</button>${menu}</div></td>
+    </tr>`; }).join('');
+  const table = players.length ? `<div class="ptwrap"><table class="ptable"><thead><tr>
+      <th class="rk num">#</th><th>Participant</th>${st.ended?`<th class="num an">Correct</th><th class="num tm fin">Total time</th>`:`<th class="an">Answer</th><th class="num tm">Time</th><th class="num qp">This question</th>`}<th class="num">Total score</th><th class="sub"></th><th class="menucell"><span class="sr">Actions</span></th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`
+    : `<div class="empty">Nobody has joined yet. Open the join screen or share the join link from Session options.</div>`;
+  const partSec = `<div class="sec"><h2>${st.ended?'Final leaderboard':`Participants (${players.length})`} <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">· ${st.ended?`${players.length} participants · ties broken by quicker total time`:`${revealedN} of ${N} revealed`}</span></h2>${table}</div>`;
+  const quizPanel = `<div class="card qcard">${completeCard}${partSec}</div>`;
+
+  if(showSlides) return `<div class="live slides"><div class="a-main">${controlPanel}${slidePane}</div><div class="a-side">${quizPanel}</div></div>`;
+  return `<div class="live">${controlPanel}${quizPanel}</div>`;
 }
 
 // ---------- events ----------
@@ -515,42 +673,53 @@ function bind(){
   app.querySelectorAll('[data-delete]').forEach(b=>b.onclick=async()=>{ const q=quizzes.find(x=>String(x.id)===b.dataset.delete); if(!confirm(`Permanently delete "${q.title}" and its answer key? This cannot be undone.`)) return; const {error}=await sb.rpc('quiz_delete_forever',{p_pin:pin,p_id:+b.dataset.delete}); if(error) return toast(error.message,true); await loadQuizzes(); toast('Deleted'); render(true); });
   // editor
   const readForm=()=>{ editing.title=document.getElementById('e_title').value; editing.embed_url=normalizeEmbed(document.getElementById('e_embed').value); editing.total_questions=+document.getElementById('e_total').value||1; editing.timer_seconds=+document.getElementById('e_timer').value||0; editing.scoring=document.getElementById('e_scoring').value; };
-  ['e_title','e_embed','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el) el.onchange=readForm;});
+  ['e_title','e_embed','e_timer','e_scoring'].forEach(id=>{const el=document.getElementById(id); if(el){ el.onchange=readForm; el.oninput=()=>{ readForm(); app.querySelectorAll('.ed-state').forEach(x=>x.textContent='Unsaved changes'); }; }});
+  on('cancel',()=>{ readForm(); if(JSON.stringify(editing)!==editing0 && !confirm('Discard unsaved changes to this quiz?')) return; go('home'); });
+  window.onbeforeunload = (view==='edit') ? ()=>{ try{readForm();}catch(e){} return JSON.stringify(editing)!==editing0 ? true : undefined; } : null;
   const et=document.getElementById('e_total'); if(et) et.onchange=()=>{ readForm(); render(true); };
   app.querySelectorAll('[data-kq]').forEach(b=>b.onclick=()=>{ readForm(); const i=b.dataset.kq,o=b.dataset.ko; if(editing.answer_key[i]===o) delete editing.answer_key[i]; else editing.answer_key[i]=o; render(true); });
   on('resetkey',()=>{ readForm(); confirmReset=true; render(true); });
   on('resetno',()=>{ confirmReset=false; render(true); });
   const rm=document.getElementById('resetmodal'); if(rm){ rm.onclick=(e)=>{ if(e.target===rm){ confirmReset=false; render(true); } }; document.getElementById('resetno').focus(); }
-  on('resetyes',()=>{ editing.answer_key={}; confirmReset=false; render(true); toast('Answer key cleared — remember to save'); });
-  const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); return null; } const q=await act('save_quiz',editing); editing.id=q.id; const {error:ee}=await sb.rpc('quiz_set_embed',{p_pin:pin,p_id:q.id,p_url:editing.embed_url||''}); if(ee){ toast(ee.message,true); } await loadQuizzes(); toast('Saved'); return q; };
+  on('resetyes',()=>{ editing.answer_key={}; confirmReset=false; render(true); toast('Answer key cleared — not saved yet'); });
+  const save=async()=>{ readForm(); if(!editing.title.trim()){ toast('Give the quiz a name', true); document.getElementById('e_title').focus(); return null; } const q=await act('save_quiz',editing); editing.id=q.id; const {error:ee}=await sb.rpc('quiz_set_embed',{p_pin:pin,p_id:q.id,p_url:editing.embed_url||''}); if(ee){ toast(ee.message,true); } await loadQuizzes(); editing0=JSON.stringify(editing); toast('Saved'); return q; };
   on('save',async()=>{ const q=await save(); if(q) render(true); });
   on('saveplay',async()=>{ const q=await save(); if(!q) return; if(liveActive() && !confirm(`A session of "${st.quiz_title}" is still running. Start this quiz instead?`)) return; await act('play',{id:q.id}); await load(); go('play'); });
   // settings
   on('togglepin',()=>{ pinShown=!pinShown; render(true); });
-  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>window.open(b.dataset.open, b.dataset.win, b.dataset.win==='_blank'?'':'width=1000,height=720'));
-  app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); toast('Link copied'); }catch(e){ const ta=document.createElement('textarea'); ta.value=b.dataset.copy; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Link copied'); } });
-  on('setpin',async()=>{const p=document.getElementById('newpin').value.trim(); await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); toast('PIN changed'); document.getElementById('newpin').value='';});
+  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{ window.open(b.dataset.open, b.dataset.win, b.dataset.win==='_blank'?'':'width=1000,height=720'); if(menuOpen){ menuOpen=null; render(true); } });
+  app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); toast('Link copied'); }catch(e){ const ta=document.createElement('textarea'); ta.value=b.dataset.copy; document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); ta.remove(); toast(ok?'Link copied':'Could not copy — use Show link instead', !ok); } menuOpen=null; render(true); });
+  on('savescoring',async()=>{ const v=id=>+document.getElementById(id).value; await act('set_scoring',{speed_top:v('sc_top'),speed_step:v('sc_step'),speed_min:v('sc_min'),flat_points:v('sc_flat')}); await load(); toast('Scoring rule saved'); });
+  const pf=document.getElementById('pinform'); if(pf) pf.onsubmit=async(e)=>{ e.preventDefault(); const p=document.getElementById('newpin').value.trim(); if(p.length<4){ toast('PIN must be at least 4 characters',true); return; } await act('set_pin',{pin:p}); pin=p; sessionStorage.setItem('quiz_pin',p); toast('PIN changed'); document.getElementById('newpin').value=''; };
   // play
-  on('open',()=>act('open').then(load)); on('lock',()=>act('lock').then(load)); on('reveal',()=>act('reveal').then(load));
-  on('next',()=>act('next').then(load)); on('prev',()=>act('prev').then(load));
-  const end=()=>{ if(confirm('End this session? Candidates will see their final score and rank.')) act('end_session').then(load); };
+  // one in-flight host action at a time (buttons disable while busy)
+  const run=(a,v)=>{ if(busy) return; busy=true; menuOpen=null; render(true); act(a,v).then(load).catch(()=>{}).finally(()=>{ busy=false; render(true); }); };
+  ['open','lock','reveal','next','prev'].forEach(id=>on(id,()=>run(id)));
+  const qs=document.getElementById('qsel'); if(qs) qs.onchange=()=>run('goto',{question:+qs.value});
+  const end=()=>{ menuOpen=null; if(confirm(`End "${st.quiz_title}" now?\n\nAnswers close and every participant sees their final score and rank. The session cannot be reopened; use New round to run this quiz again.`)) run('end_session'); else render(true); };
   on('endsess',end); on('endsess2',end);
-  on('newround',()=>{ if(confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
-  on('gotobtn',()=>act('goto',{question:+document.getElementById('goto').value}).then(load));
-  on('sessbtn',()=>{ sessOpen=true; render(true); });
-  on('slideshelp',()=>{ helpOpen=true; render(true); }); on('helpclose',()=>{ helpOpen=false; render(true); });
-  const hm=document.getElementById('helpmodal'); if(hm) hm.onclick=(e)=>{ if(e.target===hm){ helpOpen=false; render(true); } };
+  on('newround',()=>{ menuOpen=null; if(confirm(`Start a new round of "${st.quiz_title}"?\n\nThis starts a fresh session from question 1. Participants are sent back to the join screen and must rejoin; all scores restart at 0. This round's results stay in the database.`)) run('new_round'); else render(true); });
+  // menus: open/close, Escape, outside click, focus first item
+  const toggleMenu=(id,name)=>on(id,(e)=>{ e.stopPropagation(); menuOpen=menuOpen===name?null:name; render(true); const m=app.querySelector('.menu [role=menuitem]:not(:disabled)'); if(menuOpen&&m) m.focus(); });
+  toggleMenu('sessbtn','sess'); toggleMenu('morebtn','more'); toggleMenu('navbtn','nav');
+  app.querySelectorAll('[data-rowmenu]').forEach(b=>b.onclick=(e)=>{ e.stopPropagation(); const n='row:'+b.dataset.rowmenu; menuOpen=menuOpen===n?null:n; render(true); const m=app.querySelector('.menu [role=menuitem]'); if(menuOpen&&m) m.focus(); });
+  app.querySelectorAll('.menu').forEach(m=>{ m.onclick=(e)=>e.stopPropagation(); m.onkeydown=(e)=>{ const items=[...m.querySelectorAll('[role=menuitem]:not(:disabled)')]; const i=items.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); (items[i+1]||items[0]).focus(); } if(e.key==='ArrowUp'){ e.preventDefault(); (items[i-1]||items[items.length-1]).focus(); } }; });
+  on('logout2',()=>{ sessionStorage.removeItem('quiz_pin'); location.hash=''; location.reload(); });
+  on('m_slides',()=>{ menuOpen=null; slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
+  on('m_pip',()=>{ menuOpen=null; if(pipOn()){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
   app.querySelectorAll('[data-showlink]').forEach(b=>b.onclick=()=>{ linkShown=b.dataset.showlink; render(true); });
   on('linkclose',()=>{ linkShown=''; render(true); });
   const lm=document.getElementById('linkmodal'); if(lm){ lm.onclick=(e)=>{ if(e.target===lm){ linkShown=''; render(true); } }; lm.querySelector('input').select(); }
-  on('piptoggle',()=>{ if(pipWin&&!pipWin.closed){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
-  on('sessclose',()=>{ sessOpen=false; render(true); });
-  const sm=document.getElementById('sessmodal'); if(sm) sm.onclick=(e)=>{ if(e.target===sm){ sessOpen=false; render(true); } };
-  on('slidestoggle',()=>{ slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
+  on('slideshelp',()=>{ helpOpen=true; render(true); }); on('helpclose',()=>{ helpOpen=false; render(true); });
+  const hm=document.getElementById('helpmodal'); if(hm){ hm.onclick=(e)=>{ if(e.target===hm){ helpOpen=false; render(true); } }; const c=document.getElementById('helpclose'); if(c) c.focus(); }
+  on('piptoggle',(e)=>{ e.preventDefault(); if(pipOn()){ pipWin.close(); pipWin=null; render(true); } else openPresenter(); });
+  on('slidestoggle',(e)=>{ e.preventDefault(); slidesOn=!slidesOn; try{localStorage.setItem('quiz_slides',slidesOn?'1':'0');}catch(e){} render(true); });
   on('slidesfs',()=>{ const f=document.getElementById('slides'); if(f&&f.requestFullscreen) f.requestFullscreen(); });
   on('slidesnew',()=>{ const quiz=quizzes.find(x=>x.id===st.quiz_id); if(quiz) window.open(quiz.embed_url,'quizslides'); });
   on('openjoin',()=>window.open(joinUrl,'quizjoin','width=900,height=700'));
-  app.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ if(confirm('Remove "'+x.dataset.rm+'" from this session?')) act('remove_player',{name:x.dataset.rm}).then(load); });
+  app.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ menuOpen=null; const n=x.dataset.rm;
+    if(confirm(`Remove ${n} from this session?\n\nTheir answers and score are taken out of this session's results and they drop off every screen. If they answer another question from the same phone they will reappear with a fresh score.`)) run('remove_player',{name:n}); else render(true); });
   tick();
 }
 
@@ -569,64 +738,68 @@ const PI = {
   power:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>'
 };
 let pipWin=null, pipSig='', pipSess=false;
+const pipOn=()=>!!(pipWin&&!pipWin.closed);
+document.addEventListener('click',()=>{ if(menuOpen){ menuOpen=null; render(true); } });
+document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&!menuOpen){ if(linkShown){ linkShown=''; render(true); } else if(confirmReset){ confirmReset=false; render(true); } else if(helpOpen){ helpOpen=false; render(true); } return; }
+  if(e.key==='Escape'&&menuOpen){ const n=menuOpen; menuOpen=null; render(true); const t=app.querySelector(n==='sess'?'#sessbtn':n==='more'?'#morebtn':n==='nav'?'#navbtn':'[data-rowmenu]'); if(t) t.focus(); } });
 const PIP_CSS = `
+  *{box-sizing:border-box}
+  :focus-visible{outline:2px solid #4f8cff;outline-offset:2px}
   body{margin:0;background:#0f1419;color:#e8edf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;overflow:hidden}
-  .pbar{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;box-sizing:border-box;min-height:100vh}
+  .pbar{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto minmax(0,1fr);grid-template-areas:"top top" "ctl bot" "sum sum" "mid mid";gap:8px;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));height:100vh}
+  .prow.top{grid-area:top} .prow.ctl{grid-area:ctl} .prow.bot{grid-area:bot;align-self:start} .prow.sum{grid-area:sum}
+  .prow.mid{grid-area:mid;min-height:0;overflow-y:auto;overflow-x:hidden;align-content:flex-start}
+  .prow.mid.hscroll{overflow-x:auto}
   .prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .prow .sp{flex:1}
-  .pgrp{display:flex;gap:6px;padding:6px;border:1px solid #2b3642;border-radius:10px;background:#141a21}
-  .pgrp button{width:44px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center}
-  .pgrp button svg{display:block}
-  .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#8d9aa8;user-select:none;white-space:nowrap}
-  .toggle .sw{width:30px;height:18px;border-radius:999px;background:#2b3642;position:relative}
-  .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#8d9aa8}
-  .toggle.on .sw{background:#4f8cff} .toggle.on .sw::after{left:15px;background:#fff}
-  .pq{font-weight:800;font-size:22px;white-space:nowrap} .pq small{font-size:12px;color:#8d9aa8}
-  .ptimer{font-weight:800;font-size:24px;min-width:44px;text-align:center;color:#4f8cff;font-variant-numeric:tabular-nums}
-  .ptimer.low{color:#e74c3c} .ptimer.up{color:#f1c40f;font-size:12px}
-  .pctl{display:flex;gap:6px}
-  button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:0 12px;height:36px;cursor:pointer;background:#2b3642;color:#e8edf2;white-space:nowrap}
-  button:disabled{opacity:.35;cursor:default}
-  .ok{background:#2ecc71;color:#06220f} .warn{background:#f1c40f;color:#2a2400} .orange{background:#e67e22;color:#fff} .magenta{background:#e0409a;color:#fff}
-  .purple{background:#8e5cf6;color:#fff} .danger{background:#e74c3c;color:#fff} .primary{background:#4f8cff;color:#fff}
-  .sm{height:30px;padding:0 10px;font-size:12px}
-  .plb{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-width:0}
-  .chip{display:inline-flex;align-items:center;gap:5px;background:#1a2129;border:1px solid #2b3642;border-radius:999px;padding:3px 9px 3px 7px;white-space:nowrap;font-weight:600}
-  .chip b{color:#f1c40f;font-weight:800} .chip i{font-style:normal;font-size:11px;color:#8d9aa8}
-  .chip.done{border-color:#4f8cff} .chip.right{border-color:#2ecc71} .chip.right i{color:#2ecc71} .chip.wrong{border-color:#e74c3c} .chip.wrong i{color:#ff8a7f}
-  .status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#2b3642;color:#8d9aa8;white-space:nowrap}
-  .status.open{background:#1d2f4d;color:#9cc0ff} .status.revealed{background:#163d2b;color:#2ecc71} .status.locked,.status.timeup{background:#3a3415;color:#f1c40f} .status.ended{background:#4a1f1b;color:#ff8a7f}
-  .modalbg{position:fixed;inset:0;background:rgba(5,8,12,.85);display:flex;align-items:center;justify-content:center;padding:10px}
-  .modalbox{background:#1a2129;border:1px solid #2b3642;border-radius:12px;padding:12px;width:100%;max-width:560px;max-height:95vh;overflow:auto}
-  .modalbox h2{margin:8px 0 6px;font-size:11px;color:#8d9aa8;text-transform:uppercase;letter-spacing:.06em}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap} .muted{color:#8d9aa8;font-size:12px}
-  input{font:inherit;padding:6px;border-radius:6px;border:1px solid #2b3642;background:#0f1419;color:#e8edf2;width:60px}
-  .scr{display:flex;align-items:center;gap:8px;padding:4px 0} .scr .t{flex:1;font-weight:600}
-  .iconbtn{background:transparent;border:1px solid #2b3642;padding:4px 8px;height:auto;color:#8d9aa8} .iconbtn:hover{color:#fff}
-  .closex{margin-left:auto}
-  .pwr{background:#0f1419;color:#8d9aa8;width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid #2b3642;margin-left:auto}
-  .pwr:hover{color:#ff8a7f;border-color:#e74c3c}
-  .prow.top .sp{display:none}
-  .pgrp{flex-wrap:wrap}
-  .plist{display:none}
+  .pq{font-weight:800;font-size:20px;white-space:nowrap} .pq small{font-size:12px;color:#8d9aa8;font-weight:600}
+  .state{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#2b3642;color:#8d9aa8;white-space:nowrap}
+  .state.open{background:#1d2f4d;color:#9cc0ff} .state.revealed{background:#163d2b;color:#2ecc71} .state.locked,.state.timeup{background:#3a3415;color:#f1c40f} .state.ended{background:#4a1f1b;color:#ff8a7f}
+  .cnt2{color:#8d9aa8;font-variant-numeric:tabular-nums}
+  .ptimer{font-weight:800;font-size:22px;min-width:36px;text-align:right;color:#4f8cff;font-variant-numeric:tabular-nums;margin-left:auto}
+  .ptimer.low{color:#e74c3c} .ptimer:empty{display:none}
+  button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:0 12px;height:40px;cursor:pointer;background:#2b3642;color:#e8edf2;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+  button:disabled{opacity:.4;cursor:default}
+  button svg{width:16px;height:16px;flex:none}
+  .pctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .pri{background:#4f8cff;color:#fff;min-width:150px;flex:1 1 auto;font-size:14px}
+  .pri.finish{background:#2ecc71;color:#06220f}
+  .nav{width:44px;padding:0}
+  .quiet{background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-weight:600;height:34px;font-size:12px}
+  .quiet.dang{color:#ff8a7f} .quiet.dang:hover{border-color:#e74c3c}
+  .pgrp.sess{display:flex;gap:6px}
+  .sumbox{display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;padding:6px 10px;border-radius:8px;background:#141a21;border:1px solid #2b3642;font-variant-numeric:tabular-nums}
+  .sumbox b{color:#2ecc71} .sumbox .d{display:flex;gap:4px} .sumbox .d span{padding:1px 6px;border-radius:5px;background:#0f1419} .sumbox .d span.hit{background:#163d2b;color:#2ecc71;font-weight:700}
+  .muted{color:#8d9aa8;font-size:12px}
+  .ctab{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+  .tr{display:grid;grid-template-columns:22px minmax(var(--nmw,0px),1fr) 48px 44px 40px 44px 28px;gap:6px;align-items:center;min-height:40px;padding:2px 0;font-size:13px}
+  .ctab.final .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 32px 56px 0 44px 28px}
+  .ctab.final.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 56px 0 44px 28px}
+  .ctab.final.h2 .tr,.ctab.final.h3 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 0 44px 28px}
+  .ctab.h1 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 44px 40px 44px 28px} .ctab.h1 .tr > :nth-child(3){display:none}
+  .ctab.h2 .tr{grid-template-columns:22px minmax(var(--nmw,0px),1fr) 40px 44px 28px} .ctab.h2 .tr > :nth-child(3),.ctab.h2 .tr > :nth-child(4){display:none}
+  .ctab.h3 .tr{grid-template-columns:20px minmax(var(--nmw,0px),1fr) 44px 28px;gap:4px} .ctab.h3 .tr > :nth-child(3),.ctab.h3 .tr > :nth-child(4),.ctab.h3 .tr > :nth-child(5){display:none}
+  .tr + .tr{border-top:1px solid #2b3642}
+  .tr.th{min-height:0;padding:0 0 4px;font-size:10px;font-weight:600;color:#8d9aa8;text-transform:uppercase;letter-spacing:.04em}
+  .tr .rk{color:#8d9aa8;text-align:right;font-size:12px} .rk .md{font-size:15px;line-height:1}
+  .tr .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+  .tr .c{text-align:center} .tr .n{text-align:right;white-space:nowrap}
+  .tr .tot{font-weight:700} .tr.lead .tot{color:#f1c40f}
+  .ans{height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:3px;font-weight:700;font-size:12px;background:#2b3642;color:#8d9aa8}
+  .ans.done{background:#1d2f4d;color:#9cc0ff} .ans.right{background:#163d2b;color:#2ecc71} .ans.wrong{background:#4a1f1b;color:#ff8a7f} .ans.none{background:transparent;border:1px dashed #2b3642;font-weight:500}
+  .rmx{width:28px;height:28px;padding:0;background:transparent;border:1px solid #2b3642;color:#8d9aa8;font-size:11px;border-radius:8px}
+  .rmx:hover{color:#ff8a7f;border-color:#e74c3c}
+  .fin{font-weight:800;font-size:14px;padding:2px 0 6px}
+  .cnt{color:#8d9aa8;font-size:12px;text-align:right;margin-top:4px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
   @media (max-width:560px){
-    .pbar{gap:10px}
-    .prow.top{justify-content:space-between}
-    .pq{font-size:26px} .ptimer{font-size:30px;min-width:56px}
-    .pgrp{width:100%;gap:6px;padding:6px;flex-wrap:wrap}
-    .pgrp button{min-width:0;height:40px}
-    .pctl #prev,.pctl #next,.pctl #endsess{order:-1;flex:1 1 calc(50% - 3px)}
-    .pctl #open,.pctl #lock,.pctl #reveal{flex:1 1 calc(33.333% - 4px)}
-    .pgrp.sess{width:100%}
-    .pgrp.sess button{flex:1 1 calc(50% - 3px)}
-    .prow.ctl{flex-wrap:wrap}
-    .plb{display:none}
-    .plist{display:flex;flex-direction:column;gap:5px;width:100%}
-    .plist .r{display:flex;align-items:center;gap:8px;background:#1a2129;border:1px solid #2b3642;border-radius:8px;padding:6px 10px;font-weight:600}
-    .plist .r .rk{width:18px;color:#8d9aa8;font-size:12px} .plist .r .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .plist .r b{color:#f1c40f;font-weight:800} .plist .r i{font-style:normal;font-size:12px;color:#8d9aa8;width:16px;text-align:center}
-    .plist .r.done{border-color:#4f8cff} .plist .r.right{border-color:#2ecc71} .plist .r.right i{color:#2ecc71} .plist .r.wrong{border-color:#e74c3c} .plist .r.wrong i{color:#ff8a7f}
-    .plist .cnt{color:#8d9aa8;font-size:12px;text-align:right}
+    .pbar{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto;grid-template-areas:"top" "ctl" "sum" "mid" "bot"}
+    .pctl{width:100%} .pri{height:44px} .nav{height:44px}
+    .pgrp.sess{width:100%} .pgrp.sess button{flex:1 1 0;height:40px}
+  }
+  @media (max-width:300px){ .pri{min-width:0;font-size:13px;padding:0 8px} .nav{width:40px} .quiet{padding:0 8px} }
+  @media (max-height:260px){
+    .pbar{gap:6px;padding:6px 8px} .pq{font-size:16px} .ptimer{font-size:16px} button{height:32px} .pri{height:32px} .nav{height:32px} .quiet{height:28px}
+    .tr{min-height:30px}
   }`;
 
 async function openPresenter(){
@@ -635,7 +808,7 @@ async function openPresenter(){
   try{
     let sz={width:420,height:600}; try{ sz=JSON.parse(localStorage.getItem('quiz_pip_size'))||sz; }catch(e){}
     pipWin = await documentPictureInPicture.requestWindow({width:sz.width,height:sz.height});
-    pipWin.addEventListener('resize',()=>{ try{ localStorage.setItem('quiz_pip_size',JSON.stringify({width:pipWin.innerWidth,height:pipWin.innerHeight})); }catch(e){} });
+    pipWin.addEventListener('resize',()=>{ fitPip(); try{ localStorage.setItem('quiz_pip_size',JSON.stringify({width:pipWin.innerWidth,height:pipWin.innerHeight})); }catch(e){} });
   }catch(e){ toast('Could not open the remote: '+e.message, true); return; }
   const st=pipWin.document.createElement('style'); st.textContent=PIP_CSS; pipWin.document.head.appendChild(st);
   pipWin.document.title='QuizApp remote';
@@ -643,56 +816,59 @@ async function openPresenter(){
   pipSig=''; renderPip(); render(true);
 }
 function presenterBar(){
-  const q=st.current_question, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
+  const L=SessionLogic, q=st.current_question, N=st.total_questions, cur={}; answers.filter(a=>a.question===q).forEach(a=>cur[a.player]=a);
   const r=remaining(), timeUp=r!==null&&r<=0;
-  const status = st.ended?'ended':st.revealed?'revealed':st.locked?(st.question_opened_at?'locked':'waiting'):timeUp?'timeup':'open';
-  const label = {ended:'ENDED',revealed:'REVEALED',locked:'LOCKED',waiting:'WAITING',timeup:'TIME UP',open:'OPEN'}[status];
-  const quiz=quizzes.find(x=>x.id===st.quiz_id); const keyCur=quiz&&quiz.answer_key[q];
-  const canOpen = !st.ended && (!st.question_opened_at || st.locked || timeUp) && !st.revealed;
-  const lastRevealed = st.revealed && q>=st.total_questions;
-  const done = players.filter(g=>cur[g]).length;
-  const chips = scoresFor().map(x=>{ const a=cur[x.g]; const cls=a?(st.revealed?(a.is_correct?'right':'wrong'):'done'):''; const mark=a?(st.revealed||st.locked?a.choice:'✓'):'…';
-    return `<span class="chip ${cls}">${avatars[x.g]||''} ${esc(x.g)} <b>${x.p}</b><i>${mark}</i></span>`; }).join('');
-  const rows = scoresFor().map((x,i)=>{ const a=cur[x.g]; const cls=a?(st.revealed?(a.is_correct?'right':'wrong'):'done'):''; const mark=a?(st.revealed||st.locked?a.choice:'✓'):'…';
-    return `<div class="r ${cls}"><span class="rk">${i+1}</span><span class="nm">${avatars[x.g]||''} ${esc(x.g)}</span><b>${x.p}</b><i>${mark}</i></div>`; }).join('');
-  const bar = `<div class="pbar"><div class="prow top">
-    <div class="pq">Q${q}<small>/${st.total_questions}</small></div>
-    <span class="status ${status}">${label}</span>
+  const status=L.questionStatus(st,timeUp);
+  const quiz=quizzes.find(x=>x.id===st.quiz_id); const keyCur=!!(quiz&&quiz.answer_key[q]);
+  const pri=L.primaryAction(st,keyCur,timeUp), secs=L.secondaryActions(st,keyCur,timeUp);
+  const done=players.filter(g=>cur[g]).length, dis=(x)=>x?'disabled':'';
+  let summary='';
+  if(st.revealed && !st.ended){
+    const sm=L.resultsSummary(players,cur,correct);
+    summary=`<div class="prow sum"><div class="sumbox"><span>Correct <b>${correct?esc(correct):'—'}</b></span><span>${correct?`${sm.right}/${sm.total} · ${sm.pct}%`:'no key'}</span><span class="d">${['A','B','C','D'].map(o=>`<span class="${o===correct?'hit':''}">${o} ${sm.dist[o]||0}</span>`).join('')}</span></div></div>`;
+  }
+  return `<div class="pbar"><div class="prow top">
+    <div class="pq">Q${q}<small> of ${N}</small></div>
+    <span class="state ${status}">${L.STATUS_LABEL[status]}</span>
+    <span class="cnt2">${done}/${players.length} answered</span>
     <div class="ptimer" id="ptimer"></div>
-    <button class="pwr" id="pclosetoggle" title="Close remote">${PI.power}</button>
-    </div><div class="prow ctl">
-    <div class="pgrp pctl">
-      <button id="prev" title="Previous question" ${q<=1||st.ended?'disabled':''}>${PI.prev}</button>
-      <button class="ok" id="open" title="${st.question_opened_at&&!st.revealed?'Restart timer':'Open question'}" ${canOpen?'':'disabled'}>${st.question_opened_at&&!st.revealed?PI.restart:PI.open}</button>
-      <button class="warn" id="lock" title="Lock answers" ${status==='open'?'':'disabled'}>${PI.lock}</button>
-      <button class="orange" id="reveal" title="Reveal answer" ${st.revealed||!keyCur||!st.question_opened_at||st.ended?'disabled':''}>${PI.eye}</button>
-      ${lastRevealed&&!st.ended?`<button class="magenta" id="endsess" title="Finish &amp; show results">${PI.flag}</button>`:`<button id="next" title="Next question" ${q>=st.total_questions||st.ended?'disabled':''}>${PI.next}</button>`}
-    </div>
-    <div class="pgrp sess">
-      <button class="purple" id="newround" title="New round (same quiz, fresh players and scores)">${PI.round}</button>
-      <button class="danger" id="endsess2" title="End session" ${st.ended?'disabled':''}>${PI.stop}</button>
-    </div>
-    <span class="sp"></span>
-  </div>
-  <div class="prow"><div class="plb">${chips||'<span class="muted">No candidates yet</span>'}<span class="muted">${done}/${players.length} answered</span></div>
-  <div class="plist">${rows||'<span class="muted">No candidates yet</span>'}<span class="cnt">${done}/${players.length} answered</span></div></div>
+    </div><div class="prow ctl"><div class="pctl">
+      <button id="prev" class="nav" aria-label="Previous question" title="Previous question" ${dis(q<=1||st.ended||busy)}>${PI.prev}</button>
+      <button id="${pri.id}" class="pri ${pri.id==='endsess'?'finish':''}" ${dis(pri.disabled||busy)} ${pri.reason?`title="${pri.reason}"`:''}>${pri.label}</button>
+      <button id="next" class="nav" aria-label="Next question" title="Next question" ${dis(q>=N||st.ended||busy)}>${PI.next}</button>
+      ${secs.map(a=>`<button id="${a.id}" class="quiet" ${dis(busy)}>${a.label}</button>`).join('')}
+    </div></div>
+  ${summary}
+  <div class="prow mid"><div style="width:100%">${st.ended?'<div class="fin">🎉 Final leaderboard</div>':''}${players.length?candTable(true):'<span class="muted">No candidates yet</span>'}<div class="cnt">${st.ended?'Session ended · ties broken by quicker total time':`${done}/${players.length} answered`}</div></div></div>
+  <div class="prow bot"><div class="pgrp sess">
+      <button class="quiet" id="newround" ${dis(busy)}>${PI.round}New round…</button>
+      <button class="quiet dang" id="endsess2" ${dis(st.ended||busy)}>${PI.stop}End session…</button>
+  </div></div>
   </div>`;
-  return bar;
 }
 function renderPip(){
   if(!pipWin||pipWin.closed||!st) return;
-  const sig=JSON.stringify([st,players,answers,avatars,quizzes.map(x=>[x.id,x.answer_key])]);
+  const sig=JSON.stringify([st,players,answers,avatars,correct,busy,quizzes.map(x=>[x.id,x.answer_key])]);
   if(sig===pipSig) return; pipSig=sig;
   const d=pipWin.document; d.body.innerHTML=presenterBar();
   const on=(id,fn)=>{const el=d.getElementById(id); if(el) el.onclick=fn;};
-  const go=(a,v)=>()=>act(a,v).then(load).catch(()=>{});
-  on('prev',go('prev')); on('open',go('open')); on('lock',go('lock')); on('reveal',go('reveal')); on('next',go('next'));
-  on('endsess',()=>{ if(pipWin.confirm('End this session? Candidates will see their final score and rank.')) act('end_session').then(load); });
-  on('endsess2',()=>{ if(pipWin.confirm('End this session?')) act('end_session').then(load); });
-  on('newround',()=>{ if(pipWin.confirm('Start a new round? Players and scores clear (same quiz).')) act('new_round').then(load); });
-  on('gotobtn',()=>act('goto',{question:+d.getElementById('goto').value}).then(load));
-  on('pclosetoggle',()=>{ pipWin.close(); });
-  tickPip();
+  // same single-flight guard as the main page
+  const run=(a,v)=>{ if(busy) return; busy=true; render(true); act(a,v).then(load).catch(()=>{}).finally(()=>{ busy=false; render(true); }); };
+  ['prev','open','lock','reveal','next'].forEach(id=>on(id,()=>run(id)));
+  const end=()=>{ if(pipWin.confirm(`End "${st.quiz_title}" now?\n\nAnswers close and every participant sees their final score and rank. The session cannot be reopened; use New round to run this quiz again.`)) run('end_session'); };
+  on('endsess',end); on('endsess2',end);
+  on('newround',()=>{ if(pipWin.confirm(`Start a new round of "${st.quiz_title}"?\n\nThis starts a fresh session from question 1. Participants are sent back to the join screen and must rejoin; all scores restart at 0. This round's results stay in the database.`)) run('new_round'); });
+  d.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ const n=x.dataset.rm; if(pipWin.confirm(`Remove ${n} from this session?\n\nTheir answers and score are taken out of this session's results. If they answer another question from the same phone they will reappear with a fresh score.`)) run('remove_player',{name:n}); });
+  tickPip(); fitPip();
+}
+// Remote: keep names whole — size the name column to the longest name, then hide Answer, Time, Q pts (in that order) if the window is too narrow
+function fitPip(){
+  if(!pipWin||pipWin.closed) return; const t=pipWin.document.querySelector('.ctab'); if(!t) return;
+  const mid=t.closest('.prow'); t.classList.remove('h1','h2','h3'); t.style.removeProperty('--nmw');
+  let w=0; t.querySelectorAll('.nm').forEach(n=>w=Math.max(w,n.scrollWidth));
+  t.style.setProperty('--nmw',Math.ceil(w)+'px');
+  for(const c of ['h1','h2','h3']){ if(t.scrollWidth<=t.clientWidth) break; t.classList.add(c); }
+  if(mid) mid.classList.toggle('hscroll', t.scrollWidth>t.clientWidth);   // sideways scroll only when even the short table can't fit
 }
 function tickPip(){
   if(!pipWin||pipWin.closed||!st) return; const el=pipWin.document.getElementById('ptimer'); if(!el) return;
