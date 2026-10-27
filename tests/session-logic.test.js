@@ -15,6 +15,25 @@ test('status follows the quiz_state flags', () => {
   assert.equal(L.questionStatus(st({ ended: true }), false), 'ended');
 });
 
+test('question-numbered labels; Q1 first open is Start quiz', () => {
+  assert.equal(L.primaryAction(st({ current_question: 1 }), true, false).label, 'Start quiz');
+  assert.equal(L.primaryAction(st({ current_question: 1 }), true, false).start, true);
+  assert.equal(L.primaryAction(st({}), true, false).label, 'Open question 3');
+  assert.equal(L.primaryAction(st({ locked: false, question_opened_at: 'x' }), true, false).label, 'Lock Q3 answers');
+  assert.equal(L.primaryAction(st({ question_opened_at: 'x' }), true, false).label, 'Reveal Q3 answer');
+  // reopening Q1 later is not a "start"
+  assert.equal(L.primaryAction(st({ current_question: 1, question_opened_at: 'x' }), true, false).id, 'reveal');
+});
+
+test('countdown state while question_opened_at is in the future', () => {
+  const s = st({ current_question: 1, locked: false, question_opened_at: 'x' });
+  assert.equal(L.questionStatus(s, false, 3.2), 'countdown');
+  const a = L.primaryAction(s, true, false, 3.2);
+  assert.deepEqual([a.label, a.disabled, a.countdown], ['Starts in 4…', true, true]);
+  assert.deepEqual(L.secondaryActions(s, true, false, 3.2), []);
+  assert.equal(L.questionStatus(s, false, 0), 'open');
+});
+
 test('primary action for each state', () => {
   assert.equal(L.primaryAction(st({}), true, false).id, 'open');
   assert.equal(L.primaryAction(st({ locked: false, question_opened_at: 'x' }), true, false).id, 'lock');

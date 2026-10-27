@@ -2,23 +2,28 @@
 // The state comes straight from quiz_state; nothing here changes it.
 (function (root) {
   // Question status, derived from the existing flags
-  function questionStatus(st, timeUp) {
+  // `startsIn` = seconds until question_opened_at (positive while the "Start quiz" countdown runs)
+  function questionStatus(st, timeUp, startsIn) {
     if (st.ended) return 'ended';
     if (st.revealed) return 'revealed';
     if (st.locked) return st.question_opened_at ? 'locked' : 'waiting';
+    if (startsIn > 0) return 'countdown';
     return timeUp ? 'timeup' : 'open';
   }
-  const STATUS_LABEL = { waiting: 'Not opened', open: 'Accepting answers', timeup: 'Time up', locked: 'Answers locked', revealed: 'Answers revealed', ended: 'Session ended' };
+  const STATUS_LABEL = { waiting: 'Not opened', countdown: 'Starting…', open: 'Accepting answers', timeup: 'Time up', locked: 'Answers locked', revealed: 'Answers revealed', ended: 'Session ended' };
+  // The very first open of question 1 is "Start quiz" (and gets the countdown)
+  const isStart = (st) => st.current_question === 1 && !st.question_opened_at && !st.revealed && !st.ended;
 
   // The one thing the host should do next. `hasKey` = an answer key exists for this question.
-  function primaryAction(st, hasKey, timeUp) {
-    const s = questionStatus(st, timeUp), last = st.current_question >= st.total_questions;
+  function primaryAction(st, hasKey, timeUp, startsIn) {
+    const s = questionStatus(st, timeUp, startsIn), q = st.current_question, last = q >= st.total_questions;
     if (s === 'ended') return { id: 'newround', label: 'Start new round', kind: 'secondary' };
-    if (s === 'waiting') return { id: 'open', label: 'Open question', kind: 'primary' };
-    if (s === 'open') return { id: 'lock', label: 'Lock answers', kind: 'primary' };
+    if (s === 'waiting') return isStart(st) ? { id: 'open', label: 'Start quiz', kind: 'primary', start: true } : { id: 'open', label: 'Open question ' + q, kind: 'primary' };
+    if (s === 'countdown') return { id: 'lock', label: 'Starts in ' + Math.ceil(startsIn) + '…', kind: 'primary', disabled: true, countdown: true };
+    if (s === 'open') return { id: 'lock', label: 'Lock Q' + q + ' answers', kind: 'primary' };
     if (s === 'timeup' || s === 'locked') {
-      if (!hasKey) return { id: 'reveal', label: 'Reveal answer', kind: 'primary', disabled: true, reason: 'No answer key for this question' };
-      return { id: 'reveal', label: 'Reveal answer', kind: 'primary' };
+      if (!hasKey) return { id: 'reveal', label: 'Reveal Q' + q + ' answer', kind: 'primary', disabled: true, reason: 'No answer key for this question' };
+      return { id: 'reveal', label: 'Reveal Q' + q + ' answer', kind: 'primary' };
     }
     // revealed
     if (last) return { id: 'endsess', label: 'Finish & show results', kind: 'primary' };
@@ -26,8 +31,9 @@
   }
 
   // Legitimate but secondary actions for the current state
-  function secondaryActions(st, hasKey, timeUp) {
-    const s = questionStatus(st, timeUp), out = [];
+  function secondaryActions(st, hasKey, timeUp, startsIn) {
+    const s = questionStatus(st, timeUp, startsIn), out = [];
+    if (s === 'countdown') return out;
     if (s === 'open' && hasKey) out.push({ id: 'reveal', label: 'Reveal now' });
     if (s === 'open' || s === 'timeup' || s === 'locked') out.push({ id: 'open', label: s === 'open' ? 'Restart timer' : 'Reopen question' });
     return out;
@@ -46,6 +52,7 @@
     return { correct: correct, answered: answered, right: right, total: total, pct: total ? Math.round(100 * right / total) : 0, dist: dist };
   }
 
-  const api = { questionStatus, STATUS_LABEL, primaryAction, secondaryActions, resultsSummary };
+  const START_COUNTDOWN = 5;   // seconds between "Start quiz" and question 1 opening
+  const api = { questionStatus, STATUS_LABEL, primaryAction, secondaryActions, resultsSummary, isStart, START_COUNTDOWN };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.SessionLogic = api;
 })(typeof window !== 'undefined' ? window : globalThis);
